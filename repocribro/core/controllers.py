@@ -1,8 +1,8 @@
-from flask import Blueprint
+import flask
 
-core = Blueprint('core', __name__, url_prefix='/')
+core = flask.Blueprint('core', __name__, url_prefix='/')
 
 
 @core.route('/')
 def index():
-    return "TODO: Landing"
+    return flask.render_template('core/index.html')

@@ -13,11 +13,13 @@ setup(
     author_email='suchama4@fit.cvut.cz',
     license='MIT',
     url='https://github.com/MarekSuchanek/repocribro',
+    zip_safe=False,
     packages=find_packages(),
     package_data={
         'repocribro': [
             'static/*',
-            'templates/*'
+            'templates/*.html',
+            'templates/core/*.html'
         ]
     },
     entry_points={
