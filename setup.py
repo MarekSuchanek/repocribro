@@ -27,6 +27,7 @@ setup(
     },
     install_requires=[
         'Flask>=0.12',
+        'flask-bower',
     ],
     classifiers=[
         'Development Status :: 1 - Planning',

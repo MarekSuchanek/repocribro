@@ -1,7 +1,9 @@
-from flask import Flask
+import flask
+import flask_bower
 from .core.controllers import core
 
-app = Flask(__name__)
+app = flask.Flask(__name__)
+flask_bower.Bower(app)
 
 app.register_blueprint(core)
 # TODO: load all parts
@@ -11,4 +13,5 @@ app.register_blueprint(core)
 def start():
     # TODO: improve CLI for start
     # TODO: load config file(s)
+    app.config['DEBUG'] = True
     app.run()

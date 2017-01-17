@@ -1,0 +1,28 @@
+{
+  "name": "repocribro",
+  "homepage": "https://github.com/MarekSuchanek/repocribro",
+  "authors": [
+    "Marek Suchánek <suchama4@fit.cvut.cz>"
+  ],
+  "description": "Extensible sifting tool for information from GitHub repositories",
+  "main": "",
+  "keywords": [
+    "github",
+    "repositories",
+    "sieve",
+    "projects",
+    "community"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "repocribro/bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "jquery": "^3.1.1",
+    "bootstrap": "^3.3.7"
+  }
+}
