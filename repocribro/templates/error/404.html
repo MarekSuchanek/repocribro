@@ -1,0 +1,11 @@
+{% extends "layout.html" %}
+{% block body %}
+<div class="jumbotron">
+    <h1>Not Found
+        <small>(error 404)</small>
+    </h1>
+    <hr>
+    <p>Hmmm, nothing is here... Check what you are trying to access.</p>
+    <p><a class="btn btn-primary btn-lg" href="{{ url_for('core.index') }}">Go to the start</a></p>
+</div>
+{% endblock %}

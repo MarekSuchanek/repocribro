@@ -1,0 +1,11 @@
+{% extends "layout.html" %}
+{% block body %}
+<div class="jumbotron">
+    <h1>Gone
+        <small>(error 410)</small>
+    </h1>
+    <hr>
+    <p>You are too late. Requested resource was here, but now it's already gone, be faster next time ;)</p>
+    <p><a class="btn btn-primary btn-lg" href="{{ url_for('core.index') }}">Go to the start</a></p>
+</div>
+{% endblock %}
