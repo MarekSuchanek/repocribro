@@ -1,0 +1,27 @@
+{% extends "layout.html" %}
+{% block body %}
+    <h1>{{ username }}</h1>
+
+    <div class="org-info">
+        {# TODO: basic info about organisation #}
+    </div>
+
+    <ul class="nav nav-tabs">
+        <li class="active"><a href="#details" data-toggle="tab">Details</a></li>
+        <li><a href="#repos" data-toggle="tab">Repositories</a></li>
+        {# TODO: more from extensions (possibility #}
+    </ul>
+
+    <div class="tab-content">
+        <div role="tabpanel" class="tab-pane active" id="details">
+            <h2>Details</h2>
+            {# TODO: details about organisation (desc, avatar, join date, links, ...) #}
+        </div>
+        <div role="tabpanel" class="tab-pane" id="repos">
+            <h2>Repositories</h2>
+            {# TODO: filterable table with repositories #}
+        </div>
+        {# TODO: more from extensions (possibility) #}
+    </div>
+    {# TODO: share code with user (same parts) #}
+{% endblock %}
