@@ -28,8 +28,10 @@ setup(
         ],
     },
     install_requires=[
+        'configparser',
         'Flask>=0.12',
         'flask-bower',
+        'requests',
     ],
     classifiers=[
         'Development Status :: 1 - Planning',
