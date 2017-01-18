@@ -46,3 +46,12 @@ def github_callback():
         # TODO: log error
         # TODO: redirect with flash error msg
         return flask.jsonify(response.status_code)
+
+
+@auth.route('/logout')
+def logout():
+    # TODO: store info about user_attrs somewhere else
+    for user_attr in ['github_token', 'github_scope']:
+        flask.session.pop(user_attr, None)
+    # TODO: flash success msg
+    return flask.redirect(flask.url_for('core.index'))
