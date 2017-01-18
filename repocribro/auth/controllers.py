@@ -40,12 +40,13 @@ def github_callback():
         flask.session['github_scope'] = scopes
         # TODO: register/retrieve user (DB)
         # TODO: store user ID in session
-        # TODO: flash success msg
+        flask.flash('You are now logged in via GitHub.', 'success')
         return flask.redirect(flask.url_for('user.dashboard'))
     else:
         # TODO: log error
-        # TODO: redirect with flash error msg
-        return flask.jsonify(response.status_code)
+        flask.flash('Woops, we are not able to authenticate '
+                    'you via GitHub now!', 'danger')
+        return flask.redirect(flask.url_for('core.index'))
 
 
 @auth.route('/logout')
@@ -53,5 +54,5 @@ def logout():
     # TODO: store info about user_attrs somewhere else
     for user_attr in ['github_token', 'github_scope']:
         flask.session.pop(user_attr, None)
-    # TODO: flash success msg
+    flask.flash('You are now logged out, see you soon!', 'info')
     return flask.redirect(flask.url_for('core.index'))

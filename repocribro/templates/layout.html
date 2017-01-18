@@ -11,7 +11,9 @@
     <body>
         <main>
             <div id="content">
-            {% include "header.html" %}
+                {% include "header.html" %}
+
+                {% include "flash.html" %}
 
                 <div class="container">
                     {% block body %}{% endblock %}

@@ -1,0 +1,13 @@
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        <div class="flashes container">
+            {% for category, message in messages %}
+                {# TODO: category to class translation via filter #}
+                <div class="alert alert-{{ category }} alert-dismissable">
+                    <a href="#" class="close" data-dismiss="alert">&times;</a>
+                    <strong>{{ category|capitalize }}</strong>: {{ message }}
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+{% endwith %}
