@@ -13,7 +13,7 @@ def github():
     return flask.redirect(GH_AUTH_URL.format(
         'user:email repo',
         flask.current_app.config['GH_BASIC_CLIENT_ID']
-    ), 302)
+    ))
 
 
 @auth.route('/github/callback')
@@ -23,21 +23,25 @@ def github_callback():
     client_secret = flask.current_app.config['GH_BASIC_CLIENT_SECRET']
     response = requests.post(
         GH_TOKEN_URL,
-        headers = {
+        headers={
             'Accept': 'application/json'
         },
-        data = {
+        data={
             'client_id': client_id,
             'client_secret': client_secret,
             'code': session_code,
         }
     )
     if response.status_code == 200:
-        # TODO: store scopes and token in session
+        data = response.json()
+        token = flask.escape(data['access_token'])
+        scopes = [flask.escape(x) for x in data['scope'].split(',')]
+        flask.session['github_token'] = token
+        flask.session['github_scope'] = scopes
         # TODO: register/retrieve user (DB)
         # TODO: store user ID in session
-        # TODO: redirect with flash success msg
-        return flask.jsonify(response.json())
+        # TODO: flash success msg
+        return flask.redirect(flask.url_for('user.dashboard'))
     else:
         # TODO: log error
         # TODO: redirect with flash error msg

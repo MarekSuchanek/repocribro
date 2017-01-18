@@ -1,0 +1,15 @@
+{% extends "layout.html" %}
+{% block body %}
+
+    <h1>Dashboard</h1>
+
+    <h2>GitHub info</h2>
+    <p>Token: {{ token }}</p>
+
+    <p>Scopes:</p>
+    <ul>
+        {% for scope in scopes %}
+            <li>{{ scope }}</li>
+        {% endfor %}
+    </ul>
+{% endblock %}
