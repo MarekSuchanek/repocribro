@@ -1,0 +1,14 @@
+{% extends "layout.html" %}
+{% block body %}
+
+    <h1>Organizations</h1>
+
+    <p>{{ retval }}</p>
+    <pre>
+    {{ orgs_json }}
+    </pre>
+
+    <p>Do not see your organization? You need to allow access!</p>
+    <p>Review and add your authorized organizations.</p>
+    {# TODO: provide link with GitHub app client_id #}
+{% endblock %}

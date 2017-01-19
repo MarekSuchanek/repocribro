@@ -11,7 +11,7 @@ GH_TOKEN_URL = 'https://github.com/login/oauth/access_token'
 @auth.route('/github')
 def github():
     return flask.redirect(GH_AUTH_URL.format(
-        'user:email repo',
+        'user repo',
         flask.current_app.config['GH_BASIC_CLIENT_ID']
     ))
 
@@ -32,6 +32,7 @@ def github_callback():
             'code': session_code,
         }
     )
+    # TODO: check granted scopes
     if response.status_code == 200:
         data = response.json()
         token = flask.escape(data['access_token'])
