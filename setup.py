@@ -31,6 +31,8 @@ setup(
         'configparser',
         'Flask>=0.12',
         'flask-bower',
+        'flask-migrate',
+        'flask-sqlalchemy',
         'requests',
     ],
     classifiers=[

@@ -1,12 +1,28 @@
 import flask
 import flask_bower
+from flask_migrate import Migrate, MigrateCommand
+from flask_script import Manager
+from flask_sqlalchemy import SQLAlchemy
 import configparser
 from .core import core
 from .auth import auth
 from .user import user
+import os
+
+basedir = os.path.abspath(os.path.dirname(__file__))
 
 app = flask.Flask(__name__)
 flask_bower.Bower(app)
+
+# TODO: db config file
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///repocribro_dev.db'
+db = SQLAlchemy(app)
+migrate = Migrate(app, db)
+# import all models (register classes)
+from .models import *
+
+manager = Manager(app)
+manager.add_command('db', MigrateCommand)
 
 app.register_blueprint(core)
 app.register_blueprint(auth)

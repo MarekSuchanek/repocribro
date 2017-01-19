@@ -96,3 +96,6 @@ config/auth.cfg
 # Bower downloaded dependencies
 # should be installed via setup.py & bower
 repocribro/bower_components
+
+# Dev DB
+repocribro_dev.db
