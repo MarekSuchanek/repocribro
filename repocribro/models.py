@@ -1,5 +1,7 @@
 # TODO: rearrange app structure
-from .repocribro import db
+from flask_sqlalchemy import SQLAlchemy
+
+db = SQLAlchemy()
 
 
 # Example model for Flask-SQLAlchemy
