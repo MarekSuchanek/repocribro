@@ -17,6 +17,7 @@ flask_bower.Bower(app)
 
 # TODO: db config file
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///repocribro_dev.db'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 db.init_app(app)
 migrate = Migrate(app, db)
 
