@@ -3,7 +3,24 @@
 
     <h1>Repositories</h1>
 
-    <pre>
-    {{ repos_json }}
-    </pre>
+    {% for repo in repos %}
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">{{ repo.full_name }}</h3>
+            </div>
+            <div class="panel-body">
+                <p>{{ repo.description }}</p>
+
+                <form>
+                    <input type="hidden" value="{{ repo.github_id }}" name="repo_id">
+                    <div class="btn-group" role="group">
+                        <button type="button" class="btn btn-success">Public</button>
+                        <button type="button" class="btn btn-primary">Hidden</button>
+                        <button type="button" class="btn btn-warning">Private</button>
+                    </div>
+                    <button type="button" class="btn btn-danger disabled">Unused</button>
+                </form>
+            </div>
+        </div>
+    {% endfor %}
 {% endblock %}

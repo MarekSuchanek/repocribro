@@ -2,6 +2,7 @@ import flask
 import flask_login
 import requests
 import json
+from ..models import Repository
 
 user = flask.Blueprint('user', __name__, url_prefix='/user')
 
@@ -32,22 +33,35 @@ def dashboard():
 @user.route('/repos')
 @flask_login.login_required
 def repositories():
-    # TODO: require logged user (decorator?)
     response = requests.get(
         GITHUB_API + '/user/repos',
         params={
             'access_token': flask.session['github_token']
         }
     )
+    user = flask_login.current_user.github_user
     return flask.render_template(
         'user/repos.html',
-        repos_json=json.dumps(
-            response.json(),
-            sort_keys=True,
-            indent=4,
-            separators=(',', ': ')
-        )
+        repos=[Repository.create_from_dict(d, user) for d in response.json()]
     )
+
+
+@user.route('/repos/activate', methods=['POST'])
+@flask_login.login_required
+def repository_activate():
+    repo_id = flask.request.form.get('repo_id')
+    # TODO retrieve repository
+    # TODO check if owner / have access
+    # TODO register repository
+
+
+@user.route('/repos/deactivate', methods=['POST'])
+@flask_login.login_required
+def repository_deactivate():
+    repo_id = flask.request.form.get('repo_id')
+    # TODO retrieve repository
+    # TODO check if owner / have access
+    # TODO unregister repository
 
 
 @user.route('/orgs')
