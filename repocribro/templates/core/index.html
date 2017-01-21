@@ -8,9 +8,13 @@
     {# TODO: logo, more info #}
     {# TODO: search, login (get started) options #}
     <p class="buttons">
-        <a class="btn btn-primary btn-lg" href="{{ url_for('core.search') }}">Take a look</a>
+        <a class="btn btn-primary btn-lg" href="{{ url_for('core.search') }}">
+            <span class="octicon octicon-search"></span> Take a look
+        </a>
          or
-        <a class="btn btn-success btn-lg" href="{{ url_for('auth.github') }}">Join now</a>
+        <a class="btn btn-success btn-lg" href="{{ url_for('auth.github') }}">
+            <span class="octicon octicon-mark-github"></span> Join now
+        </a>
     </p>
 </div>
 {% endblock %}

@@ -15,9 +15,9 @@
                 {% if current_user.is_authenticated %}
                     <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                            <span class="glyphicon glyphicon-user"></span> 
+                            <span class="octicon octicon-person"></span>
                             <strong>{{ current_user.github_user.login }}</strong>
-                            <span class="glyphicon glyphicon-chevron-down"></span>
+                            <span class="octicon octicon-chevron-down"></span>
                         </a>
                         <ul class="dropdown-menu">
                             <li><a href="{{ url_for('user.dashboard') }}">Dashboard</a></li>
@@ -28,8 +28,11 @@
                         </ul>
                     </li>
                 {% else %}
-                    {# TODO: GitHub icon (like glyphicon) #}
-                    <li><a href="{{ url_for('auth.github') }}">Login via GitHub</a></li>
+                    <li>
+                        <a href="{{ url_for('auth.github') }}">
+                            <span class="octicon octicon-mark-github"></span> Login via GitHub
+                        </a>
+                    </li>
                 {% endif %}
             </ul>
         </div><!--/.nav-collapse -->
