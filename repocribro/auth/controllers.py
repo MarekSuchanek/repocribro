@@ -1,6 +1,8 @@
 import flask
+import flask_login
 import requests
 from ..models import User, UserAccount, db
+from ..extensions import login_manager
 
 auth = flask.Blueprint('auth', __name__, url_prefix='/auth')
 
@@ -8,6 +10,16 @@ auth = flask.Blueprint('auth', __name__, url_prefix='/auth')
 GH_API = 'https://api.github.com'
 GH_AUTH_URL = 'https://github.com/login/oauth/authorize?scope={}&client_id={}'
 GH_TOKEN_URL = 'https://github.com/login/oauth/access_token'
+
+
+@login_manager.unauthorized_handler
+def unauthorized():
+    flask.abort(403)
+
+
+@login_manager.user_loader
+def load_user(user_id):
+    return UserAccount.query.get(int(user_id))
 
 
 @auth.route('/github')
@@ -61,7 +73,7 @@ def github_callback():
         flask.session['github_token'] = token
         flask.session['github_scope'] = scopes
         user_account, is_new = github_callback_get_account()
-        flask.session['account_id'] = user_account.id
+        flask_login.login_user(user_account)
         if is_new:
             flask.flash('You account has been created via GitHub.'
                         'Welcome in repocribro!', 'success')
@@ -77,6 +89,7 @@ def github_callback():
 
 @auth.route('/logout')
 def logout():
+    flask_login.logout_user()
     # TODO: store info about user_attrs somewhere else
     for user_attr in ['github_token', 'github_scope']:
         flask.session.pop(user_attr, None)

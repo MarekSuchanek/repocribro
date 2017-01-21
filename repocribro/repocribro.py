@@ -8,6 +8,7 @@ from .auth import auth
 from .user import user
 from .models import db
 import os
+from .extensions import login_manager
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 
@@ -20,6 +21,8 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///repocribro_dev.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 db.init_app(app)
 migrate = Migrate(app, db)
+
+login_manager.init_app(app)
 
 manager = Manager(app)
 manager.add_command('db', MigrateCommand)

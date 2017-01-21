@@ -31,6 +31,7 @@ setup(
         'configparser',
         'Flask>=0.12',
         'flask-bower',
+        'flask-login',
         'flask-migrate',
         'flask-sqlalchemy',
         'requests',

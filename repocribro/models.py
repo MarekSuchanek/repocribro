@@ -1,12 +1,13 @@
 # TODO: rearrange app structure
 from flask_sqlalchemy import SQLAlchemy
+import flask_login
 import datetime
 
 db = SQLAlchemy()
 
 
 # Example model for Flask-SQLAlchemy
-class UserAccount(db.Model):
+class UserAccount(db.Model, flask_login.UserMixin):
     """UserAccount in the repocribro app"""
     __tablename__ = 'UserAccount'
     id = db.Column(db.Integer, primary_key=True)

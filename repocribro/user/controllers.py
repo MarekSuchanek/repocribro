@@ -1,4 +1,5 @@
 import flask
+import flask_login
 import requests
 import json
 
@@ -8,8 +9,8 @@ GITHUB_API = 'https://api.github.com'
 
 
 @user.route('/dashboard')
+@flask_login.login_required
 def dashboard():
-    # TODO: require logged user (decorator?)
     response = requests.get(
         GITHUB_API + '/user',
         params={'access_token': flask.session['github_token']}
@@ -18,6 +19,7 @@ def dashboard():
         'user/dashboard.html',
         token=flask.session['github_token'],
         scopes=flask.session['github_scope'],
+        user=flask_login.current_user,
         user_json=json.dumps(
             response.json(),
             sort_keys=True,
@@ -28,6 +30,7 @@ def dashboard():
 
 
 @user.route('/repos')
+@flask_login.login_required
 def repositories():
     # TODO: require logged user (decorator?)
     response = requests.get(
@@ -48,6 +51,7 @@ def repositories():
 
 
 @user.route('/orgs')
+@flask_login.login_required
 def organizations():
     # TODO: require logged user (decorator?)
     response = requests.get(
