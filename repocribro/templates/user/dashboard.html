@@ -5,20 +5,29 @@
     <h1>Dashboard</h1>
 
     <ul class="nav nav-tabs">
-        <li class="active"><a href="#repositories" data-toggle="tab"><span class="octicon octicon-repo"></span>
-            Repositories</a></li>
-        <li><a href="#profile" data-toggle="tab"><span class="octicon octicon-person"></span> Profile</a></li>
-        <li><a href="#session" data-toggle="tab"><span class="octicon octicon-mark-github"></span> Session</a></li>
+        <li{% if tab == 'repos' %} class="active"{% endif %}>
+            <a href="#repos" data-toggle="tab">
+                <span class="octicon octicon-repo"></span> Repositories</a>
+        </li>
+        <li{% if tab == 'profile' %} class="active"{% endif %}>
+            <a href="#profile" data-toggle="tab">
+                <span class="octicon octicon-person"></span> Profile
+            </a>
+        </li>
+        <li{% if tab == 'session' %} class="active"{% endif %}>
+            <a href="#session" data-toggle="tab">
+                <span class="octicon octicon-mark-github"></span> Session</a>
+        </li>
         {# TODO: more from extensions (possibility #}
     </ul>
 
     <div class="tab-content">
-        <div role="tabpanel" class="tab-pane active" id="repositories">
+        <div class="tab-pane{% if tab == 'repos' %} active{% endif %}" id="repos">
             <h2>Repositories</h2>
             {# TODO: list of registered repositories #}
             {# TODO: button link to add more repos #}
         </div>
-        <div role="tabpanel" class="tab-pane" id="profile">
+        <div class="tab-pane{% if tab == 'profile' %} active{% endif %}" id="profile">
             <h2>Profile</h2>
 
             <div class="row">
@@ -56,6 +65,10 @@
                             <td>{{ gh_user.blog_url }}</td>
                         </tr>
                         <tr>
+                            <th>Hireable</th>
+                            <td>{{ gh_user.hireable }}</td>
+                        </tr>
+                        <tr>
                             <th>Bio</th>
                             <td>{{ gh_user.description }}</td>
                         </tr>
@@ -69,7 +82,7 @@
             </div>
 
         </div>
-        <div role="tabpanel" class="tab-pane" id="session">
+        <div class="tab-pane{% if tab == 'session' %} active{% endif %}" id="session">
             <h2>GitHub session</h2>
             <div class="row">
                 <div class="col-lg-6">

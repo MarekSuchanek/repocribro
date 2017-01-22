@@ -2,7 +2,7 @@ import flask
 import flask_login
 import requests
 import json
-from ..models import Repository
+from ..models import Repository, db
 
 user = flask.Blueprint('user', __name__, url_prefix='/user')
 
@@ -12,28 +12,26 @@ GITHUB_API = 'https://api.github.com'
 @user.route('')
 @flask_login.login_required
 def dashboard():
-    response = requests.get(
-        GITHUB_API + '/user',
-        params={'access_token': flask.session['github_token']}
-    )
+    tab = flask.request.args.get('tab', default='repos')
     return flask.render_template(
         'user/dashboard.html',
+        tab=tab,
         token=flask.session['github_token'],
-        scopes=flask.session['github_scope'],
-        user=flask_login.current_user,
-        user_json=json.dumps(
-            response.json(),
-            sort_keys=True,
-            indent=4,
-            separators=(',', ': ')
-        )
+        scopes=flask.session['github_scope']
     )
 
 
 @user.route('/profile/update')
 def update_profile():
-    # TODO: update profile from github
-    return flask.redirect(flask.url_for('dashboard'))
+    # TODO: protect from updating too often
+    response = requests.get(
+        GITHUB_API + '/user',
+        params={'access_token': flask.session['github_token']}
+    )
+    gh_user = flask_login.current_user.github_user
+    gh_user.update_from_dict(response.json())
+    db.session.commit()
+    return flask.redirect(flask.url_for('user.dashboard', tab='profile'))
 
 
 @user.route('/repos')

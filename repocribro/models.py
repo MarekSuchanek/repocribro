@@ -70,6 +70,17 @@ class User(RepositoryOwner):
         self.hireable = hireable
         self.user_account = user_account
 
+    def update_from_dict(self, user_dict):
+        self.login = user_dict['login']
+        self.email = user_dict['email']
+        self.name = user_dict['name']
+        self.company = user_dict['company']
+        self.location = user_dict['location']
+        self.description = user_dict['bio']
+        self.blog_url = user_dict['blog']
+        self.avatar_url = user_dict['avatar_url']
+        self.hireable = user_dict['hireable']
+
     @staticmethod
     def create_from_dict(user_dict, user_account):
         return User(
