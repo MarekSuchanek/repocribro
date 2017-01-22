@@ -30,5 +30,6 @@
         <script src="{{ url_for('bower.static', filename='jquery/dist/jquery.js') }}"></script>
         <script src="{{ url_for('bower.static', filename='bootstrap/dist/js/bootstrap.js') }}"></script>
         <script src="{{ url_for('static', filename='script.js') }}"></script>
+        {% block scripts %}{% endblock %}
     </body>
 </html>

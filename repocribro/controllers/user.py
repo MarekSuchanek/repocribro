@@ -9,7 +9,7 @@ user = flask.Blueprint('user', __name__, url_prefix='/user')
 GITHUB_API = 'https://api.github.com'
 
 
-@user.route('/dashboard')
+@user.route('')
 @flask_login.login_required
 def dashboard():
     response = requests.get(
@@ -28,6 +28,12 @@ def dashboard():
             separators=(',', ': ')
         )
     )
+
+
+@user.route('/profile/update')
+def update_profile():
+    # TODO: update profile from github
+    return flask.redirect(flask.url_for('dashboard'))
 
 
 @user.route('/repos')
