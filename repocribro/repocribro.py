@@ -38,11 +38,12 @@ def create_app():
 
 
 def init_controllers(app):
-    from .controllers import auth, core, errors, user
+    from .controllers import auth, core, errors, user, webhooks
     app.register_blueprint(auth)
     app.register_blueprint(core)
     app.register_blueprint(errors)
     app.register_blueprint(user)
+    app.register_blueprint(webhooks)
 
 
 app = create_app()
