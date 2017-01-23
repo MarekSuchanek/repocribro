@@ -34,6 +34,7 @@ setup(
         'flask-login',
         'flask-migrate',
         'flask-sqlalchemy',
+        'jinja2',
         'requests',
     ],
     classifiers=[

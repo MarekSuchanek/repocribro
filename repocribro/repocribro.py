@@ -29,6 +29,7 @@ def create_app():
 
     # TODO: load config file(s), make config class (defaults)
     app.config['DEBUG'] = True # TODO: from config
+    app.config['TEMPLATES_AUTO_RELOAD'] = True
     app.config['GH_BASIC_CLIENT_ID'] = cfg['github']['client_id']
     app.config['GH_BASIC_CLIENT_SECRET'] = cfg['github']['client_secret']
     app.secret_key = cfg['flask']['secret_key']

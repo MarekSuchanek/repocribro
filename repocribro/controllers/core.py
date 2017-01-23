@@ -1,5 +1,6 @@
 import flask
 from ..models import User, Organization, Repository
+from ..helpers import ViewTab
 
 core = flask.Blueprint('core', __name__, url_prefix='')
 
@@ -30,13 +31,28 @@ def user_detail(login):
         flask.flash('Oy! You wanted to access user, but it\'s an organization.'
                     'We redirected you but be careful next time!', 'notice')
         return flask.redirect(flask.url_for('core.org', login=login))
+
     # TODO: gather & prepare tabs & pass to template
-    return flask.render_template('core/user.html', user=user)
+    tabs = [
+        ViewTab(
+            'details', 'Details', 0,
+            flask.render_template('core/user/details_tab.html', user=user)
+        ),
+        ViewTab(
+            'repositories', 'Repositories', 1,
+            flask.render_template('core/user/repositories_tab.html', user=user)
+        ),
+    ]
+
+    return flask.render_template(
+        'core/user.html', user=user, tabs=tabs,
+        active_tab=flask.request.args.get('tab', 'details')
+    )
 
 
 @core.route('/org/<login>')
 def org_detail(login):
-    org = Organization.query.filter_by(login=login).first()
+    org = User.query.filter_by(login=login).first()
     if org is None:
         is_user = User.query.filter_by(login=login).exists()
         if is_user:
@@ -45,8 +61,23 @@ def org_detail(login):
             flask.abort(404)
         flask.flash('Oy! You wanted to access organization, but it\'s  auser.'
                     'We redirected you but be careful next time!', 'notice')
+
     # TODO: gather & prepare tabs & pass to template
-    return flask.render_template('core/org.html', login=login)
+    tabs = [
+        ViewTab(
+            'details', 'Details', 0,
+            flask.render_template('core/org/details_tab.html', org=org)
+        ),
+        ViewTab(
+            'repositories', 'Repositories', 1,
+            flask.render_template('core/org/repositories_tab.html', org=org)
+        ),
+    ]
+
+    return flask.render_template(
+        'core/org.html', org=org, tabs=tabs,
+        active_tab=flask.request.args.get('tab', 'details')
+    )
 
 
 @core.route('/repo/<login>')
@@ -68,5 +99,24 @@ def repo_detail(login, reponame):
         # TODO: implement 410 (repo deleted/archived)
         # TODO: repository renaming
         flask.abort(404)
-    # TODO: gather & prepare tabs & pass to template
-    return flask.render_template('core/repo.html', repo=repo)
+
+    # TODO: gather & prepare tabs
+    tabs = [
+        ViewTab(
+            'details', 'Details', 0,
+            flask.render_template('core/repo/details_tab.html', repo=repo)
+        ),
+        ViewTab(
+            'releases', 'Releases', 1,
+            flask.render_template('core/repo/releases_tab.html', repo=repo)
+        ),
+        ViewTab(
+            'updates', 'Updates', 2,
+            flask.render_template('core/repo/updates_tab.html', repo=repo)
+        ),
+    ]
+
+    return flask.render_template(
+        'core/repo.html', repo=repo, tabs=tabs,
+        active_tab=flask.request.args.get('tab', 'details')
+    )

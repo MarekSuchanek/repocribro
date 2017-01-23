@@ -1,0 +1,20 @@
+{% macro tabzone(tabs, active_tab) -%}
+    {% if not active_tab %}
+        {% set active_tab = tabs[0].id if tabs|length > 0 else '' %}
+    {% endif %}
+    <ul class="nav nav-tabs">
+        {% for tab in tabs %}
+            <li{% if tab.id == active_tab %} class="active"{% endif %}>
+                <a href="#{{ tab.id }}" data-toggle="tab">{{ tab.name }}</a>
+            </li>
+        {% endfor %}
+    </ul>
+
+    <div class="tab-content">
+        {% for tab in tabs %}
+            <div class="tab-pane {% if tab.id == active_tab %} active{% endif %}" id="{{ tab.id }}">
+                {{ tab.content }}
+            </div>
+        {% endfor %}
+    </div>
+{%- endmacro %}
