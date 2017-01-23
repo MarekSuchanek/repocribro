@@ -1,28 +1,7 @@
 {% extends "layout.html" %}
+{% from "macros/tabs.html" import tabzone without context %}
 {% block body %}
     <h1>{{ repo.full_name }} <small>&laquo;repository&raquo;</small></h1>
 
-
-    <ul class="nav nav-tabs">
-        <li class="active"><a href="#details" data-toggle="tab">Details</a></li>
-        <li><a href="#releases" data-toggle="tab">Releases</a></li>
-        <li><a href="#updates" data-toggle="tab">Updates</a></li>
-        {# TODO: more from extensions (possibility #}
-    </ul>
-
-    <div class="tab-content">
-        <div role="tabpanel" class="tab-pane active" id="details">
-            <h2>Details</h2>
-            {# TODO: details about user (bio, avatar, join date, links, ...) #}
-        </div>
-        <div role="tabpanel" class="tab-pane" id="releases">
-            <h2>Releases</h2>
-            {# TODO: releases list #}
-        </div>
-        <div role="tabpanel" class="tab-pane" id="updates">
-            <h2>Updates</h2>
-            {# TODO: filterable table with pushes (and commits) #}
-        </div>
-        {# TODO: more from extensions (possibility) #}
-    </div>
+    {{ tabzone(tabs, active_tab) }}
 {% endblock %}

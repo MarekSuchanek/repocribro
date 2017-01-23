@@ -5,7 +5,9 @@
     <ul class="nav nav-tabs">
         {% for tab in tabs %}
             <li{% if tab.id == active_tab %} class="active"{% endif %}>
-                <a href="#{{ tab.id }}" data-toggle="tab">{{ tab.name }}</a>
+                <a href="#{{ tab.id }}" data-toggle="tab">
+                    {% if tab.octicon %}<span class="octicon octicon-{{ tab.octicon }}"></span>{% endif %} {{ tab.name }}
+                </a>
             </li>
         {% endfor %}
     </ul>

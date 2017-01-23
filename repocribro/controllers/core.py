@@ -37,11 +37,13 @@ def user_detail(login):
     tabs = [
         ViewTab(
             'details', 'Details', 0,
-            flask.render_template('core/user/details_tab.html', user=user)
+            flask.render_template('core/user/details_tab.html', user=user),
+            octicon='user'
         ),
         ViewTab(
             'repositories', 'Repositories', 1,
-            flask.render_template('core/user/repositories_tab.html', user=user)
+            flask.render_template('core/user/repositories_tab.html', user=user),
+            octicon='repo'
         ),
     ]
 
@@ -67,11 +69,13 @@ def org_detail(login):
     tabs = [
         ViewTab(
             'details', 'Details', 0,
-            flask.render_template('core/org/details_tab.html', org=org)
+            flask.render_template('core/org/details_tab.html', org=org),
+            octicon='organization'
         ),
         ViewTab(
             'repositories', 'Repositories', 1,
-            flask.render_template('core/org/repositories_tab.html', org=org)
+            flask.render_template('core/org/repositories_tab.html', org=org),
+            octicon='repo'
         ),
     ]
 
@@ -105,15 +109,18 @@ def repo_detail(login, reponame):
     tabs = [
         ViewTab(
             'details', 'Details', 0,
-            flask.render_template('core/repo/details_tab.html', repo=repo)
+            flask.render_template('core/repo/details_tab.html', repo=repo),
+            octicon='repo'
         ),
         ViewTab(
             'releases', 'Releases', 1,
-            flask.render_template('core/repo/releases_tab.html', repo=repo)
+            flask.render_template('core/repo/releases_tab.html', repo=repo),
+            octicon='tag'
         ),
         ViewTab(
             'updates', 'Updates', 2,
-            flask.render_template('core/repo/updates_tab.html', repo=repo)
+            flask.render_template('core/repo/updates_tab.html', repo=repo),
+            octicon='git-commit'
         ),
     ]
 
@@ -139,15 +146,18 @@ def repo_detail_hidden(secret):
     tabs = [
         ViewTab(
             'details', 'Details', 0,
-            flask.render_template('core/repo/details_tab.html', repo=repo)
+            flask.render_template('core/repo/details_tab.html', repo=repo),
+            octicon='repo'
         ),
         ViewTab(
             'releases', 'Releases', 1,
-            flask.render_template('core/repo/releases_tab.html', repo=repo)
+            flask.render_template('core/repo/releases_tab.html', repo=repo),
+            octicon='tag'
         ),
         ViewTab(
             'updates', 'Updates', 2,
-            flask.render_template('core/repo/updates_tab.html', repo=repo)
+            flask.render_template('core/repo/updates_tab.html', repo=repo),
+            octicon='git-commit'
         ),
     ]
 
