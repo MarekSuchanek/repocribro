@@ -1,4 +1,5 @@
 import flask
+import flask_login
 from ..models import User, Organization, Repository
 from ..helpers import ViewTab
 
@@ -92,12 +93,46 @@ def repo_detail(login, reponame):
     repo = Repository.query.filter_by(
         full_name='{}/{}'.format(login, reponame),
     ).first()
-    if not repo.is_public():
-        # TODO: 404 or 410 (if were public in the past)?
-        flask.abort(404)
     if repo is None:
         # TODO: implement 410 (repo deleted/archived)
         # TODO: repository renaming
+        flask.abort(404)
+    if not repo.is_public() and repo.user != flask_login.current_user:
+        # TODO: 404 or 410 (if were public in the past)?
+        flask.abort(404)
+
+    # TODO: gather & prepare tabs
+    tabs = [
+        ViewTab(
+            'details', 'Details', 0,
+            flask.render_template('core/repo/details_tab.html', repo=repo)
+        ),
+        ViewTab(
+            'releases', 'Releases', 1,
+            flask.render_template('core/repo/releases_tab.html', repo=repo)
+        ),
+        ViewTab(
+            'updates', 'Updates', 2,
+            flask.render_template('core/repo/updates_tab.html', repo=repo)
+        ),
+    ]
+
+    return flask.render_template(
+        'core/repo.html', repo=repo, tabs=tabs,
+        active_tab=flask.request.args.get('tab', 'details')
+    )
+
+
+# TODO: DRY (similar to repo_detail)
+@core.route('/hidden-repo/<secret>')
+def repo_detail_hidden(secret):
+    repo = Repository.query.filter_by(secret=secret).first()
+    if repo is None:
+        # TODO: implement 410 (repo deleted/archived)
+        # TODO: repository renaming
+        flask.abort(404)
+    if not repo.is_hidden():
+        # TODO: 404 or 410 (if were hidden in the past)?
         flask.abort(404)
 
     # TODO: gather & prepare tabs
