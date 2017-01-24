@@ -6,10 +6,22 @@ import datetime
 db = SQLAlchemy()
 
 
+class SearchableMixin:
+    __searchable__ = []
+
+    @classmethod
+    def fulltext_query(cls, query):
+        query_parts = []
+        for col in cls.__searchable__:
+            query_parts.append('\'{}\' LIKE \'%{}%\''.format(col, query))
+        return ' OR '.join(query_parts)
+
+
 # Example model for Flask-SQLAlchemy
-class UserAccount(db.Model, flask_login.UserMixin):
+class UserAccount(db.Model, flask_login.UserMixin, SearchableMixin):
     """UserAccount in the repocribro app"""
     __tablename__ = 'UserAccount'
+
     id = db.Column(db.Integer, primary_key=True)
     created_at = db.Column(db.DateTime, default=datetime.datetime.now())
     github_user = db.relationship(
@@ -27,9 +39,12 @@ class UserAccount(db.Model, flask_login.UserMixin):
         return '<UserAccount {}>'.format(id)
 
 
-class RepositoryOwner(db.Model):
+class RepositoryOwner(db.Model, SearchableMixin):
     """RepositoryOwner (User or Organization) from GitHub"""
     __tablename__ = 'RepositoryOwner'
+    __searchable__ = ['login', 'email', 'name', 'company',
+                      'description', 'location']
+
     id = db.Column(db.Integer, primary_key=True)
     github_id = db.Column(db.Integer, unique=True)
     login = db.Column(db.String(40), unique=True)
@@ -143,9 +158,11 @@ class Organization(RepositoryOwner):
     }
 
 
-class Repository(db.Model):
+class Repository(db.Model, SearchableMixin):
     """Repository from GitHub"""
     __tablename__ = 'Repository'
+    __searchable__ = ['full_name', 'languages', 'description']
+
     id = db.Column(db.Integer, primary_key=True)
     github_id = db.Column(db.Integer, unique=True)
     fork_of = db.Column(db.Integer)
@@ -213,9 +230,12 @@ class Repository(db.Model):
         return '<GH Repository {} ({})>'.format(self.full_name, self.github_id)
 
 
-class Push(db.Model):
+class Push(db.Model, SearchableMixin):
     """Push from GitHub"""
     __tablename__ = 'Push'
+    __searchable__ = ['after', 'before', 'sender_login', 'pusher_name',
+                      'pusher_email']
+
     id = db.Column(db.Integer, primary_key=True)
     after = db.Column(db.Integer)
     before = db.Column(db.Integer)
@@ -247,9 +267,13 @@ class Push(db.Model):
         return '<GH Push {}-{}>'.format(self.before[0:7], self.after[0:7])
 
 
-class Commit(db.Model):
+class Commit(db.Model, SearchableMixin):
     """Commit from GitHub"""
     __tablename__ = 'Commit'
+    __searchable__ = ['sha', 'message', 'tree_sha',
+                      'author_name', 'author_name', 'author_login',
+                      'committer_name', 'committer_email', 'committer_login']
+
     id = db.Column(db.Integer, primary_key=True)
     sha = db.Column(db.String(40))
     tree_sha = db.Column(db.String(40))
@@ -285,9 +309,12 @@ class Commit(db.Model):
         return '<GH Commit {}>'.format(self.sha[0:7])
 
 
-class Release(db.Model):
+class Release(db.Model, SearchableMixin):
     """Release from GitHub"""
     __tablename__ = 'Release'
+    __searchable__ = ['tag_name', 'name', 'body',
+                      'author_login', 'sender_login']
+
     id = db.Column(db.Integer, primary_key=True)
     github_id = db.Column(db.Integer())
     tag_name = db.Column(db.String(255))
