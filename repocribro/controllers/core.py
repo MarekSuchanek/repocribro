@@ -1,6 +1,6 @@
 import flask
 import flask_login
-from ..models import User, Organization, Repository
+from ..models import User, Organization, Repository, db
 from ..helpers import ViewTab, Badge
 
 core = flask.Blueprint('core', __name__, url_prefix='')
@@ -13,9 +13,35 @@ def index():
 
 @core.route('/search')
 @core.route('/search/<query>')
-def search(query=None):
-    # TODO: do query in DB and send results to view
-    return flask.render_template('core/search.html')
+def search(query=''):
+    # TODO: more attrs
+    users = User.fulltext_query(query).all()
+    orgs = Organization.fulltext_query(query).all()
+    repos = Repository.fulltext_query(query).all()
+
+    # TODO: gather & prepare tabs & pass to template
+    tabs = [
+        ViewTab(
+            'repositories', 'Repositories', 0,
+            flask.render_template('core/search/repos_tab.html', repos=repos),
+            octicon='repo', badge=Badge(len(repos))
+        ),
+        ViewTab(
+            'users', 'Users', 1,
+            flask.render_template('core/search/users_tab.html', users=users),
+            octicon='person', badge=Badge(len(users))
+        ),
+        ViewTab(
+            'orgs', 'Organizations', 2,
+            flask.render_template('core/search/orgs_tab.html', orgs=orgs),
+            octicon='organization', badge=Badge(len(orgs))
+        ),
+    ]
+
+    return flask.render_template(
+        'core/search.html', query=query, tabs=tabs,
+        active_tab=flask.request.args.get('tab', 'repositories')
+    )
 
 
 @core.route('/user/<login>')
@@ -43,8 +69,7 @@ def user_detail(login):
         ViewTab(
             'repositories', 'Repositories', 1,
             flask.render_template(
-                'core/repo_owner/repositories_tab.html',
-                owner=user
+                'core/repo_owner/repositories_tab.html', owner=user
             ),
             octicon='repo', badge=Badge(len(user.repositories))
         ),
@@ -78,10 +103,9 @@ def org_detail(login):
         ViewTab(
             'repositories', 'Repositories', 1,
             flask.render_template(
-                'core/repo_owner/repositories_tab.html',
-                owner=org
+                'core/repo_owner/repositories_tab.html', owner=org
             ),
-            octicon='repo', badge=Badge(len(user.repositories))
+            octicon='repo', badge=Badge(len(org.repositories))
         ),
     ]
 

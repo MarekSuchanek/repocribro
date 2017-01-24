@@ -1,0 +1,26 @@
+{# Organization search results #}
+<h2>Organizations <small>search results</small></h2>
+
+<div class="row">
+    {% for org in orgs %}
+        <div class="user-card panel panel-default col-md-4 col-xs-6">
+            <a href="{{ url_for('core.org_detail', login=user.login) }}">
+                <div class="panel-body">
+                    <div class="col-md-5 avatar-block">
+                        <div class="thumbnail">
+                            <img src="{{ org.avatar_url }}" alt="avatar">
+                        </div>
+                    </div>
+                    <div class="col-md-7 properties-block">
+                        <div class="property login">{{ org.login }}</div>
+                        <div class="property name">{{ org.name }}</div>
+                        <div class="property location">{{ org.location }}</div>
+                        <div class="property company">{{ org.company }}</div>
+                        <div class="property email">{{ org.email }}</div>
+                    </div>
+                </div>
+            </a>
+        </div>
+    {% endfor %}
+    {# TODO: pagination #}
+</div>
