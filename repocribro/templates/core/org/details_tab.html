@@ -1,2 +1,38 @@
-
+{# Organization details #}
 <h2>Details</h2>
+
+<div class="row">
+    <div class="col-xs-6 col-md-4">
+        <div class="thumbnail">
+            <img src="{{ org.avatar_url }}" alt="avatar">
+        </div>
+    </div>
+    <div class="col-xs-12 col-md-8">
+        <table class="table table-responsive table-striped">
+            <tr>
+                <th>Name</th>
+                <td>{{ org.name }}</td>
+            </tr>
+            <tr>
+                <th>Email</th>
+                <td>{{ org.email }}</td>
+            </tr>
+            <tr>
+                <th>Company</th>
+                <td>{{ org.company }}</td>
+            </tr>
+            <tr>
+                <th>Location</th>
+                <td>{{ org.location }}</td>
+            </tr>
+            <tr>
+                <th>URL</th>
+                <td>{{ org.blog_url }}</td>
+            </tr>
+            <tr>
+                <th>Description</th>
+                <td>{{ org.description }}</td>
+            </tr>
+        </table>
+    </div>
+</div>

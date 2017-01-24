@@ -38,11 +38,14 @@ def user_detail(login):
         ViewTab(
             'details', 'Details', 0,
             flask.render_template('core/user/details_tab.html', user=user),
-            octicon='user'
+            octicon='person'
         ),
         ViewTab(
             'repositories', 'Repositories', 1,
-            flask.render_template('core/user/repositories_tab.html', user=user),
+            flask.render_template(
+                'core/repo_owner/repositories_tab.html',
+                owner=user
+            ),
             octicon='repo'
         ),
     ]
@@ -74,7 +77,10 @@ def org_detail(login):
         ),
         ViewTab(
             'repositories', 'Repositories', 1,
-            flask.render_template('core/org/repositories_tab.html', org=org),
+            flask.render_template(
+                'core/repo_owner/repositories_tab.html',
+                owner=org
+            ),
             octicon='repo'
         ),
     ]

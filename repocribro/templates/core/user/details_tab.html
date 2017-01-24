@@ -1,2 +1,46 @@
-
+{# User (person) details #}
 <h2>Details</h2>
+
+<div class="row">
+    <div class="col-xs-6 col-md-4">
+        <div class="thumbnail">
+            <img src="{{ user.avatar_url }}" alt="avatar">
+        </div>
+    </div>
+    <div class="col-xs-12 col-md-8">
+        <table class="table table-responsive table-striped">
+            <tr>
+                <th>Name</th>
+                <td>{{ user.name }}</td>
+            </tr>
+            <tr>
+                <th>Email</th>
+                <td>{{ user.email }}</td>
+            </tr>
+            <tr>
+                <th>Company</th>
+                <td>{{ user.company }}</td>
+            </tr>
+            <tr>
+                <th>Location</th>
+                <td>{{ user.location }}</td>
+            </tr>
+            <tr>
+                <th>Login</th>
+                <td>{{ user.login }}</td>
+            </tr>
+            <tr>
+                <th>URL</th>
+                <td>{{ user.blog_url }}</td>
+            </tr>
+            <tr>
+                <th>Hireable</th>
+                <td>{{ user.hireable }}</td>
+            </tr>
+            <tr>
+                <th>Bio</th>
+                <td>{{ user.description }}</td>
+            </tr>
+        </table>
+    </div>
+</div>

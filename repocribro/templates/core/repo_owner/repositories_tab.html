@@ -1,0 +1,35 @@
+{# List of repositories (of owner) #}
+<h2>Repositories</h2>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Languages</th>
+            <th>Visibility</th>
+            <th>Pushes</th>
+            <th>Releases</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for repo in owner.repositories if current_user.sees_repo(repo) %}
+        <tr>
+            <td>{{ repo.name }}</td>
+            <td>{{ repo.languages }}</td>
+            <td>{{ repo.visibility_type }}</td>{# TODO: filter #}
+            <td>{{ repo.pushes|length }}</td>
+            <td>{{ repo.releases|length }}</td>
+            <td>
+                <a href="{{ repo.url }}">
+                    <span class="octicon octicon-mark-github"></span>
+                </a>
+                <a href="{{ url_for('core.repo_detail', login=owner.login, reponame=repo.name) }}">
+                    <span class="octicon octicon-repo"></span>
+                </a>
+            </td>
+        </tr>
+    {% endfor %}
+    </tbody>
+    {# TODO: pagination? #}
+</table>
