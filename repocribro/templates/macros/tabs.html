@@ -6,7 +6,9 @@
         {% for tab in tabs %}
             <li{% if tab.id == active_tab %} class="active"{% endif %}>
                 <a href="#{{ tab.id }}" data-toggle="tab">
-                    {% if tab.octicon %}<span class="octicon octicon-{{ tab.octicon }}"></span>{% endif %} {{ tab.name }}
+                    {% if tab.octicon %}{{ octicon(tab.octicon) }}{% endif %}
+                    {{ tab.name }}
+                    {% if tab.badge %}{{ badge(tab.badge) }}{% endif %}
                 </a>
             </li>
         {% endfor %}
@@ -19,4 +21,12 @@
             </div>
         {% endfor %}
     </div>
+{%- endmacro %}
+
+{% macro octicon(octicon_name) -%}
+    <span class="octicon octicon-{{ octicon_name }}"></span>
+{%- endmacro %}
+
+{% macro badge(b) -%}
+    <span class="badge">{{ b.content }}</span>
 {%- endmacro %}

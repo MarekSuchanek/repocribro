@@ -1,7 +1,7 @@
 import flask
 import flask_login
 from ..models import User, Organization, Repository
-from ..helpers import ViewTab
+from ..helpers import ViewTab, Badge
 
 core = flask.Blueprint('core', __name__, url_prefix='')
 
@@ -46,7 +46,7 @@ def user_detail(login):
                 'core/repo_owner/repositories_tab.html',
                 owner=user
             ),
-            octicon='repo'
+            octicon='repo', badge=Badge(len(user.repositories))
         ),
     ]
 
@@ -81,7 +81,7 @@ def org_detail(login):
                 'core/repo_owner/repositories_tab.html',
                 owner=org
             ),
-            octicon='repo'
+            octicon='repo', badge=Badge(len(user.repositories))
         ),
     ]
 
@@ -121,12 +121,12 @@ def repo_detail(login, reponame):
         ViewTab(
             'releases', 'Releases', 1,
             flask.render_template('core/repo/releases_tab.html', repo=repo),
-            octicon='tag'
+            octicon='tag', badge=Badge(len(repo.releases))
         ),
         ViewTab(
             'updates', 'Updates', 2,
             flask.render_template('core/repo/updates_tab.html', repo=repo),
-            octicon='git-commit'
+            octicon='git-commit', badge=Badge(len(repo.pushes))
         ),
     ]
 
