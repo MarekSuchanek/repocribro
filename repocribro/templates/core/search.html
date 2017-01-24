@@ -30,12 +30,12 @@
     {% endif %}
 {% endblock %}
 
-
 {% block scripts %}
     {{ super() }}
 
     <script type="application/javascript">
         $(document).ready(function () {
+            $('#nav-search-form').hide();
             var searchUrl = "{{ url_for('core.search') }}";
             $('#query').on('input', function () {
                 $('#search-form').attr('action', searchUrl + "/" + $(this).val());

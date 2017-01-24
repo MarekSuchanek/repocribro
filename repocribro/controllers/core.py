@@ -15,6 +15,7 @@ def index():
 @core.route('/search/<query>')
 def search(query=''):
     # TODO: more attrs
+    # TODO: limits, nonempty search?
     users = User.fulltext_query(query).all()
     orgs = Organization.fulltext_query(query).all()
     repos = Repository.fulltext_query(query).all()
