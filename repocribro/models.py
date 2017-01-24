@@ -18,6 +18,11 @@ class UserAccount(db.Model, flask_login.UserMixin):
         back_populates='user_account'
     )
 
+    def sees_repo(self, repo):
+        # TODO: admins, org repos
+        return repo.is_public() or \
+               repo.owner.github_id == self.github_user.github_id
+
     def __repr__(self):
         return '<UserAccount {}>'.format(id)
 
@@ -147,6 +152,7 @@ class Repository(db.Model):
     full_name = db.Column(db.String(150), unique=True)
     name = db.Column(db.String(100))
     languages = db.Column(db.UnicodeText)
+    url = db.Column(db.UnicodeText)
     description = db.Column(db.UnicodeText)
     private = db.Column(db.Boolean)
     visibility_type = db.Column(db.Integer)
@@ -160,13 +166,14 @@ class Repository(db.Model):
     VISIBILITY_PRIVATE = 1
     VISIBILITY_HIDDEN = 2
 
-    def __init__(self, github_id, fork_of, full_name, name, languages,
+    def __init__(self, github_id, fork_of, full_name, name, languages, url,
                  description, private, owner, visibility_type, secret):
         self.github_id = github_id
         self.fork_of = fork_of
         self.full_name = full_name
         self.name = name
         self.languages = languages
+        self.url = url
         self.description = description
         self.private = private
         self.owner = owner
@@ -185,6 +192,7 @@ class Repository(db.Model):
             repo_dict['full_name'],
             repo_dict['name'],
             repo_dict['language'],
+            repo_dict['url'],
             repo_dict['description'],
             repo_dict['private'],
             owner,
@@ -213,6 +221,7 @@ class Push(db.Model):
     before = db.Column(db.Integer)
     ref = db.Column(db.String(255))
     timestamp = db.Column(db.DateTime())
+    compare_url = db.Column(db.UnicodeText())
     pusher_name = db.Column(db.UnicodeText())
     pusher_email = db.Column(db.String(255))
     sender_login = db.Column(db.String(40))
@@ -221,12 +230,13 @@ class Push(db.Model):
     repository = db.relationship('Repository', back_populates='pushes')
     commits = db.relationship('Commit', back_populates='push')
 
-    def __init__(self, after, before, ref, timestamp, pusher_name,
+    def __init__(self, after, before, ref, timestamp, pusher_name, compare_url,
                  pusher_email, sender_login, sender_id, repository):
         self.after = after
         self.before = before
         self.ref = ref
         self.timestamp = timestamp
+        self.compare_url = compare_url
         self.pusher_name = pusher_name
         self.pusher_email = pusher_email
         self.sender_login = sender_login
@@ -245,6 +255,7 @@ class Commit(db.Model):
     tree_sha = db.Column(db.String(40))
     message = db.Column(db.UnicodeText())
     timestamp = db.Column(db.DateTime())
+    url = db.Column(db.UnicodeText())
     author_name = db.Column(db.UnicodeText())
     author_email = db.Column(db.String(255))
     author_login = db.Column(db.String(40))
@@ -254,13 +265,14 @@ class Commit(db.Model):
     push_id = db.Column(db.Integer, db.ForeignKey('Push.id'))
     push = db.relationship('Push', back_populates='commits')
 
-    def __init__(self, sha, tree_sha, message, timestamp,
+    def __init__(self, sha, tree_sha, message, timestamp, url,
                  author_name, author_email, author_login,
                  committer_name, committer_email, committer_login, push):
         self.sha = sha
         self.tree_sha = tree_sha
         self.message = message
         self.timestamp = timestamp
+        self.url = url
         self.author_name = author_name
         self.author_email = author_email
         self.author_login = author_login
@@ -281,6 +293,7 @@ class Release(db.Model):
     tag_name = db.Column(db.String(255))
     created_at = db.Column(db.DateTime())
     published_at = db.Column(db.DateTime())
+    url = db.Column(db.UnicodeText())
     prerelease = db.Column(db.Boolean())
     draft = db.Column(db.Boolean())
     name = db.Column(db.UnicodeText())
@@ -292,13 +305,14 @@ class Release(db.Model):
     repository_id = db.Column(db.Integer, db.ForeignKey('Repository.id'))
     repository = db.relationship('Repository', back_populates='releases')
 
-    def __init__(self, github_id, tag_name, created_at, published_at,
+    def __init__(self, github_id, tag_name, created_at, published_at, url,
                  prerelease, draft, name, body, author_id, author_login,
                  sender_login, sender_id, repository):
         self.github_id = github_id
         self.tag_name = tag_name
         self.created_at = created_at
         self.published_at = published_at
+        self.url = url
         self.prerelease = prerelease
         self.draft = draft
         self.name = name
