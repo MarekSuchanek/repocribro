@@ -36,6 +36,7 @@ setup(
         'flask-sqlalchemy',
         'jinja2',
         'requests',
+        'sqlalchemy',
     ],
     classifiers=[
         'Development Status :: 1 - Planning',

@@ -1,5 +1,6 @@
 # TODO: rearrange app structure
 from flask_sqlalchemy import SQLAlchemy
+import sqlalchemy
 import flask_login
 import datetime
 
@@ -10,11 +11,12 @@ class SearchableMixin:
     __searchable__ = []
 
     @classmethod
-    def fulltext_query(cls, query):
-        query_parts = []
-        for col in cls.__searchable__:
-            query_parts.append('\'{}\' LIKE \'%{}%\''.format(col, query))
-        return ' OR '.join(query_parts)
+    def fulltext_query(cls, query_str):
+        query_str = '%{}%'.format(query_str)
+        condition = sqlalchemy.or_(
+            *[getattr(cls, col).like(query_str) for col in cls.__searchable__]
+        )
+        return cls.query.filter(condition)
 
 
 # Example model for Flask-SQLAlchemy
@@ -39,11 +41,9 @@ class UserAccount(db.Model, flask_login.UserMixin, SearchableMixin):
         return '<UserAccount {}>'.format(id)
 
 
-class RepositoryOwner(db.Model, SearchableMixin):
+class RepositoryOwner(db.Model):
     """RepositoryOwner (User or Organization) from GitHub"""
     __tablename__ = 'RepositoryOwner'
-    __searchable__ = ['login', 'email', 'name', 'company',
-                      'description', 'location']
 
     id = db.Column(db.Integer, primary_key=True)
     github_id = db.Column(db.Integer, unique=True)
@@ -63,8 +63,11 @@ class RepositoryOwner(db.Model, SearchableMixin):
     }
 
 
-class User(RepositoryOwner):
+class User(RepositoryOwner, SearchableMixin):
     """User from GitHub"""
+    __searchable__ = ['login', 'email', 'name', 'company',
+                      'description', 'location']
+
     hireable = db.Column(db.Boolean)
     user_account_id = db.Column(db.Integer, db.ForeignKey('UserAccount.id'))
     user_account = db.relationship(
@@ -121,8 +124,10 @@ class User(RepositoryOwner):
         return '<GH User {} ({})>'.format(self.login, self.github_id)
 
 
-class Organization(RepositoryOwner):
+class Organization(RepositoryOwner, SearchableMixin):
     """Organization from GitHub"""
+    __searchable__ = ['login', 'email', 'name', 'company',
+                      'description', 'location']
 
     def __init__(self, github_id, login, email, name, company, location,
                  description, blog_url, avatar_url):
