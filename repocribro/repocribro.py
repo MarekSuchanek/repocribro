@@ -4,7 +4,6 @@ from flask_migrate import Migrate, MigrateCommand
 from flask_script import Manager
 import configparser
 from .models import db
-from .extensions import login_manager
 import os
 
 basedir = os.path.abspath(os.path.dirname(__file__))
@@ -20,7 +19,11 @@ def create_app():
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
     db.init_app(app)
 
+    from .extensions import login_manager
     login_manager.init_app(app)
+
+    from .api import create_api
+    api_manager = create_api(app)
     # TODO: load all parts
     # TODO: load all extensions
 
