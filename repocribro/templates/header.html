@@ -36,6 +36,10 @@
                             <li><a href="{{ url_for('user.repositories') }}">Repositories</a></li>
                             <li><a href="{{ url_for('user.organizations') }}">Organizations</a></li>
                             <li class="divider"></li>
+                            {% if current_user.has_role('admin') %}
+                            <li><a href="{{ url_for('admin.index') }}">Administration</a></li>
+                            <li class="divider"></li>
+                            {% endif %}
                             <li><a href="{{ url_for('auth.logout') }}">Logout</a></li>
                         </ul>
                     </li>
