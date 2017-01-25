@@ -1,3 +1,5 @@
+import hashlib
+import hmac
 import flask
 import json
 import requests
@@ -85,14 +87,14 @@ class GitHubAPI:
 
     @classmethod
     def webhook_create(cls, owner, repo, events, hook_url):
-        # TODO: secure webhooks
         data = {
             'name': 'web',
             'active': True,
             'events': events,
             'config': {
                 'url': hook_url,
-                'content_type': 'json'
+                'content_type': 'json',
+                'secret': flask.current_app.config['GH_BASIC_WEBHOOKS_SECRET']
             }
         }
         response = requests.post(
@@ -123,3 +125,12 @@ class GitHubAPI:
             headers=cls._get_auth_header()
         )
         return response.status_code == 204
+
+    @staticmethod
+    def webhook_verify_signature(payload, signature):
+        h = hmac.new(
+            flask.current_app.config['GH_BASIC_WEBHOOKS_SECRET'],
+            payload,
+            hashlib.sha1
+        )
+        return hmac.compare_digest(h.hexdigest(), signature)

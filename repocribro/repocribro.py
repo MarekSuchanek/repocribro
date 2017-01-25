@@ -36,6 +36,7 @@ def create_app():
     app.config['TEMPLATES_AUTO_RELOAD'] = True
     app.config['GH_BASIC_CLIENT_ID'] = cfg['github']['client_id']
     app.config['GH_BASIC_CLIENT_SECRET'] = cfg['github']['client_secret']
+    app.config['GH_BASIC_WEBHOOKS_SECRET'] = cfg['github']['webhooks_secret']
     app.secret_key = cfg['flask']['secret_key']
 
     init_controllers(app)
