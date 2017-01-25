@@ -1,12 +1,10 @@
 import flask
 import flask_login
-import requests
 import json
+from ..github import GitHubAPI
 from ..models import Repository, db
 
 user = flask.Blueprint('user', __name__, url_prefix='/user')
-
-GITHUB_API = 'https://api.github.com'
 
 
 @user.route('')
@@ -16,20 +14,17 @@ def dashboard():
     return flask.render_template(
         'user/dashboard.html',
         tab=tab,
-        token=flask.session['github_token'],
-        scopes=flask.session['github_scope']
+        token=GitHubAPI.get_token(),
+        scopes=GitHubAPI.get_scope()
     )
 
 
 @user.route('/profile/update')
 def update_profile():
     # TODO: protect from updating too often
-    response = requests.get(
-        GITHUB_API + '/user',
-        params={'access_token': flask.session['github_token']}
-    )
+    user_data = GitHubAPI.get_data('/user')
     gh_user = flask_login.current_user.github_user
-    gh_user.update_from_dict(response.json())
+    gh_user.update_from_dict(user_data)
     db.session.commit()
     return flask.redirect(flask.url_for('user.dashboard', tab='profile'))
 
@@ -37,16 +32,11 @@ def update_profile():
 @user.route('/repos')
 @flask_login.login_required
 def repositories():
-    response = requests.get(
-        GITHUB_API + '/user/repos',
-        params={
-            'access_token': flask.session['github_token']
-        }
-    )
+    repos_data = GitHubAPI.get_data('/user/repos')
     user = flask_login.current_user.github_user
     return flask.render_template(
         'user/repos.html',
-        repos=[Repository.create_from_dict(d, user) for d in response.json()]
+        repos=[Repository.create_from_dict(d, user) for d in repos_data]
     )
 
 
@@ -71,16 +61,11 @@ def repository_deactivate():
 @user.route('/orgs')
 @flask_login.login_required
 def organizations():
-    # TODO: require logged user (decorator?)
-    response = requests.get(
-        GITHUB_API + '/user/orgs',
-        params={'access_token': flask.session['github_token']}
-    )
+    orgs_data = GitHubAPI.get_data('/user/orgs')
     return flask.render_template(
         'user/orgs.html',
-        retval=response.status_code,
         orgs_json=json.dumps(
-            response.json(),
+            orgs_data,
             sort_keys=True,
             indent=4,
             separators=(',', ': ')

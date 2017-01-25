@@ -1,16 +1,12 @@
 import flask
 import requests
+from ..github import GitHubAPI
 from ..models import User, UserAccount, db
 from ..security import login_manager, clear_session,\
     login as security_login, logout as security_logout
 
 
 auth = flask.Blueprint('auth', __name__, url_prefix='/auth')
-
-
-GH_API = 'https://api.github.com'
-GH_AUTH_URL = 'https://github.com/login/oauth/authorize?scope={}&client_id={}'
-GH_TOKEN_URL = 'https://github.com/login/oauth/access_token'
 
 
 @login_manager.unauthorized_handler
@@ -25,25 +21,19 @@ def load_user(user_id):
 
 @auth.route('/github')
 def github():
-    return flask.redirect(GH_AUTH_URL.format(
-        'user repo',
-        flask.current_app.config['GH_BASIC_CLIENT_ID']
-    ))
+    return flask.redirect(GitHubAPI.get_auth_url())
 
 
 def github_callback_get_account():
-    response = requests.get(
-        GH_API + '/user',
-        params={'access_token': flask.session['github_token']}
-    )
+    user_data = GitHubAPI.get_data('/user')
     gh_user = User.query.filter(
-        User.github_id == response.json()['id']
+        User.github_id == user_data['id']
     ).first()
     is_new = False
     if gh_user is None:
         user_account = UserAccount()
         db.session.add(user_account)
-        gh_user = User.create_from_dict(response.json(), user_account)
+        gh_user = User.create_from_dict(user_data, user_account)
         db.session.add(gh_user)
         db.session.commit()
         is_new = True
@@ -53,33 +43,14 @@ def github_callback_get_account():
 @auth.route('/github/callback')
 def github_callback():
     session_code = flask.request.args.get('code')
-    client_id = flask.current_app.config['GH_BASIC_CLIENT_ID']
-    client_secret = flask.current_app.config['GH_BASIC_CLIENT_SECRET']
-    response = requests.post(
-        GH_TOKEN_URL,
-        headers={
-            'Accept': 'application/json'
-        },
-        data={
-            'client_id': client_id,
-            'client_secret': client_secret,
-            'code': session_code,
-        }
-    )
-    # TODO: check granted scopes
-    if response.status_code == 200:
-        data = response.json()
-        token = flask.escape(data['access_token'])
-        scopes = [flask.escape(x) for x in data['scope'].split(',')]
-        flask.session['github_token'] = token
-        flask.session['github_scope'] = scopes
+    if GitHubAPI.login(session_code):
         user_account, is_new = github_callback_get_account()
         security_login(user_account)
         if not user_account.active:
             flask.flash('Sorry, but your account is deactivated. '
                         'Please contact admin for details', 'error')
             security_logout()
-            clear_session('github_token', 'github_scope')
+            GitHubAPI.logout()
             return flask.redirect(flask.url_for('core.index'))
         if is_new:
             flask.flash('You account has been created via GitHub. '
@@ -97,7 +68,6 @@ def github_callback():
 @auth.route('/logout')
 def logout():
     security_logout()
-    # TODO: store info about user_attrs somewhere else
-    clear_session('github_token', 'github_scope')
+    GitHubAPI.logout()
     flask.flash('You are now logged out, see you soon!', 'info')
     return flask.redirect(flask.url_for('core.index'))
