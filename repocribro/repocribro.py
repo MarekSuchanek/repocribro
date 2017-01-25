@@ -19,8 +19,9 @@ def create_app():
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
     db.init_app(app)
 
-    from .extensions import login_manager
+    from .security import login_manager, principals
     login_manager.init_app(app)
+    principals.init_app(app)
 
     from .api import create_api
     api_manager = create_api(app)

@@ -1,10 +1,10 @@
 # TODO: rearrange app structure
-from flask_sqlalchemy import SQLAlchemy
+import flask_sqlalchemy
 import sqlalchemy
 import flask_login
 import datetime
 
-db = SQLAlchemy()
+db = flask_sqlalchemy.SQLAlchemy()
 
 
 class SearchableMixin:
@@ -19,17 +19,53 @@ class SearchableMixin:
         return cls.query.filter(condition)
 
 
-# Example model for Flask-SQLAlchemy
-class UserAccount(db.Model, flask_login.UserMixin, SearchableMixin):
+class RoleMixin:
+
+    def __eq__(self, other):
+        return (self.name == other or
+                self.name == getattr(other, 'name', None))
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
+    def __hash__(self):
+        return hash(self.name)
+
+
+class UserMixin(flask_login.UserMixin):
+
+    @property
+    def is_active(self):
+        return self.active
+
+    def has_role(self, role):
+        return role in (role.name for role in self.roles)
+
+
+# Many-to-Many
+roles_users = db.Table(
+    'RolesAccounts',
+    db.Column('account_id', db.Integer(), db.ForeignKey('UserAccount.id')),
+    db.Column('role_id', db.Integer(), db.ForeignKey('Role.id'))
+)
+
+
+class UserAccount(db.Model, UserMixin, SearchableMixin):
     """UserAccount in the repocribro app"""
     __tablename__ = 'UserAccount'
 
     id = db.Column(db.Integer, primary_key=True)
     created_at = db.Column(db.DateTime, default=datetime.datetime.now())
+    active = db.Column(db.Boolean, default=True)
     github_user = db.relationship(
         'User',
         uselist=False,
         back_populates='user_account'
+    )
+    roles = db.relationship(
+        'Role',
+        secondary=roles_users,
+        backref=db.backref('users', lazy='dynamic')
     )
 
     def sees_repo(self, repo):
@@ -39,6 +75,15 @@ class UserAccount(db.Model, flask_login.UserMixin, SearchableMixin):
 
     def __repr__(self):
         return '<UserAccount {}>'.format(id)
+
+
+class Role(db.Model, RoleMixin):
+    """User account role in the application"""
+    __tablename__ = 'Role'
+
+    id = db.Column(db.Integer(), primary_key=True)
+    name = db.Column(db.String(80), unique=True)
+    description = db.Column(db.String(255))
 
 
 class RepositoryOwner(db.Model):

@@ -33,6 +33,7 @@ setup(
         'flask-bower',
         'flask-login',
         'flask-migrate',
+        'flask-principal',
         'flask-restless',
         'flask-sqlalchemy',
         'jinja2',
