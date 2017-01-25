@@ -66,7 +66,7 @@ class GitHubAPI:
         # TODO: deal with pagination
         return requests.get(
             cls.API_URL + what,
-            params={'access_token': flask.session['github_token']}
+            headers=cls._get_auth_header()
         )
 
     @classmethod
