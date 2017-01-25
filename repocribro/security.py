@@ -5,9 +5,15 @@ import flask_principal
 login_manager = flask_login.LoginManager()
 principals = flask_principal.Principal()
 
-admin_permission = flask_principal.Permission(
-    flask_principal.RoleNeed('admin')
-)
+
+class Permissions:
+    # TODO: load roles & their names from somewhere else
+    admin_role = flask_principal.Permission(
+        flask_principal.RoleNeed('admin')
+    )
+
+permissions = Permissions()
+
 
 def login(user_account):
     flask_login.login_user(user_account)
