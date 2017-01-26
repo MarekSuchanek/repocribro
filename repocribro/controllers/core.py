@@ -132,7 +132,8 @@ def repo_detail(login, reponame):
         # TODO: implement 410 (repo deleted/archived)
         # TODO: repository renaming
         flask.abort(404)
-    if not repo.is_public() and repo.user != flask_login.current_user:
+    if not repo.is_public() and \
+       repo.owner.user_account != flask_login.current_user:
         # TODO: 404 or 410 (if were public in the past)?
         flask.abort(404)
 

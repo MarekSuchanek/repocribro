@@ -1,5 +1,5 @@
 {# Repository search results #}
-{% from "macros/tabs.html" import tabzone without context %}
+{% from "macros/basic.html" import octicon without context %}
 <h2>Repositories <small>search results</small></h2>
 
 <table class="table table-striped">
@@ -25,7 +25,7 @@
                 <a href="{{ repo.url }}">
                     {{ octicon('mark-github') }}
                 </a>
-                <a href="{{ url_for('core.repo_detail', login=owner.login, reponame=repo.name) }}">
+                <a href="{{ url_for('core.repo_detail', login=repo.owner.login, reponame=repo.name) }}">
                     {{ octicon('repo') }}
                 </a>
             </td>
