@@ -11,6 +11,8 @@ class GitHubAPI:
     AUTH_URL = 'https://github.com/login/oauth/authorize?scope={}&client_id={}'
     TOKEN_URL = 'https://github.com/login/oauth/access_token'
     SCOPES = ['user', 'repo', 'admin:repo_hook']
+    WEBHOOKS = ['push', 'release', 'repository']
+    WEBHOOK_CONTROLLER = 'webhooks.gh_webhook'
 
     @staticmethod
     def _get_auth_header():
@@ -76,17 +78,25 @@ class GitHubAPI:
         return cls.get(what).json()
 
     @classmethod
-    def webhooks_get(cls, owner, repo):
-        response = requests.get(
-            cls.API_URL + '/repos/{}/{}/hooks'.format(owner, repo),
-            headers=cls._get_auth_header()
-        )
+    def webhook_get(cls, full_name, id):
+        response = cls.get('/repos/{}/hooks/{}'.format(full_name, id))
+        if response.status_code == 200:
+            return response.json()
+        return None
+
+    @classmethod
+    def webhooks_get(cls, full_name):
+        response = cls.get('/repos/{}/hooks'.format(full_name))
         if response.status_code == 200:
             return response.json()
         return []
 
     @classmethod
-    def webhook_create(cls, owner, repo, events, hook_url):
+    def webhook_create(cls, full_name, events=None, hook_url=None):
+        if events is None:
+            events = cls.WEBHOOKS
+        if hook_url is None:
+            hook_url = flask.url_for(cls.WEBHOOK_CONTROLLER)
         data = {
             'name': 'web',
             'active': True,
@@ -98,29 +108,29 @@ class GitHubAPI:
             }
         }
         response = requests.post(
-            cls.API_URL + '/repos/{}/{}/hooks'.format(owner, repo),
+            cls.API_URL + '/repos/{}/hooks'.format(full_name),
             data=json.dumps(data),
             headers=cls._get_auth_header()
         )
         if response.status_code == 201:
             return response.json()
-        return {}
+        return None
 
     @classmethod
-    def webhook_tests(cls, owner, repo, hook_id):
+    def webhook_tests(cls, full_name, hook_id):
         response = requests.delete(
-            cls.API_URL + '/repos/{}/{}/hooks/{}/tests'.format(
-                owner, repo, hook_id
+            cls.API_URL + '/repos/{}/hooks/{}/tests'.format(
+                full_name, hook_id
             ),
             headers=cls._get_auth_header()
         )
         return response.status_code == 204
 
     @classmethod
-    def webhook_delete(cls, owner, repo, hook_id):
+    def webhook_delete(cls, full_name, hook_id):
         response = requests.delete(
-            cls.API_URL + '/repos/{}/{}/hooks/{}'.format(
-                owner, repo, hook_id
+            cls.API_URL + '/repos/{}/hooks/{}'.format(
+                full_name, hook_id
             ),
             headers=cls._get_auth_header()
         )
