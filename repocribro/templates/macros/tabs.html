@@ -1,3 +1,4 @@
+{% from "macros/basic.html" import badge, octicon without context %}
 {% macro tabzone(tabs, active_tab) -%}
     {% if not active_tab %}
         {% set active_tab = tabs[0].id if tabs|length > 0 else '' %}
@@ -21,12 +22,4 @@
             </div>
         {% endfor %}
     </div>
-{%- endmacro %}
-
-{% macro octicon(octicon_name) -%}
-    <span class="octicon octicon-{{ octicon_name }}"></span>
-{%- endmacro %}
-
-{% macro badge(b) -%}
-    <span class="badge">{{ b.content }}</span>
 {%- endmacro %}

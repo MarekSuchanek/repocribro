@@ -1,0 +1,8 @@
+
+{% macro octicon(octicon_name) -%}
+    <span class="octicon octicon-{{ octicon_name }}"></span>
+{%- endmacro %}
+
+{% macro badge(b) -%}
+    <span class="badge">{{ b.content }}</span>
+{%- endmacro %}
