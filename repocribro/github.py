@@ -96,7 +96,7 @@ class GitHubAPI:
         if events is None:
             events = cls.WEBHOOKS
         if hook_url is None:
-            hook_url = flask.url_for(cls.WEBHOOK_CONTROLLER)
+            hook_url = flask.url_for(cls.WEBHOOK_CONTROLLER, _external=True)
         data = {
             'name': 'web',
             'active': True,

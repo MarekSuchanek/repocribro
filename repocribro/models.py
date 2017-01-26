@@ -272,11 +272,11 @@ class Repository(db.Model, SearchableMixin):
         )
 
     def update_from_dict(self, repo_dict):
-        self.full_name = repo_dict['full_name'],
-        self.name = repo_dict['name'],
-        self.languages = repo_dict['language'],
-        self.url = repo_dict['url'],
-        self.description = repo_dict['description'],
+        self.full_name = repo_dict['full_name']
+        self.name = repo_dict['name']
+        self.languages = repo_dict['language']
+        self.url = repo_dict['url']
+        self.description = repo_dict['description']
         self.private = repo_dict['private']
 
     @staticmethod
