@@ -11,8 +11,7 @@ manage = flask.Blueprint('manage', __name__, url_prefix='/manage')
 @manage.route('')
 @flask_login.login_required
 def dashboard():
-    repos = []
-    orgs = []
+    repos = flask_login.current_user.github_user.repositories
 
     tabs = [
         ViewTab(
