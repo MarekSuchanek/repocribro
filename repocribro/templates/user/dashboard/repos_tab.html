@@ -1,3 +1,42 @@
+{% from "macros/basic.html" import octicon without context %}
 <h2>Repositories</h2>
-{# TODO: list of registered repositories #}
-{# TODO: button link to add more repos #}
+
+<p>
+    Here is list of your connected repositories to <em>repocribro</em> you can
+    <a href="{{ url_for('user.repositories') }}" class="btn btn-success">{{ octicon('link') }}  connect more</a>
+    of your personal repos or browse
+    <a href="{{ url_for('user.organizations') }}" class="btn btn-primary">{{ octicon('organization') }} your organizations</a>.
+</p>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Languages</th>
+            <th>Visibility</th>
+            <th>Pushes</th>
+            <th>Releases</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for repo in repos %}
+        <tr>
+            <td>{{ repo.name }}</td>
+            <td>{{ repo.languages }}</td>
+            <td>{{ repo.visibility_type }}</td>
+            <td>{{ repo.pushes|length }}</td>
+            <td>{{ repo.releases|length }}</td>
+            <td>
+                <a href="{{ repo.url }}">
+                    <span class="octicon octicon-mark-github"></span>
+                </a>
+                <a href="{{ url_for('user.repo_detail', reponame=repo.name) }}">
+                    <span class="octicon octicon-repo"></span>
+                </a>
+            </td>
+        </tr>
+    {% endfor %}
+    </tbody>
+    {# TODO: pagination? #}
+</table>

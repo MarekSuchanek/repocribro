@@ -67,6 +67,12 @@ def repositories():
     )
 
 
+@user.route('/repo/<reponame>')
+@flask_login.login_required
+def repo_detail(reponame):
+    flask.abort(501)
+
+
 @user.route('/repos/activate', methods=['POST'])
 @flask_login.login_required
 def repository_activate():
