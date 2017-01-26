@@ -11,14 +11,17 @@
             <div class="panel-body">
                 <p>{{ repo.description }}</p>
 
-                <form>
-                    <input type="hidden" value="{{ repo.github_id }}" name="repo_id">
+                <form action="{{ url_for('manage.repo_activate') }}" method="POST">
+                    <input type="hidden" value="{{ repo.name }}" name="reponame">
                     <div class="btn-group" role="group">
-                        <button type="button" class="btn btn-success">Public</button>
-                        <button type="button" class="btn btn-primary">Hidden</button>
-                        <button type="button" class="btn btn-warning">Private</button>
+                        <button type="submit" class="btn btn-success" name="enable" value="{{ Repository.VISIBILITY_PUBLIC }}">Public</button>
+                        <button type="submit" class="btn btn-primary" name="enable" value="{{ Repository.VISIBILITY_HIDDEN }}">Hidden</button>
+                        <button type="submit" class="btn btn-warning" name="enable" value="{{ Repository.VISIBILITY_PRIVATE }}">Private</button>
                     </div>
-                    <button type="button" class="btn btn-danger disabled">Unused</button>
+                </form>
+                <form action="{{ url_for('manage.repo_deactivate') }}" method="POST">
+                    <input type="hidden" value="{{ repo.name }}" name="reponame">
+                    <button type="submit" class="btn btn-danger disabled" name="disable">Deactivate</button>
                 </form>
             </div>
         </div>

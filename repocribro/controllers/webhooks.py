@@ -4,6 +4,11 @@ webhooks = flask.Blueprint('webhooks', __name__, url_prefix='/webhook/github')
 # TODO: secure webhooks: https://developer.github.com/webhooks/securing/
 
 
+@webhooks.route('', methods=['POST'])
+def gh_webhook():
+    return ''
+
+
 @webhooks.route('/push', methods=['POST'])
 def gh_push():
     data = flask.request.get_json()

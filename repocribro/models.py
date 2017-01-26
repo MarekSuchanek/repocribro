@@ -271,6 +271,22 @@ class Repository(db.Model, SearchableMixin):
             secret
         )
 
+    def update_from_dict(self, repo_dict):
+        self.full_name = repo_dict['full_name'],
+        self.name = repo_dict['name'],
+        self.languages = repo_dict['language'],
+        self.url = repo_dict['url'],
+        self.description = repo_dict['description'],
+        self.private = repo_dict['private']
+
+    @staticmethod
+    def make_full_name(login, reponame):
+        return '{}/{}'.format(login, reponame)
+
+    def generate_secret(self):
+        # TODO: check for some good mechanism to generate unique string
+        self.secret = "some_randomized_secret_unique_code"
+
     def is_public(self):
         return self.visibility_type == self.VISIBILITY_PUBLIC
 

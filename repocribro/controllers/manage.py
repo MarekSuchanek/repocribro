@@ -63,7 +63,8 @@ def repositories():
     user = flask_login.current_user.github_user
     return flask.render_template(
         'manage/repos.html',
-        repos=[Repository.create_from_dict(d, user) for d in repos_data]
+        repos=[Repository.create_from_dict(d, user) for d in repos_data],
+        Repository=Repository
     )
 
 
@@ -73,22 +74,74 @@ def repo_detail(reponame):
     flask.abort(501)
 
 
+def update_webhook(repo):
+    if repo.webhook_id is not None:
+        # Check if actual webhook is still there
+        # TODO: check if there are right events
+        webhook = GitHubAPI.webhook_get(repo.full_name, repo.webhook_id)
+        if webhook is None:
+            repo.webhook_id = None
+    if repo.webhook_id is None:
+        # Create new webhook
+        webhook = GitHubAPI.webhook_create(repo.full_name)
+        if webhook is None:
+            return False
+        repo.webhook_id = webhook['id']
+    return True
+
+
 @manage.route('/repos/activate', methods=['POST'])
 @flask_login.login_required
-def repository_activate():
-    repo_id = flask.request.form.get('repo_id')
-    # TODO retrieve repository
-    # TODO check if owner / have access
-    # TODO register repository
+def repo_activate():
+    visibility_type = flask.request.form.get('enable', type=int)
+    if visibility_type not in (
+        Repository.VISIBILITY_HIDDEN,
+        Repository.VISIBILITY_PRIVATE,
+        Repository.VISIBILITY_PUBLIC
+    ):
+        flask.flash('You\'ve requested something weird...', 'error')
+        return flask.redirect(flask.url_for('manage.repositories'))
+
+    # TODO: protect from activating too often
+    reponame = flask.request.form.get('reponame')
+    user = flask_login.current_user.github_user
+    full_name = Repository.make_full_name(user.login, reponame)
+
+    repo = Repository.query.filter_by(full_name=full_name).first()
+
+    response = GitHubAPI.get('/repos/' + full_name)
+    if response.status_code != 200:
+        flask.flash('GitHub didn\'t give us data about that repository',
+                    'error')
+        return flask.redirect(flask.url_for('manage.repositories'))
+    gh_repo = response.json()
+
+    if repo is None:
+        repo = Repository.create_from_dict(gh_repo, user)
+        db.session.add(repo)
+    else:
+        repo.update_from_dict(gh_repo)
+    if not update_webhook(repo):
+        flask.flash('We were unable to create webhook for that repository',
+                    'warning')
+    repo.visibility_type = visibility_type
+    if repo.visibility_type == Repository.VISIBILITY_HIDDEN:
+        repo.generate_secret()
+    db.session.commit()
+    return flask.redirect(
+        flask.url_for('manage.repo_detail', reponame=reponame)
+    )
 
 
 @manage.route('/repos/deactivate', methods=['POST'])
 @flask_login.login_required
-def repository_deactivate():
-    repo_id = flask.request.form.get('repo_id')
+def repo_deactivate():
+    flask.abort(501)
+    reponame = flask.request.form.get('reponame')
     # TODO retrieve repository
-    # TODO check if owner / have access
-    # TODO unregister repository
+    # TODO archive/delete repository
+    # TODO remove webhook from repository
+    return flask.redirect(flask.url_for('manage.repositories'))
 
 
 @manage.route('/orgs')
