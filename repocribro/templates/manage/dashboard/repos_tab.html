@@ -3,9 +3,9 @@
 
 <p>
     Here is list of your connected repositories to <em>repocribro</em> you can
-    <a href="{{ url_for('user.repositories') }}" class="btn btn-success">{{ octicon('link') }}  connect more</a>
+    <a href="{{ url_for('manage.repositories') }}" class="btn btn-success">{{ octicon('link') }}  connect more</a>
     of your personal repos or browse
-    <a href="{{ url_for('user.organizations') }}" class="btn btn-primary">{{ octicon('organization') }} your organizations</a>.
+    <a href="{{ url_for('manage.organizations') }}" class="btn btn-primary">{{ octicon('organization') }} your organizations</a>.
 </p>
 
 <table class="table table-striped">
@@ -29,7 +29,7 @@
             <td>{{ repo.releases|length }}</td>
             <td>
                 <a href="{{ repo.url }}">{{ octicon('mark-github') }}</a>
-                <a href="{{ url_for('user.repo_detail', reponame=repo.name) }}">{{ octicon('repo') }}</a>
+                <a href="{{ url_for('manage.repo_detail', reponame=repo.name) }}">{{ octicon('repo') }}</a>
             </td>
         </tr>
     {% endfor %}

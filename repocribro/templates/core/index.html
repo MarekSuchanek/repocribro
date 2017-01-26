@@ -14,7 +14,7 @@
         </a>
          or
         {% if current_user %}
-        <a class="btn btn-warning btn-lg" href="{{ url_for('user.dashboard') }}">
+        <a class="btn btn-warning btn-lg" href="{{ url_for('manage.dashboard') }}">
             {{ octicon('settings') }} cribro your repos
         </a>
         {% else %}

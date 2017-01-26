@@ -5,10 +5,10 @@ from ..github import GitHubAPI
 from ..models import Repository, db
 from ..helpers import ViewTab, Badge
 
-user = flask.Blueprint('user', __name__, url_prefix='/user')
+manage = flask.Blueprint('manage', __name__, url_prefix='/manage')
 
 
-@user.route('')
+@manage.route('')
 @flask_login.login_required
 def dashboard():
     repos = []
@@ -17,13 +17,13 @@ def dashboard():
     tabs = [
         ViewTab(
             'repositories', 'Repositories', 0,
-            flask.render_template('user/dashboard/repos_tab.html', repos=repos),
+            flask.render_template('manage/dashboard/repos_tab.html', repos=repos),
             octicon='repo', badge=Badge(len(repos))
         ),
         ViewTab(
             'profile', 'Profile', 1,
             flask.render_template(
-                'user/dashboard/profile_tab.html',
+                'manage/dashboard/profile_tab.html',
                 user=flask_login.current_user.github_user
             ),
             octicon='person'
@@ -31,7 +31,7 @@ def dashboard():
         ViewTab(
             'session', 'Session', 2,
             flask.render_template(
-                'user/dashboard/session_tab.html',
+                'manage/dashboard/session_tab.html',
                 token=GitHubAPI.get_token(),
                 scopes=GitHubAPI.get_scope()
             ),
@@ -40,13 +40,13 @@ def dashboard():
     ]
 
     return flask.render_template(
-        'user/dashboard.html',
+        'manage/dashboard.html',
         tabs=tabs,
         active_tab=flask.request.args.get('tab', 'repositories')
     )
 
 
-@user.route('/profile/update')
+@manage.route('/profile/update')
 def update_profile():
     # TODO: protect from updating too often
     user_data = GitHubAPI.get_data('/user')
@@ -56,24 +56,24 @@ def update_profile():
     return flask.redirect(flask.url_for('user.dashboard', tab='profile'))
 
 
-@user.route('/repos')
+@manage.route('/repos')
 @flask_login.login_required
 def repositories():
     repos_data = GitHubAPI.get_data('/user/repos')
     user = flask_login.current_user.github_user
     return flask.render_template(
-        'user/repos.html',
+        'manage/repos.html',
         repos=[Repository.create_from_dict(d, user) for d in repos_data]
     )
 
 
-@user.route('/repo/<reponame>')
+@manage.route('/repo/<reponame>')
 @flask_login.login_required
 def repo_detail(reponame):
     flask.abort(501)
 
 
-@user.route('/repos/activate', methods=['POST'])
+@manage.route('/repos/activate', methods=['POST'])
 @flask_login.login_required
 def repository_activate():
     repo_id = flask.request.form.get('repo_id')
@@ -82,7 +82,7 @@ def repository_activate():
     # TODO register repository
 
 
-@user.route('/repos/deactivate', methods=['POST'])
+@manage.route('/repos/deactivate', methods=['POST'])
 @flask_login.login_required
 def repository_deactivate():
     repo_id = flask.request.form.get('repo_id')
@@ -91,12 +91,12 @@ def repository_deactivate():
     # TODO unregister repository
 
 
-@user.route('/orgs')
+@manage.route('/orgs')
 @flask_login.login_required
 def organizations():
     orgs_data = GitHubAPI.get_data('/user/orgs')
     return flask.render_template(
-        'user/orgs.html',
+        'manage/orgs.html',
         orgs_json=json.dumps(
             orgs_data,
             sort_keys=True,

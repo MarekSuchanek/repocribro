@@ -29,9 +29,9 @@
                             {{ octicon('person') }} <strong>{{ current_user.github_user.login }}</strong> {{ octicon('chevron-down') }}
                         </a>
                         <ul class="dropdown-menu">
-                            <li><a href="{{ url_for('user.dashboard') }}">Dashboard</a></li>
-                            <li><a href="{{ url_for('user.repositories') }}">Repositories</a></li>
-                            <li><a href="{{ url_for('user.organizations') }}">Organizations</a></li>
+                            <li><a href="{{ url_for('manage.dashboard') }}">Dashboard</a></li>
+                            <li><a href="{{ url_for('manage.repositories') }}">Repositories</a></li>
+                            <li><a href="{{ url_for('manage.organizations') }}">Organizations</a></li>
                             <li class="divider"></li>
                             {% if current_user.has_role('admin') %}
                             <li><a href="{{ url_for('admin.index') }}">Administration</a></li>
