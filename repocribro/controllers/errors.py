@@ -21,3 +21,8 @@ def err_gone(error):
 @errors.app_errorhandler(500)
 def err_internal(error):
     return flask.render_template('error/500.html'), 500
+
+
+@errors.app_errorhandler(501)
+def err_internal(error):
+    return flask.render_template('error/501.html'), 501
