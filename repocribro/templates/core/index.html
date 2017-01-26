@@ -1,4 +1,5 @@
 {% extends "layout.html" %}
+{% from "macros/basic.html" import octicon without context %}
 {% block body %}
 
 <div class="jumbotron">
@@ -9,12 +10,19 @@
 
     <p class="buttons">
         <a class="btn btn-primary btn-lg" href="{{ url_for('core.search') }}">
-            <span class="octicon octicon-search"></span> Take a look
+            {{ octicon('search') }} Take a look
         </a>
          or
-        <a class="btn btn-success btn-lg" href="{{ url_for('auth.github') }}">
-            <span class="octicon octicon-mark-github"></span> Join now
+        {% if current_user %}
+        <a class="btn btn-warning btn-lg" href="{{ url_for('user.dashboard') }}">
+            {{ octicon('settings') }} cribro your repos
         </a>
+        {% else %}
+        <a class="btn btn-success btn-lg" href="{{ url_for('auth.github') }}">
+            {{ octicon('mark-github') }} join now
+        </a>
+        {% endif %}
+        .
     </p>
 </div>
 {% endblock %}
