@@ -1,4 +1,5 @@
 {# List of repositories (of owner) #}
+{% from "macros/tabs.html" import tabzone without context %}
 <h2>Repositories</h2>
 
 <table class="table table-striped">
@@ -21,12 +22,8 @@
             <td>{{ repo.pushes|length }}</td>
             <td>{{ repo.releases|length }}</td>
             <td>
-                <a href="{{ repo.url }}">
-                    <span class="octicon octicon-mark-github"></span>
-                </a>
-                <a href="{{ url_for('core.repo_detail', login=owner.login, reponame=repo.name) }}">
-                    <span class="octicon octicon-repo"></span>
-                </a>
+                <a href="{{ repo.url }}">{{ octicon('mark-github') }}</a>
+                <a href="{{ url_for('core.repo_detail', login=owner.login, reponame=repo.name) }}">{{ octicon('repo') }}</a>
             </td>
         </tr>
     {% endfor %}

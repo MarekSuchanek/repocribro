@@ -1,4 +1,5 @@
 {# Repo detail #}
+{% from "macros/tabs.html" import tabzone without context %}
 <h2>Details</h2>
 
 <div class="row">
@@ -17,11 +18,11 @@
                 <td>
                     {% if repo.owner.type == 'user' %}
                         <a href="{{ url_for('core.user_detail', login=repo.owner.login) }}">
-                            <span class="octicon octicon-person"></span> {{ repo.owner.login }}
+                            {{ octicon('person') }} {{ repo.owner.login }}
                         </a>
                     {% else %}
                         <a href="{{ url_for('core.org_detail', login=repo.owner.login) }}">
-                            <span class="octicon octicon-organization"></span> {{ repo.owner.login }}
+                            {{ octicon('organization') }} {{ repo.owner.login }}
                         </a>
                     {% endif %}
                 </td>

@@ -1,4 +1,5 @@
 {# Pushes and commits of repository #}
+{% from "macros/tabs.html" import tabzone without context %}
 <h2>Updates</h2>
 
 <table class="table table-striped">
@@ -24,9 +25,7 @@
             <td>{{ push.sender_login }}</td>
             <td>{{ push.commits|length }}</td>{# TODO: filter #}
             <td>
-                <a href="{{ push.compare_url }}">
-                    <span class="octicon octicon-mark-github"></span>
-                </a>
+                <a href="{{ push.compare_url }}">{{ octicon('mark-github') }}</a>
             </td>
         </tr>
     {% endfor %}
