@@ -224,6 +224,7 @@ class Repository(db.Model, SearchableMixin):
     private = db.Column(db.Boolean)
     visibility_type = db.Column(db.Integer)
     secret = db.Column(db.String(255))
+    webhook_id = db.Column(db.Integer)
     owner_id = db.Column(db.Integer, db.ForeignKey('RepositoryOwner.id'))
     owner = db.relationship('RepositoryOwner', back_populates='repositories')
     pushes = db.relationship('Push', back_populates='repository')
@@ -234,7 +235,8 @@ class Repository(db.Model, SearchableMixin):
     VISIBILITY_HIDDEN = 2
 
     def __init__(self, github_id, fork_of, full_name, name, languages, url,
-                 description, private, owner, visibility_type, secret):
+                 description, private, webhook_id, owner, visibility_type,
+                 secret=None):
         self.github_id = github_id
         self.fork_of = fork_of
         self.full_name = full_name
@@ -243,12 +245,13 @@ class Repository(db.Model, SearchableMixin):
         self.url = url
         self.description = description
         self.private = private
+        self.webhook_id = webhook_id
         self.owner = owner
         self.visibility_type = visibility_type
         self.secret = secret
 
     @staticmethod
-    def create_from_dict(repo_dict, owner,
+    def create_from_dict(repo_dict, owner, webhook_id=None,
                          visibility_type=0, secret=None):
         fork_of = None
         if 'parent' in repo_dict:
@@ -262,6 +265,7 @@ class Repository(db.Model, SearchableMixin):
             repo_dict['url'],
             repo_dict['description'],
             repo_dict['private'],
+            webhook_id,
             owner,
             visibility_type,
             secret
