@@ -3,6 +3,7 @@ import flask_login
 import json
 from ..github import GitHubAPI
 from ..models import Repository, db
+from ..helpers import ViewTab, Badge
 
 user = flask.Blueprint('user', __name__, url_prefix='/user')
 
@@ -10,12 +11,38 @@ user = flask.Blueprint('user', __name__, url_prefix='/user')
 @user.route('')
 @flask_login.login_required
 def dashboard():
-    tab = flask.request.args.get('tab', default='repos')
+    repos = []
+    orgs = []
+
+    tabs = [
+        ViewTab(
+            'repositories', 'Repositories', 0,
+            flask.render_template('user/dashboard/repos_tab.html', repos=repos),
+            octicon='repo', badge=Badge(len(repos))
+        ),
+        ViewTab(
+            'profile', 'Profile', 1,
+            flask.render_template(
+                'user/dashboard/profile_tab.html',
+                user=flask_login.current_user.github_user
+            ),
+            octicon='person'
+        ),
+        ViewTab(
+            'session', 'Session', 2,
+            flask.render_template(
+                'user/dashboard/session_tab.html',
+                token=GitHubAPI.get_token(),
+                scopes=GitHubAPI.get_scope()
+            ),
+            octicon='mark-github'
+        ),
+    ]
+
     return flask.render_template(
         'user/dashboard.html',
-        tab=tab,
-        token=GitHubAPI.get_token(),
-        scopes=GitHubAPI.get_scope()
+        tabs=tabs,
+        active_tab=flask.request.args.get('tab', 'repositories')
     )
 
 

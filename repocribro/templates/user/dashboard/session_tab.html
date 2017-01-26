@@ -1,0 +1,22 @@
+<h2>GitHub session</h2>
+<div class="row">
+    <div class="col-lg-6">
+        <div class="input-group">
+            <label for="gh_token" class="input-group-addon">Token:</label>
+            <input id="gh_token" type="password" value="{{ token }}" class="form-control">
+            <span class="input-group-btn">
+                    <button class="btn btn-default" type="button" id="toggle-gh_token">
+                        <span class="octicon octicon-eye"></span>
+                    </button>
+                </span>
+        </div>
+    </div>
+</div>
+<hr>
+
+<p>Given permissions (scopes):</p>
+<ul>
+    {% for scope in scopes %}
+        <li>{{ scope }}</li>
+    {% endfor %}
+</ul>
