@@ -1,3 +1,3 @@
-from .repocribro import app, db, manager, start
+from .repocribro import create_app, start
 
-__all__ = ['app', 'db', 'manager', 'start']
+__all__ = ['create_app', 'start']

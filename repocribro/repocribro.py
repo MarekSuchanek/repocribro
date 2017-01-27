@@ -1,23 +1,25 @@
 import flask
 import flask_bower
-from flask_migrate import Migrate, MigrateCommand
 from flask_script import Manager
+from flask_migrate import Migrate, MigrateCommand
 import configparser
-from .models import db
 import os
-
-basedir = os.path.abspath(os.path.dirname(__file__))
 
 
 # TODO: app factory and/or subclass
-def create_app():
+def create_app(cfg):
     app = flask.Flask(__name__)
     flask_bower.Bower(app)
 
     # TODO: db config file
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///repocribro_dev.db'
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
+    from .models import db
     db.init_app(app)
+
+    migrate = Migrate(app, db)
+    manager = Manager(app)
+    manager.add_command('db', MigrateCommand)
 
     from .security import login_manager, principals
     login_manager.init_app(app)
@@ -28,9 +30,6 @@ def create_app():
     # TODO: load all parts
     # TODO: load all extensions
 
-    cfg = configparser.ConfigParser()
-    cfg.read('config/auth.cfg')
-
     # TODO: load config file(s), make config class (defaults)
     app.config['DEBUG'] = True  # TODO: from config
     app.config['TEMPLATES_AUTO_RELOAD'] = True
@@ -40,7 +39,7 @@ def create_app():
     app.secret_key = cfg['flask']['secret_key']
 
     init_controllers(app)
-    return app
+    return app, manager
 
 
 def init_controllers(app):
@@ -53,13 +52,13 @@ def init_controllers(app):
     app.register_blueprint(webhooks)
 
 
-app = create_app()
-
-migrate = Migrate(app, db)
-
-manager = Manager(app)
-manager.add_command('db', MigrateCommand)
+def get_auth_cfg(cfg_file='config/auth.cfg'):
+    auth_cfg = configparser.ConfigParser()
+    auth_cfg.read(cfg_file)
+    return auth_cfg
 
 
 def start():
+    auth_cfg = get_auth_cfg()
+    app, manager = create_app(auth_cfg)
     app.run()
