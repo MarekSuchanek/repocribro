@@ -1,7 +1,7 @@
 repocribro
 ==========
 
-|travis|
+|license| |travis| |docs|
 
 
 Repocribro is web application allowing users to register their GitHub repository so they can 
@@ -113,6 +113,12 @@ This project is licensed under the MIT License - see the `LICENSE`_ file for mor
 .. _shields.io: http://shields.io
 .. _LICENSE: LICENSE
 
+.. |license| image:: https://img.shields.io/badge/license-MIT-blue.svg
+    :alt: License
+    :target: LICENSE
 .. |travis| image:: https://travis-ci.org/MarekSuchanek/repocribro.svg?branch=master
     :alt: Build Status
     :target: https://travis-ci.org/MarekSuchanek/repocribro
+.. |docs| image:: https://readthedocs.org/projects/pyt-twitterwall/badge/?version=latest
+    :alt: Documentation Status
+    :target: http://pyt-twitterwall.readthedocs.io/en/latest/?badge=latest
