@@ -3,8 +3,10 @@ python:
 - '3.5'
 install:
 - python setup.py install
+- pip install -r docs/requirements.txt
 before_script:
 - npm install -g bower
 - bower install
 script:
 - python setup.py test
+- cd docs && make doctest
