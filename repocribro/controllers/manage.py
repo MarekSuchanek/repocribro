@@ -16,7 +16,10 @@ def dashboard():
     tabs = [
         ViewTab(
             'repositories', 'Repositories', 0,
-            flask.render_template('manage/dashboard/repos_tab.html', repos=repos),
+            flask.render_template(
+                'manage/dashboard/repos_tab.html',
+                repos=repos
+            ),
             octicon='repo', badge=Badge(len(repos))
         ),
         ViewTab(

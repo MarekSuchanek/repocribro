@@ -8,4 +8,3 @@ admin = flask.Blueprint('admin', __name__, url_prefix='/admin')
 @permissions.admin_role.require(404)
 def index():
     return flask.render_template('admin/index.html')
-
