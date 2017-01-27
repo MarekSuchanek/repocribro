@@ -223,7 +223,7 @@ class Repository(db.Model, SearchableMixin):
     description = db.Column(db.UnicodeText)
     private = db.Column(db.Boolean)
     visibility_type = db.Column(db.Integer)
-    secret = db.Column(db.String(255))
+    secret = db.Column(db.String(255), unique=True)
     webhook_id = db.Column(db.Integer)
     owner_id = db.Column(db.Integer, db.ForeignKey('RepositoryOwner.id'))
     owner = db.relationship('RepositoryOwner', back_populates='repositories')
@@ -284,8 +284,12 @@ class Repository(db.Model, SearchableMixin):
         return '{}/{}'.format(login, reponame)
 
     def generate_secret(self):
-        # TODO: check for some good mechanism to generate unique string
-        self.secret = "some_randomized_secret_unique_code"
+        import uuid
+        import hashlib
+        self.secret = ''.join([
+            uuid.uuid4().hex,
+            hashlib.sha1(self.full_name).hexdigest()
+        ])
 
     def is_public(self):
         return self.visibility_type == self.VISIBILITY_PUBLIC
