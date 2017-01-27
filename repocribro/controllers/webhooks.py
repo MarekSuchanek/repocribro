@@ -1,4 +1,5 @@
 import flask
+import functools
 from ..github import GitHubAPI
 from ..models import Repository, Push, Release, db
 
@@ -7,10 +8,20 @@ webhooks = flask.Blueprint('webhooks', __name__, url_prefix='/webhook/github')
 # TODO: move webhooks logic somewhere else
 
 
-def gh_webhook_push(repo, data, deliver_id):
-    if 'push' not in data or 'sender' not in data:
-        flask.abort(400)
+# Decorator for checking data fields
+def webhook_data_requires(*fields):
+    def check_data_requires(func):
+        @functools.wraps(func)
+        def webhook_processor(repo, data, delivery_id):
+            for field in fields:
+                if field not in data:
+                    flask.abort(400)
+            return func(repo, data, delivery_id)
+    return check_data_requires
 
+
+@webhook_data_requires('push', 'sender')
+def gh_webhook_push(repo, data, delivery_id):
     # TODO: deal with limit of commits in webhook msg (20)
     push = Push.create_from_dict(data['push'], data['sender'], repo)
     db.session.add(push)
@@ -18,18 +29,14 @@ def gh_webhook_push(repo, data, deliver_id):
         db.session.add(commit)
 
 
-def gh_webhook_release(repo, data, deliver_id):
-    if 'release' not in data or 'sender' not in data:
-        flask.abort(400)
-
+@webhook_data_requires('release', 'sender')
+def gh_webhook_release(repo, data, delivery_id):
     release = Release.create_from_dict(data['release'], data['sender'], repo)
     db.session.add(release)
 
 
-def gh_webhook_repository(repo, data, deliver_id):
-    if 'action' not in data or 'reopsitory' not in data:
-        flask.abort(400)
-
+@webhook_data_requires('action', 'repository')
+def gh_webhook_repository(repo, data, delivery_id):
     # This can be one of "created", "deleted", "publicized", or "privatized".
     # TODO: find out where is "updated" action
     action = data['action']
