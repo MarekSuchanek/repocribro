@@ -1,6 +1,6 @@
 import flask
 from ..github import GitHubAPI
-from ..models import Repository, db
+from ..models import Repository, Push, Release, db
 
 webhooks = flask.Blueprint('webhooks', __name__, url_prefix='/webhook/github')
 
@@ -8,13 +8,22 @@ webhooks = flask.Blueprint('webhooks', __name__, url_prefix='/webhook/github')
 
 
 def gh_webhook_push(repo, data, deliver_id):
-    # TODO: lookup repository and add push (commits)
-    return ''
+    if 'push' not in data or 'sender' not in data:
+        flask.abort(400)
+
+    # TODO: deal with limit of commits in webhook msg (20)
+    push = Push.create_from_dict(data['push'], data['sender'], repo)
+    db.session.add(push)
+    for commit in push.commits:
+        db.session.add(commit)
 
 
 def gh_webhook_release(repo, data, deliver_id):
-    # TODO: lookup repository and add release
-    return ''
+    if 'release' not in data or 'sender' not in data:
+        flask.abort(400)
+
+    release = Release.create_from_dict(data['release'], data['sender'], repo)
+    db.session.add(release)
 
 
 def gh_webhook_repository(repo, data, deliver_id):

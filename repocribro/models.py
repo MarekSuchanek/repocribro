@@ -320,7 +320,7 @@ class Push(db.Model, SearchableMixin):
     repository = db.relationship('Repository', back_populates='pushes')
     commits = db.relationship('Commit', back_populates='push')
 
-    def __init__(self, after, before, ref, timestamp, pusher_name, compare_url,
+    def __init__(self, after, before, ref, timestamp, compare_url, pusher_name,
                  pusher_email, sender_login, sender_id, repository):
         self.after = after
         self.before = before
@@ -332,6 +332,24 @@ class Push(db.Model, SearchableMixin):
         self.sender_login = sender_login
         self.sender_id = sender_id
         self.repository = repository
+
+    @staticmethod
+    def create_from_dict(push_dict, sender_dict, repository):
+        push = Push(
+            push_dict['after'],
+            push_dict['before'],
+            push_dict['ref'],
+            push_dict['timestamp'],
+            push_dict['compare_url'],
+            push_dict['pusher_name'],
+            push_dict['pusher_email'],
+            sender_dict['login'],
+            sender_dict['id'],
+            repository
+        )
+        for commit_data in push_dict.get('commits', []):
+            Commit.create_from_dict(commit_data, push)
+        return push
 
     def __repr__(self):
         return '<GH Push {}-{}>'.format(self.before[0:7], self.after[0:7])
@@ -374,6 +392,25 @@ class Commit(db.Model, SearchableMixin):
         self.committer_email = committer_email
         self.committer_login = committer_login
         self.push = push
+
+    @staticmethod
+    def create_from_dict(commit_dict, push):
+        # TODO: verify, there are some conflict in GitHub docs
+        #       (commits in webhook PushEvent vs Commits API)
+        return Commit(
+            commit_dict['sha'],
+            commit_dict['tree_sha'],
+            commit_dict['message'],
+            commit_dict['timestamp'],
+            commit_dict['html_url'],
+            commit_dict['author']['name'],
+            commit_dict['author']['email'],
+            commit_dict['author']['login'],
+            commit_dict['committer']['name'],
+            commit_dict['committer']['email'],
+            commit_dict['committer']['login'],
+            push
+        )
 
     def __repr__(self):
         return '<GH Commit {}>'.format(self.sha[0:7])
@@ -419,6 +456,25 @@ class Release(db.Model, SearchableMixin):
         self.sender_login = sender_login
         self.sender_id = sender_id
         self.repository = repository
+
+    @staticmethod
+    def create_from_dict(release_dict, sender_dict, repo):
+        return Release(
+            release_dict['id'],
+            release_dict['tag_name'],
+            release_dict['created_at'],
+            release_dict['published_at'],
+            release_dict['html_url'],
+            release_dict['prerelease'],
+            release_dict['draft'],
+            release_dict['name'],
+            release_dict['body'],
+            release_dict['author']['login'],
+            release_dict['author']['id'],
+            sender_dict['login'],
+            sender_dict['id'],
+            repo
+        )
 
     def __repr__(self):
         return '<GH Commit {}>'.format(self.sha[0:7])
