@@ -3,5 +3,8 @@ python:
 - '3.5'
 install:
 - python setup.py install
+before_script:
+- npm install -g bower
+- bower install
 script:
 - python setup.py test
