@@ -1,6 +1,9 @@
 repocribro
 ==========
 
+|travis|
+
+
 Repocribro is web application allowing users to register their GitHub repository so they can 
 be managed, searched, browsed, tested, etc. (depends on used extensions) with the site. Main 
 idea is to provide simple but powerful modular tool for building groups of GitHub repositories 
@@ -109,3 +112,7 @@ This project is licensed under the MIT License - see the `LICENSE`_ file for mor
 .. _Docker: https://www.docker.com
 .. _shields.io: http://shields.io
 .. _LICENSE: LICENSE
+
+.. |travis| image:: https://travis-ci.org/MarekSuchanek/repocribro.svg?branch=master
+    :alt: Build Status
+    :target: https://travis-ci.org/MarekSuchanek/repocribro
