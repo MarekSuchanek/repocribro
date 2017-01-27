@@ -1,0 +1,4 @@
+include setup.cfg
+include pytest.ini
+include config/auth.example.cfg
+include tests/*.py

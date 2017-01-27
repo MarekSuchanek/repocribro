@@ -40,6 +40,14 @@ setup(
         'requests',
         'sqlalchemy',
     ],
+    setup_requires=[
+        'pytest-runner',
+    ],
+    tests_require=[
+        'pytest-pep8',
+        'pytest-cov',
+        'pytest'
+    ],
     classifiers=[
         'Development Status :: 1 - Planning',
         'Environment :: Web Environment',
