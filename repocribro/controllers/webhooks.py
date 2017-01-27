@@ -27,8 +27,22 @@ def gh_webhook_release(repo, data, deliver_id):
 
 
 def gh_webhook_repository(repo, data, deliver_id):
-    # TODO: lookup repository and update it
-    return ''
+    if 'action' not in data or 'reopsitory' not in data:
+        flask.abort(400)
+
+    # This can be one of "created", "deleted", "publicized", or "privatized".
+    # TODO: find out where is "updated" action
+    action = data['action']
+    if action == 'privatized':
+        repo.private = True
+        repo.visibility_type = Repository.VISIBILITY_PRIVATE
+    elif action == 'publicized':
+        repo.private = False
+        repo.visibility_type = Repository.VISIBILITY_PUBLIC
+    elif action == 'deleted':
+        # TODO: consider some signalization of not being @GitHub anymore
+        repo.webhook_id = None
+        repo.visibility_type = Repository.VISIBILITY_PRIVATE
 
 
 # TODO: extensible registered hooks
