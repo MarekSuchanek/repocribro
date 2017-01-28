@@ -1,0 +1,28 @@
+{% from 'macros/basic.html' import octicon without context %}
+<h2>Roles</h2>
+
+{# TODO: add and edit role #}
+<table class="table table-striped">
+    <thead>
+    <tr>
+        <th>Name</th>
+        <th>Description</th>
+        <th>Users</th>
+        <th></th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for role in roles %}
+        <tr>
+            <td>{{ role.name }}</td>
+            <td>{{ role.description }}</td>
+            <td>{{ role.accounts|length }}</td>
+            <td>
+                <a href="{{ url_for('admin.role_detail', uid=role.id) }}" class="btn btn-primary btn-small">
+                    {{ octicon('tools') }}
+                </a>
+            </td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>

@@ -71,3 +71,7 @@ div.user-card div.login{
     font-size: 120%;
     font-weight: bold;
 }
+
+table.table > tbody > tr > td{
+    vertical-align: middle;
+}

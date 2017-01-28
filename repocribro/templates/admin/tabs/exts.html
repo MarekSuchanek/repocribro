@@ -1,0 +1,26 @@
+<h2>Extensions</h2>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Category</th>
+            <th>Author</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for ext in exts %}
+        <tr>
+            <td>{{ ext.name }}</td>
+            <td>{{ ext.category }}</td>
+            <td>{{ ext.author }}</td>
+            <td>
+                <a href="{{ ext.int_url }}">{{ octicon('tools') }}</a>
+                <a href="{{ ext.ext_url }}" target="_blank">{{ octicons('home') }}</a>
+                <a href="{{ ext.gh_url }}" target="_blank">{{ octicons('mark-github') }}</a>
+            </td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>

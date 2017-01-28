@@ -1,6 +1,7 @@
 {% extends "layout.html" %}
+{% from 'macros/tabs.html' import tabzone without context %}
 {% block body %}
-    <h1>Admin zone</h1>
+    <h1>Administration</h1>
 
-    {# TODO: administration panels (users, repos, ...) #}
+    {{ tabzone(tabs, active_tab) }}
 {% endblock %}

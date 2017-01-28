@@ -1,0 +1,29 @@
+{% from 'macros/basic.html' import octicon without context %}
+<h2>Users</h2>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Login (GitHub)</th>
+            <th>Created</th>
+            <th>Repos</th>
+            <th>Roles</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for account in accounts %}
+        <tr>
+            <td>{{ account.github_user.login }}</td>
+            <td>{{ account.created_at }}</td>
+            <td>{{ account.github_user.repositories|length }}</td>
+            <td>{{ account.rolenames|join(', ') }}</td>
+            <td>
+                <a href="{{ url_for('admin.account_detail', uid=account.id) }}" class="btn btn-primary btn-small">
+                    {{ octicon('tools') }}
+                </a>
+            </td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>

@@ -67,6 +67,10 @@ class UserAccount(db.Model, UserMixin, SearchableMixin):
         backref=db.backref('users', lazy='dynamic')
     )
 
+    @property
+    def rolenames(self):
+        return [role.name for role in self.roles]
+
     def sees_repo(self, repo):
         # TODO: admins, org repos
         return repo.is_public() or \
@@ -83,7 +87,8 @@ class Role(db.Model, RoleMixin):
     id = db.Column(db.Integer(), primary_key=True)
     name = db.Column(db.String(80), unique=True)
     description = db.Column(db.String(255))
-
+    accounts = db.relationship('UserAccount', back_populates='roles',
+        secondary=roles_users)
 
 class RepositoryOwner(db.Model):
     """RepositoryOwner (User or Organization) from GitHub"""
