@@ -1,6 +1,7 @@
 import flask
 import flask_login
 import flask_principal
+from .models import UserAccount
 
 login_manager = flask_login.LoginManager()
 principals = flask_principal.Principal()
@@ -13,6 +14,16 @@ class Permissions:
     )
 
 permissions = Permissions()
+
+
+@login_manager.unauthorized_handler
+def unauthorized():
+    flask.abort(403)
+
+
+@login_manager.user_loader
+def load_user(user_id):
+    return UserAccount.query.get(int(user_id))
 
 
 def login(user_account):

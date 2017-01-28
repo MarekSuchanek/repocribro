@@ -9,16 +9,6 @@ from ..security import login_manager, clear_session,\
 auth = flask.Blueprint('auth', __name__, url_prefix='/auth')
 
 
-@login_manager.unauthorized_handler
-def unauthorized():
-    flask.abort(403)
-
-
-@login_manager.user_loader
-def load_user(user_id):
-    return UserAccount.query.get(int(user_id))
-
-
 @auth.route('/github')
 def github():
     return flask.redirect(GitHubAPI.get_auth_url())
@@ -57,11 +47,10 @@ def github_callback():
                         'Welcome in repocribro!', 'success')
         else:
             flask.flash('You are now logged in via GitHub.', 'success')
-        return flask.redirect(flask.url_for('user.dashboard'))
+        return flask.redirect(flask.url_for('manage.dashboard'))
     else:
-        # TODO: log error
-        flask.flash('Woops, we are not able to authenticate '
-                    'you via GitHub now!', 'danger')
+        flask.flash('Whoops, we are not able to authenticate '
+                    'you via GitHub now!', 'error')
         return flask.redirect(flask.url_for('core.index'))
 
 
