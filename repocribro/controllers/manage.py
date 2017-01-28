@@ -138,17 +138,46 @@ def repo_activate():
 @manage.route('/repos/deactivate', methods=['POST'])
 @flask_login.login_required
 def repo_deactivate():
-    flask.abort(501)
     reponame = flask.request.form.get('reponame')
-    # TODO retrieve repository
-    # TODO archive/delete repository
-    # TODO remove webhook from repository
+    user = flask_login.current_user.github_user
+    full_name = Repository.make_full_name(user.login, reponame)
+
+    repo = Repository.query.filter_by(full_name=full_name).first()
+    if repo.webhook_id is not None:
+        if GitHubAPI.webhook_delete(repo.full_name, repo.webhook_id):
+            flask.flash('Webhook was deactivated', 'success')
+            repo.webhook_id = None
+            db.session.commit()
+        else:
+            flask.flash('GitHub couldn\'t delete the webhook', 'warning')
+    else:
+        flask.flash('There is no registered the webhook', 'info')
+    return flask.redirect(
+        flask.url_for('manage.repo_detail', reponame=reponame)
+    )
+
+
+@manage.route('/repos/delete', methods=['POST'])
+@flask_login.login_required
+def repo_delete():
+    reponame = flask.request.form.get('reponame')
+    user = flask_login.current_user.github_user
+    full_name = Repository.make_full_name(user.login, reponame)
+
+    repo = Repository.query.filter_by(full_name=full_name).first()
+    if repo.webhook_id is not None:
+        GitHubAPI.webhook_delete(repo.full_name, repo.webhook_id)
+    db.session.delete(repo)
+    db.session.commit()
+    flask.flash('Repository {} has been deleted within app.'.format(full_name)
+                , 'success')
     return flask.redirect(flask.url_for('manage.repositories'))
 
 
 @manage.route('/orgs')
 @flask_login.login_required
 def organizations():
+    flask.abort(501)
     orgs_data = GitHubAPI.get_data('/user/orgs')
     return flask.render_template(
         'manage/orgs.html',

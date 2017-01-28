@@ -58,9 +58,8 @@ class UserAccount(db.Model, UserMixin, SearchableMixin):
     created_at = db.Column(db.DateTime, default=datetime.datetime.now())
     active = db.Column(db.Boolean, default=True)
     github_user = db.relationship(
-        'User',
-        uselist=False,
-        back_populates='user_account'
+        'User', back_populates='user_account',
+        uselist=False, cascade='all, delete-orphan'
     )
     roles = db.relationship(
         'Role',
@@ -101,7 +100,10 @@ class RepositoryOwner(db.Model):
     blog_url = db.Column(db.UnicodeText)
     avatar_url = db.Column(db.String(255))
     type = db.Column(db.String(30))
-    repositories = db.relationship('Repository', back_populates="owner")
+    repositories = db.relationship(
+        'Repository', back_populates='owner',
+        cascade='all, delete-orphan'
+    )
     __mapper_args__ = {
         'polymorphic_on': type,
         'polymorphic_identity': 'RepositoryOwner'
@@ -116,8 +118,7 @@ class User(RepositoryOwner, SearchableMixin):
     hireable = db.Column(db.Boolean)
     user_account_id = db.Column(db.Integer, db.ForeignKey('UserAccount.id'))
     user_account = db.relationship(
-        'UserAccount',
-        back_populates='github_user'
+        'UserAccount', back_populates='github_user'
     )
 
     __mapper_args__ = {
@@ -227,8 +228,14 @@ class Repository(db.Model, SearchableMixin):
     webhook_id = db.Column(db.Integer)
     owner_id = db.Column(db.Integer, db.ForeignKey('RepositoryOwner.id'))
     owner = db.relationship('RepositoryOwner', back_populates='repositories')
-    pushes = db.relationship('Push', back_populates='repository')
-    releases = db.relationship('Release', back_populates='repository')
+    pushes = db.relationship(
+        'Push', back_populates='repository',
+        cascade='all, delete-orphan'
+    )
+    releases = db.relationship(
+        'Release', back_populates='repository',
+        cascade='all, delete-orphan'
+    )
 
     VISIBILITY_PUBLIC = 0
     VISIBILITY_PRIVATE = 1
@@ -322,7 +329,10 @@ class Push(db.Model, SearchableMixin):
     sender_id = db.Column(db.Integer())
     repository_id = db.Column(db.Integer, db.ForeignKey('Repository.id'))
     repository = db.relationship('Repository', back_populates='pushes')
-    commits = db.relationship('Commit', back_populates='push')
+    commits = db.relationship(
+        'Commit', back_populates='push',
+        cascade='all, delete-orphan'
+    )
 
     def __init__(self, after, before, ref, timestamp, compare_url, pusher_name,
                  pusher_email, sender_login, sender_id, repository):
