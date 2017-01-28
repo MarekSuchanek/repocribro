@@ -96,7 +96,8 @@ def repo_detail(reponame):
     user = flask_login.current_user.github_user
     full_name = Repository.make_full_name(user.login, reponame)
     repo = Repository.query.filter_by(full_name=full_name).first_or_404()
-    return flask.render_template('manage/repo.html', repo=repo, user=user)
+    return flask.render_template('manage/repo.html',
+                                 repo=repo, user=user, Repository=Repository)
 
 
 @manage.route('/repo/<reponame>/update')
@@ -105,7 +106,7 @@ def repo_update(reponame):
     user = flask_login.current_user.github_user
     full_name = Repository.make_full_name(user.login, reponame)
     repo = Repository.query.filter_by(full_name=full_name).first_or_404()
-    repo_data = GitHubAPI.get('/repo/'+full_name)
+    repo_data = GitHubAPI.get('/repos/' + full_name)
     repo.update_from_dict(repo_data)
     db.session.commit()
     return flask.redirect(
@@ -188,8 +189,8 @@ def repo_delete():
         GitHubAPI.webhook_delete(repo.full_name, repo.webhook_id)
     db.session.delete(repo)
     db.session.commit()
-    flask.flash('Repository {} has been deleted within app.'.format(full_name)
-                , 'success')
+    flask.flash('Repository {} has been deleted within app.'.format(full_name),
+                'success')
     return flask.redirect(flask.url_for('manage.repositories'))
 
 

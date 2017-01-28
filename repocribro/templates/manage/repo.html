@@ -1,5 +1,5 @@
 {% extends 'layout.html' %}
-
+{% from 'macros/basic.html' import octicon without context %}
 {% block body %}
     <h1>{{ repo.full_name }}
         <small>&laquo;manage&raquo;</small>
@@ -36,14 +36,49 @@
         </tr>
     </table>
 
-    <ul>
-        <li>Back to my repos</li>
-        <li>(Re)create webhook (receiving updates)</li>
-        <li>Remove webhook (receiving updates)</li>
-        <li>Make repository public (@repocribro)</li>
-        <li>Make repository private (@repocribro)</li>
-        <li>Make repository hidden (@repocribro) or refresh secret URL</li>
-        <li>Update repository information</li>
-        <li>Delete repository (@repocribro)</li>
-    </ul>
+    <div class="row">
+        <p>
+            <a href="{{ url_for('manage.repositories', reponame=repo.name) }}" class="btn btn-default">
+                {{ octicon('list-unordered') }} Back
+            </a>
+        </p>
+
+        <form action="{{ url_for('manage.repo_activate', reponame=repo.name) }}" method="POST">
+            <button type="submit" class="btn btn-primary" name="enable" value="{{ repo.visibility_type }}">
+                {{ octicon('link') }} Reactivate
+            </button>
+        </form>
+        <form action="{{ url_for('manage.repo_update', reponame=repo.name) }}" method="POST">
+            <button type="submit" class="btn btn-primary">
+                {{ octicon('sync') }} Update
+            </button>
+        </form>
+        <form action="{{ url_for('manage.repo_deactivate', reponame=repo.name) }}" method="POST">
+            <button type="submit" class="btn btn-danger">
+                {{ octicon('circle-slash') }} Deactivate
+            </button>
+        </form>
+
+
+        <form action="{{ url_for('manage.repo_activate', reponame=repo.name) }}" method="POST">
+            <input type="hidden" value="{{ repo.name }}" name="reponame">
+            <div class="btn-group" role="group">
+                <button type="submit" class="btn btn-success" name="enable" value="{{ Repository.VISIBILITY_PUBLIC }}">
+                    Public
+                </button>
+                <button type="submit" class="btn btn-primary" name="enable" value="{{ Repository.VISIBILITY_HIDDEN }}">
+                    Hidden
+                </button>
+                <button type="submit" class="btn btn-warning" name="enable" value="{{ Repository.VISIBILITY_PRIVATE }}">
+                    Private
+                </button>
+            </div>
+        </form>
+
+        <form action="{{ url_for('manage.repo_delete', reponame=repo.name) }}" method="POST">
+            <button type="submit" class="btn btn-danger">
+                {{ octicon('trashcan') }} Delete
+            </button>
+        </form>
+    </div>
 {% endblock %}
