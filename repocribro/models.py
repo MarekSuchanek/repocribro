@@ -269,7 +269,7 @@ class Repository(db.Model, SearchableMixin):
             repo_dict['full_name'],
             repo_dict['name'],
             repo_dict['language'],
-            repo_dict['url'],
+            repo_dict['html_url'],
             repo_dict['description'],
             repo_dict['private'],
             webhook_id,
@@ -282,7 +282,7 @@ class Repository(db.Model, SearchableMixin):
         self.full_name = repo_dict['full_name']
         self.name = repo_dict['name']
         self.languages = repo_dict['language']
-        self.url = repo_dict['url']
+        self.url = repo_dict['html_url']
         self.description = repo_dict['description']
         self.private = repo_dict['private']
 

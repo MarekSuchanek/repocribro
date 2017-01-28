@@ -70,19 +70,17 @@ def repositories():
     )
 
 
-@manage.route('/repo/<reponame>')
-@flask_login.login_required
-def repo_detail(reponame):
-    flask.abort(501)
+def has_good_webhook(repo):
+    if repo.webhook_id is None:
+        return False
+    # TODO: check if there are right events
+    webhook = GitHubAPI.webhook_get(repo.full_name, repo.webhook_id)
+    return webhook is None
 
 
 def update_webhook(repo):
-    if repo.webhook_id is not None:
-        # Check if actual webhook is still there
-        # TODO: check if there are right events
-        webhook = GitHubAPI.webhook_get(repo.full_name, repo.webhook_id)
-        if webhook is None:
-            repo.webhook_id = None
+    if not has_good_webhook(repo):
+        repo.webhook_id = None
     if repo.webhook_id is None:
         # Create new webhook
         webhook = GitHubAPI.webhook_create(repo.full_name)
@@ -92,9 +90,32 @@ def update_webhook(repo):
     return True
 
 
-@manage.route('/repos/activate', methods=['POST'])
+@manage.route('/repo/<reponame>')
 @flask_login.login_required
-def repo_activate():
+def repo_detail(reponame):
+    user = flask_login.current_user.github_user
+    full_name = Repository.make_full_name(user.login, reponame)
+    repo = Repository.query.filter_by(full_name=full_name).first_or_404()
+    return flask.render_template('manage/repo.html', repo=repo, user=user)
+
+
+@manage.route('/repo/<reponame>/update')
+@flask_login.login_required
+def repo_update(reponame):
+    user = flask_login.current_user.github_user
+    full_name = Repository.make_full_name(user.login, reponame)
+    repo = Repository.query.filter_by(full_name=full_name).first_or_404()
+    repo_data = GitHubAPI.get('/repo/'+full_name)
+    repo.update_from_dict(repo_data)
+    db.session.commit()
+    return flask.redirect(
+        flask.url_for('manage.repo_detail', reponame=reponame)
+    )
+
+
+@manage.route('/repo/<reponame>/activate', methods=['POST'])
+@flask_login.login_required
+def repo_activate(reponame):
     visibility_type = flask.request.form.get('enable', type=int)
     if visibility_type not in (
         Repository.VISIBILITY_HIDDEN,
@@ -105,11 +126,10 @@ def repo_activate():
         return flask.redirect(flask.url_for('manage.repositories'))
 
     # TODO: protect from activating too often
-    reponame = flask.request.form.get('reponame')
     user = flask_login.current_user.github_user
     full_name = Repository.make_full_name(user.login, reponame)
 
-    repo = Repository.query.filter_by(full_name=full_name).first()
+    repo = Repository.query.filter_by(full_name=full_name).first_or_404()
 
     response = GitHubAPI.get('/repos/' + full_name)
     if response.status_code != 200:
@@ -135,14 +155,13 @@ def repo_activate():
     )
 
 
-@manage.route('/repos/deactivate', methods=['POST'])
+@manage.route('/repo/<reponame>/deactivate', methods=['POST'])
 @flask_login.login_required
-def repo_deactivate():
-    reponame = flask.request.form.get('reponame')
+def repo_deactivate(reponame):
     user = flask_login.current_user.github_user
     full_name = Repository.make_full_name(user.login, reponame)
 
-    repo = Repository.query.filter_by(full_name=full_name).first()
+    repo = Repository.query.filter_by(full_name=full_name).first_or_404()
     if repo.webhook_id is not None:
         if GitHubAPI.webhook_delete(repo.full_name, repo.webhook_id):
             flask.flash('Webhook was deactivated', 'success')
@@ -164,7 +183,7 @@ def repo_delete():
     user = flask_login.current_user.github_user
     full_name = Repository.make_full_name(user.login, reponame)
 
-    repo = Repository.query.filter_by(full_name=full_name).first()
+    repo = Repository.query.filter_by(full_name=full_name).first_or_404()
     if repo.webhook_id is not None:
         GitHubAPI.webhook_delete(repo.full_name, repo.webhook_id)
     db.session.delete(repo)
