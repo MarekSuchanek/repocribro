@@ -305,6 +305,10 @@ class Repository(db.Model, SearchableMixin):
     def make_full_name(login, reponame):
         return '{}/{}'.format(login, reponame)
 
+    @property
+    def owner_login(self):
+        return self.full_name.split('/')[0]
+
     def generate_secret(self):
         import uuid
         import hashlib

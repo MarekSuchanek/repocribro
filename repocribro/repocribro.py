@@ -38,6 +38,9 @@ def create_app(cfg):
     app.config['GH_BASIC_WEBHOOKS_SECRET'] = cfg['github']['webhooks_secret']
     app.secret_key = cfg['flask']['secret_key']
 
+    from .filters import register_filters
+    register_filters(app)
+
     init_controllers(app)
     return app, manager
 
