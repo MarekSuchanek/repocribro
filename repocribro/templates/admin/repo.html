@@ -1,39 +1,69 @@
 {% extends 'layout.html' %}
-
+{% from 'macros/basic.html' import octicon without context %}
 {% block body %}
     <h1>{{ repo.full_name }}
         <small>&laquo;administration&raquo;</small>
     </h1>
 
-    <table class="table table-striped">
-        <tr>
-            <th>Full name:</th>
-            <td>{{ repo.full_name }}</td>
-        </tr>
-        <tr>
-            <th>Languages:</th>
-            <td>{{ repo.languages }}</td>
-        </tr>
-        <tr>
-            <th>Description:</th>
-            <td>{{ repo.description }}</td>
-        </tr>
-        <tr>
-            <th>Visibility @GitHub:</th>
-            <td>{{ repo.private }}{# TODO filter #}</td>
-        </tr>
-        <tr>
-            <th>Visibility @repocribro:</th>
-            <td>{{ repo.visibility_type }}{# TODO filter #}</td>
-        </tr>
-        <tr>
-            <th>URL @GitHub:</th>
-            <td>{{ repo.url }}</td>
-        </tr>
-        <tr>
-            <th>URL @repocribro:</th>
-            <td>{# TODO: via filter #}</td>
-        </tr>
-    </table>
+    <div class="row">
+        <div class="col-xs-12 col-md-9">
+            <table class="table table-striped">
+                <tr>
+                    <th>Full name:</th>
+                    <td>{{ repo.full_name }}</td>
+                </tr>
+                <tr>
+                    <th>Languages:</th>
+                    <td>{{ repo.languages }}</td>
+                </tr>
+                <tr>
+                    <th>Description:</th>
+                    <td>{{ repo.description }}</td>
+                </tr>
+                <tr>
+                    <th>Visibility @GitHub:</th>
+                    <td>{{ repo.private }}{# TODO filter #}</td>
+                </tr>
+                <tr>
+                    <th>Visibility @repocribro:</th>
+                    <td>{{ repo.visibility_type }}{# TODO filter #}</td>
+                </tr>
+                <tr>
+                    <th>URL @GitHub:</th>
+                    <td>{{ repo.url }}</td>
+                </tr>
+                <tr>
+                    <th>URL @repocribro:</th>
+                    <td>{# TODO: via filter #}</td>
+                </tr>
+            </table>
+        </div>
+        <div class="col-xs-12 col-md-3">
+            <form action="{{ url_for('admin.repo_visibility', login=repo.owner.login, reponame=repo.name) }}"
+                  method="POST">
+                <input type="hidden" value="{{ repo.name }}" name="reponame">
+                <div class="btn-group" role="group">
+                    <button type="submit" class="btn btn-success" name="enable"
+                            value="{{ Repository.VISIBILITY_PUBLIC }}">
+                        Public
+                    </button>
+                    <button type="submit" class="btn btn-primary" name="enable"
+                            value="{{ Repository.VISIBILITY_HIDDEN }}">
+                        Hidden
+                    </button>
+                    <button type="submit" class="btn btn-warning" name="enable"
+                            value="{{ Repository.VISIBILITY_PRIVATE }}">
+                        Private
+                    </button>
+                </div>
+            </form>
+
+            <form action="{{ url_for('admin.repo_delete', login=repo.owner.login, reponame=repo.name) }}" method="POST">
+                <button class="btn btn-danger" type="submit">
+                    {{ octicon('trashcan') }} Delete repository (with all content)
+                </button>
+            </form>
+        </div>
+    </div>
 
 {% endblock %}

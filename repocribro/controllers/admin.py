@@ -78,21 +78,66 @@ def account_delete(login):
     user = User.query.filter_by(login=login).first_or_404()
     db.session.delete(user.user_account)
     db.session.commit()
-    flask.flash('User account {} with everything related data'
+    flask.flash('User account {} with the all related data'
                 ' has been deleted'.format(login), 'success')
     return flask.redirect(
-        flask.url_for('admin.account_detail', login=login)
+        flask.url_for('admin.index', tab='users')
     )
 
 
-@admin.route('/repository/<login>/reponame')
+@admin.route('/repository/<login>/<reponame>')
 @permissions.admin_role.require(404)
 def repo_detail(login, reponame):
     repo = Repository.query.filter_by(
         full_name=Repository.make_full_name(login, reponame)
     ).first_or_404()
-    return flask.render_template('admin/repo.html', repo=repo)
+    return flask.render_template(
+        'admin/repo.html',
+        repo=repo, Repository=Repository
+    )
 
+
+@admin.route('/repository/<login>/<reponame>/visibility', methods=['POST'])
+@permissions.admin_role.require(404)
+def repo_visibility(login, reponame):
+    repo = Repository.query.filter_by(
+        full_name=Repository.make_full_name(login, reponame)
+    ).first_or_404()
+    visibility_type = flask.request.form.get('enable', type=int)
+    if visibility_type not in (
+            Repository.VISIBILITY_HIDDEN,
+            Repository.VISIBILITY_PRIVATE,
+            Repository.VISIBILITY_PUBLIC
+    ):
+        flask.flash('You\'ve requested something weird...', 'error')
+        return flask.redirect(
+            flask.url_for('admin.repo_detail', login=login, reponame=reponame)
+        )
+
+    repo.visibility_type = visibility_type
+    if repo.visibility_type == Repository.VISIBILITY_HIDDEN:
+        repo.generate_secret()
+    db.session.commit()
+    flask.flash('The visibility of repository {}  has been '
+                'updated'.format(repo.full_name), 'success')
+    return flask.redirect(
+        flask.url_for('admin.repo_detail', login=login, reponame=reponame)
+    )
+
+
+@admin.route('/repository/<login>/<reponame>/delete', methods=['POST'])
+@permissions.admin_role.require(404)
+def repo_delete(login, reponame):
+    repo = Repository.query.filter_by(
+        full_name=Repository.make_full_name(login, reponame)
+    ).first_or_404()
+    db.session.delete(repo)
+    db.session.commit()
+    flask.flash('Repository {} with the all related data has '
+                'been deleted'.format(repo.full_name), 'success')
+    return flask.redirect(
+        flask.url_for('admin.index', tab='repos')
+    )
 
 @admin.route('/role/<name>')
 @permissions.admin_role.require(404)
