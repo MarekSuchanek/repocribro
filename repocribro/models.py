@@ -68,6 +68,12 @@ class UserAccount(db.Model, UserMixin, SearchableMixin):
     )
 
     @property
+    def login(self):
+        if self.github_user is None:
+            return '<unknown>'
+        return self.github_user.login
+
+    @property
     def rolenames(self):
         return [role.name for role in self.roles]
 
@@ -86,9 +92,14 @@ class Role(db.Model, RoleMixin):
 
     id = db.Column(db.Integer(), primary_key=True)
     name = db.Column(db.String(80), unique=True)
-    description = db.Column(db.String(255))
-    accounts = db.relationship('UserAccount', back_populates='roles',
-        secondary=roles_users)
+    description = db.Column(db.UnicodeText)
+    user_accounts = db.relationship('UserAccount', back_populates='roles',
+                                    secondary=roles_users)
+
+    def __init__(self, name, description):
+        self.name = name
+        self.description = description
+
 
 class RepositoryOwner(db.Model):
     """RepositoryOwner (User or Organization) from GitHub"""

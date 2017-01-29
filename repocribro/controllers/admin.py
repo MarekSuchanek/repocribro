@@ -1,4 +1,5 @@
 import flask
+import sqlalchemy
 from ..security import permissions
 from ..helpers import ViewTab, Badge
 from ..models import UserAccount, User, Role, Repository, db
@@ -135,12 +136,62 @@ def repo_delete(login, reponame):
     db.session.commit()
     flask.flash('Repository {} with the all related data has '
                 'been deleted'.format(repo.full_name), 'success')
-    return flask.redirect(
-        flask.url_for('admin.index', tab='repos')
-    )
+    return flask.redirect(flask.url_for('admin.index', tab='repos'))
+
 
 @admin.route('/role/<name>')
 @permissions.admin_role.require(404)
 def role_detail(name):
     role = Role.query.filter_by(name=name).first_or_404()
     return flask.render_template('admin/role.html', role=role)
+
+
+@admin.route('/role/<name>/edit', methods=['POST'])
+@permissions.admin_role.require(404)
+def role_edit(name):
+    role = Role.query.filter_by(name=name).first_or_404()
+    name = flask.request.form.get('name', '')
+    desc = flask.request.form.get('description', None)
+    if name == '':
+        flask.flash('Couldn\'t make that role...', 'warning')
+        return flask.redirect(flask.url_for('admin.index', tab='roles'))
+    try:
+        role.name = name
+        role.description = desc
+        db.session.commit()
+    except sqlalchemy.exc.IntegrityError as e:
+        flask.flash('Couldn\'t make that role... {}'.format(str(e)),
+                    'warning')
+        return flask.redirect(flask.url_for('admin.index', tab='roles'))
+    flask.flash('Role {} has been edited'.format(name), 'success')
+    return flask.redirect(flask.url_for('admin.role_detail', name=role.name))
+
+
+@admin.route('/role/<name>/delete', methods=['POST'])
+@permissions.admin_role.require(404)
+def role_delete(name):
+    role = Role.query.filter_by(name=name).first_or_404()
+    db.session.delete(role)
+    db.session.commit()
+    flask.flash('Role {} with the all related data has '
+                'been deleted'.format(name), 'success')
+    return flask.redirect(flask.url_for('admin.index', tab='roles'))
+
+
+@admin.route('/roles/create', methods=['POST'])
+@permissions.admin_role.require(404)
+def role_create():
+    name = flask.request.form.get('name', '')
+    desc = flask.request.form.get('description', None)
+    if name == '':
+        flask.flash('Couldn\'t make that role...', 'warning')
+        return flask.redirect(flask.url_for('admin.index', tab='roles'))
+    try:
+        role = Role(name, desc)
+        db.session.add(role)
+        db.session.commit()
+    except sqlalchemy.exc.IntegrityError as e:
+        flask.flash('Couldn\'t make that role... {}'.format(str(e)),
+                    'warning')
+        return flask.redirect(flask.url_for('admin.index', tab='roles'))
+    return flask.redirect(flask.url_for('admin.role_detail', name=role.name))

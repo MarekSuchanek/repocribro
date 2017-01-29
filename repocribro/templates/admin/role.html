@@ -1,11 +1,48 @@
 {% extends 'layout.html' %}
-
+{% from 'macros/basic.html' import octicon without context %}
 {% block body %}
-    <h1>{{ role.name }} <small>&laquo;administration&raquo;</small></h1>
+    <h1>{{ role.name }}
+        <small>&laquo;administration&raquo;</small>
+    </h1>
 
-    <table>
-
-    </table>
+    <div class="row">
+        <div class="col-xs-12 col-md-9">
+            <form action="{{ url_for('admin.role_edit', name=role.name) }}" method="POST">
+                <div class="row">
+                    <div class="form-group col-md-8">
+                        <label for="name">Name:</label>
+                        <input type="text" class="form-control" id="name" name="name" value="{{ role.name }}">
+                    </div>
+                    <div class="col-md-4 btns-fullwidth">
+                        <button type="submit" class="btn btn-success">
+                            {{ octicon('pencil') }} Edit
+                        </button>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="name">Description:</label>
+                    <textarea class="form-control" id="name" name="description">{{ role.description }}</textarea>
+                </div>
+            </form>
+        </div>
+        <div class="col-xs-12 col-md-3 btns-fullwidth">
+            <form action="{{ url_for('admin.role_delete', name=role.name) }}" method="POST">
+                <button type="submit" class="btn btn-danger">
+                    {{ octicon('trashcan') }} Delete
+                </button>
+            </form>
+        </div>
+    </div>
 
     <h2>Assignees</h2>
+
+    <ul>
+        {% for account in role.user_accounts|sort(attribute='login') %}
+            <li>
+                <a href="{{ url_for('admin.account_detail', login=account.github_user.login) }}">
+                    {{ account.github_user.login }}
+                </a>
+            </li>
+        {% endfor %}
+    </ul>
 {% endblock %}
