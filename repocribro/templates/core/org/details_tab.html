@@ -11,11 +11,11 @@
         <table class="table table-responsive table-striped">
             <tr>
                 <th>Name</th>
-                <td>{{ org.name }}</td>
+                <td>{{ org|gh_user_link }}</td>
             </tr>
             <tr>
                 <th>Email</th>
-                <td>{{ org.email }}</td>
+                <td>{{ org.email|email_link }}</td>
             </tr>
             <tr>
                 <th>Company</th>
@@ -27,7 +27,7 @@
             </tr>
             <tr>
                 <th>URL</th>
-                <td>{{ org.blog_url }}</td>
+                <td>{{ org.blog_url|ext_link }}</td>
             </tr>
             <tr>
                 <th>Description</th>

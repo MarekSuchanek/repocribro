@@ -10,7 +10,7 @@
             <table class="table table-striped">
                 <tr>
                     <th>Full name:</th>
-                    <td>{{ repo.full_name }}</td>
+                    <td>{{ repo|gh_repo_link }}</td>
                 </tr>
                 <tr>
                     <th>Languages:</th>
@@ -22,19 +22,19 @@
                 </tr>
                 <tr>
                     <th>Visibility @GitHub:</th>
-                    <td>{{ repo.private }}{# TODO filter #}</td>
+                    <td>{{ repo|gh_repo_visibility }}</td>
                 </tr>
                 <tr>
                     <th>Visibility @repocribro:</th>
-                    <td>{{ repo.visibility_type }}{# TODO filter #}</td>
+                    <td>{{ repo|repo_visibility }}</td>
                 </tr>
                 <tr>
                     <th>URL @GitHub:</th>
-                    <td>{{ repo.url }}</td>
+                    <td>{{ repo.url|ext_link }}</td>
                 </tr>
                 <tr>
                     <th>URL @repocribro:</th>
-                    <td>{# TODO: via filter #}</td>
+                    <td>{{ repo|repo_link(show_secret=True) }}</td>
                 </tr>
             </table>
         </div>

@@ -14,10 +14,14 @@
     <tbody>
     {% for account in accounts %}
         <tr>
-            <td>{{ account.github_user.login }}</td>
+            <td><a href="{{ url_for('admin.account_detail', login=account.login) }}">{{ account.login }}</a></td>
             <td>{{ account.created_at }}</td>
             <td>{{ account.github_user.repositories|length }}</td>
-            <td>{{ account.rolenames|join(', ') }}</td>
+            <td>
+                {% for role in account.roles %}
+                    <span class="badge">{{ role.name }}</span>
+                {% endfor %}
+            </td>
             <td>
                 <a href="{{ url_for('admin.account_detail', login=account.github_user.login) }}" class="btn btn-primary btn-small">
                     {{ octicon('tools') }}

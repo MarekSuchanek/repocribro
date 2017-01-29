@@ -8,7 +8,7 @@
     <table class="table table-striped">
         <tr>
             <th>Full name:</th>
-            <td>{{ repo.full_name }}</td>
+            <td>{{ repo|gh_repo_link }}</td>
         </tr>
         <tr>
             <th>Languages:</th>
@@ -20,46 +20,54 @@
         </tr>
         <tr>
             <th>Visibility @GitHub:</th>
-            <td>{{ repo.private }}{# TODO filter #}</td>
+            <td>{{ repo|gh_repo_visibility }}</td>
         </tr>
         <tr>
             <th>Visibility @repocribro:</th>
-            <td>{{ repo.visibility_type }}{# TODO filter #}</td>
+            <td>{{ repo|repo_visibility }}</td>
         </tr>
         <tr>
             <th>URL @GitHub:</th>
-            <td>{{ repo.url }}</td>
+            <td>{{ repo.url|ext_link }}</td>
         </tr>
         <tr>
             <th>URL @repocribro:</th>
-            <td>{# TODO: via filter #}</td>
+            <td>{{ repo|repo_link(show_secret=True) }}</td>
         </tr>
     </table>
 
     <div class="row">
-        <p>
-            <a href="{{ url_for('manage.repositories', reponame=repo.name) }}" class="btn btn-default">
+        <div class="col-md-2">
+            <a href="{{ url_for('manage.dashboard', tab='repositories') }}" class="btn btn-default">
                 {{ octicon('list-unordered') }} Back
             </a>
-        </p>
+        </div>
 
+        <div class="col-md-2">
         <form action="{{ url_for('manage.repo_activate', reponame=repo.name) }}" method="POST">
             <button type="submit" class="btn btn-primary" name="enable" value="{{ repo.visibility_type }}">
                 {{ octicon('link') }} Reactivate
             </button>
         </form>
-        <form action="{{ url_for('manage.repo_update', reponame=repo.name) }}" method="POST">
-            <button type="submit" class="btn btn-primary">
-                {{ octicon('sync') }} Update
-            </button>
-        </form>
+        </div>
+
+        <div class="col-md-2">
         <form action="{{ url_for('manage.repo_deactivate', reponame=repo.name) }}" method="POST">
             <button type="submit" class="btn btn-danger">
                 {{ octicon('circle-slash') }} Deactivate
             </button>
         </form>
+        </div>
 
+        <div class="col-md-2">
+        <form action="{{ url_for('manage.repo_update', reponame=repo.name) }}" method="POST">
+            <button type="submit" class="btn btn-primary">
+                {{ octicon('sync') }} Update
+            </button>
+        </form>
+        </div>
 
+        <div class="col-md-3">
         <form action="{{ url_for('manage.repo_activate', reponame=repo.name) }}" method="POST">
             <input type="hidden" value="{{ repo.name }}" name="reponame">
             <div class="btn-group" role="group">
@@ -74,11 +82,14 @@
                 </button>
             </div>
         </form>
+        </div>
 
+        <div class="col-md-1">
         <form action="{{ url_for('manage.repo_delete', reponame=repo.name) }}" method="POST">
             <button type="submit" class="btn btn-danger">
                 {{ octicon('trashcan') }} Delete
             </button>
         </form>
+        </div>
     </div>
 {% endblock %}

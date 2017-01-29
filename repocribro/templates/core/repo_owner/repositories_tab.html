@@ -16,14 +16,14 @@
     <tbody>
     {% for repo in owner.repositories if current_user.sees_repo(repo) %}
         <tr>
-            <td>{{ repo.name }}</td>
+            <td><a href="{{ url_for('core.repo_detail', login=owner.login, reponame=repo.name) }}">{{ repo.name }}</a></td>
             <td>{{ repo.languages }}</td>
-            <td>{{ repo.visibility_type }}</td>{# TODO: filter #}
+            <td>{{ repo|repo_visibility }}</td>
             <td>{{ repo.pushes|length }}</td>
             <td>{{ repo.releases|length }}</td>
-            <td>
-                <a href="{{ repo.url }}">{{ octicon('mark-github') }}</a>
-                <a href="{{ url_for('core.repo_detail', login=owner.login, reponame=repo.name) }}">{{ octicon('repo') }}</a>
+            <td class="btn-group">
+                <a href="{{ repo.url }}" class="btn btn-default">{{ octicon('mark-github') }}</a>
+                <a href="{{ url_for('core.repo_detail', login=owner.login, reponame=repo.name) }}" class="btn btn-primary">{{ octicon('repo') }}</a>
             </td>
         </tr>
     {% endfor %}

@@ -14,8 +14,8 @@
     <tbody>
     {% for repo in repos %}
         <tr>
-            <td>{{ repo.full_name }}</td>
-            <td>{{ repo.owner.login }}</td>
+            <td><a href="{{ url_for('admin.repo_detail', login=repo.owner.login, reponame=repo.name) }}">{{ repo.full_name }}</a></td>
+            <td><a href="{{ url_for('admin.account_detail', login=repo.owner.login) }}">{{ repo.owner.login }}</a></td>
             <td>{{ repo.releases|length }}</td>
             <td>{{ repo.pushes|length }}</td>
             <td>
