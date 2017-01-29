@@ -207,7 +207,7 @@ def role_assignment_add(name):
         flask.flash('User {} already has role {}'.format(login, name),
                     'error')
     else:
-        role.user_accounts.add(account)
+        role.user_accounts.append(account)
         db.session.commit()
         flask.flash('Role {} assigned to user {}'.format(name, login),
                     'success')

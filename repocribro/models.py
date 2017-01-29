@@ -62,9 +62,8 @@ class UserAccount(db.Model, UserMixin, SearchableMixin):
         uselist=False, cascade='all, delete-orphan'
     )
     roles = db.relationship(
-        'Role',
+        'Role', back_populates='user_accounts',
         secondary=roles_users,
-        backref=db.backref('users', lazy='dynamic')
     )
 
     @property
