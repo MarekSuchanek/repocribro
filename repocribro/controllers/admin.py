@@ -195,3 +195,37 @@ def role_create():
                     'warning')
         return flask.redirect(flask.url_for('admin.index', tab='roles'))
     return flask.redirect(flask.url_for('admin.role_detail', name=role.name))
+
+
+@admin.route('/role/<name>/add', methods=['POST'])
+@permissions.admin_role.require(404)
+def role_assignment_add(name):
+    login = flask.request.form.get('login', '')
+    account = User.query.filter_by(login=login).first_or_404().user_account
+    role = Role.query.filter_by(name=name).first_or_404()
+    if account in role.user_accounts:
+        flask.flash('User {} already has role {}'.format(login, name),
+                    'error')
+    else:
+        role.user_accounts.add(account)
+        db.session.commit()
+        flask.flash('Role {} assigned to user {}'.format(name, login),
+                    'success')
+    return flask.redirect(flask.url_for('admin.role_detail', name=name))
+
+
+@admin.route('/role/<name>/remove', methods=['POST'])
+@permissions.admin_role.require(404)
+def role_assignment_remove(name):
+    login = flask.request.form.get('login', '')
+    account = User.query.filter_by(login=login).first_or_404().user_account
+    role = Role.query.filter_by(name=name).first_or_404()
+    if account not in role.user_accounts:
+        flask.flash('User {} doesn\'t have role {}'.format(login, name),
+                    'error')
+    else:
+        role.user_accounts.remove(account)
+        db.session.commit()
+        flask.flash('Role {} removed from user {}'.format(name, login),
+                    'success')
+    return flask.redirect(flask.url_for('admin.role_detail', name=name))

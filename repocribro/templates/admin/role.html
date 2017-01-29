@@ -14,6 +14,7 @@
                         <input type="text" class="form-control" id="name" name="name" value="{{ role.name }}">
                     </div>
                     <div class="col-md-4 btns-fullwidth">
+                        <label>&nbsp;</label>
                         <button type="submit" class="btn btn-success">
                             {{ octicon('pencil') }} Edit
                         </button>
@@ -27,6 +28,7 @@
         </div>
         <div class="col-xs-12 col-md-3 btns-fullwidth">
             <form action="{{ url_for('admin.role_delete', name=role.name) }}" method="POST">
+                <label>&nbsp;</label>
                 <button type="submit" class="btn btn-danger">
                     {{ octicon('trashcan') }} Delete
                 </button>
@@ -35,6 +37,36 @@
     </div>
 
     <h2>Assignees</h2>
+
+    <form action="{{ url_for('admin.role_assignment_add', name=role.name) }}" method="POST">
+        <div class="row">
+            <div class="form-group col-md-8">
+                <label for="login">Login (GitHub):</label>
+                <input type="text" class="form-control" id="login" name="login">
+            </div>
+            <div class="col-md-4 btns-fullwidth">
+                <label>&nbsp;</label>
+                <button type="submit" class="btn btn-primary">
+                    {{ octicon('plus') }} Add assignment
+                </button>
+            </div>
+        </div>
+    </form>
+
+    <form action="{{ url_for('admin.role_assignment_remove', name=role.name) }}" method="POST">
+        <div class="row">
+            <div class="form-group col-md-8">
+                <label for="login">Login (GitHub):</label>
+                <input type="text" class="form-control" id="login" name="login">
+            </div>
+            <div class="col-md-4 btns-fullwidth">
+                <label>&nbsp;</label>
+                <button type="submit" class="btn btn-warning" style="display: inline;">
+                        {{ octicon('X') }} Remove assignment
+                </button>
+            </div>
+        </div>
+    </form>
 
     <ul>
         {% for account in role.user_accounts|sort(attribute='login') %}
