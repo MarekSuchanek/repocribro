@@ -19,7 +19,7 @@
             <td>{{ repo.releases|length }}</td>
             <td>{{ repo.pushes|length }}</td>
             <td>
-                <a href="{{ url_for('admin.repo_detail', uid=repo.id) }}" class="btn btn-primary btn-small">
+                <a href="{{ url_for('admin.repo_detail', login=repo.owner.login, reponame=repo.name) }}" class="btn btn-primary btn-small">
                     {{ octicon('tools') }}
                 </a>
             </td>

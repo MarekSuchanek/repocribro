@@ -18,7 +18,7 @@
             <td>{{ role.description }}</td>
             <td>{{ role.accounts|length }}</td>
             <td>
-                <a href="{{ url_for('admin.role_detail', uid=role.id) }}" class="btn btn-primary btn-small">
+                <a href="{{ url_for('admin.role_detail', name=role.name) }}" class="btn btn-primary btn-small">
                     {{ octicon('tools') }}
                 </a>
             </td>

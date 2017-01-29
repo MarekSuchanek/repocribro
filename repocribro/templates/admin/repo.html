@@ -1,0 +1,39 @@
+{% extends 'layout.html' %}
+
+{% block body %}
+    <h1>{{ repo.full_name }}
+        <small>&laquo;administration&raquo;</small>
+    </h1>
+
+    <table class="table table-striped">
+        <tr>
+            <th>Full name:</th>
+            <td>{{ repo.full_name }}</td>
+        </tr>
+        <tr>
+            <th>Languages:</th>
+            <td>{{ repo.languages }}</td>
+        </tr>
+        <tr>
+            <th>Description:</th>
+            <td>{{ repo.description }}</td>
+        </tr>
+        <tr>
+            <th>Visibility @GitHub:</th>
+            <td>{{ repo.private }}{# TODO filter #}</td>
+        </tr>
+        <tr>
+            <th>Visibility @repocribro:</th>
+            <td>{{ repo.visibility_type }}{# TODO filter #}</td>
+        </tr>
+        <tr>
+            <th>URL @GitHub:</th>
+            <td>{{ repo.url }}</td>
+        </tr>
+        <tr>
+            <th>URL @repocribro:</th>
+            <td>{# TODO: via filter #}</td>
+        </tr>
+    </table>
+
+{% endblock %}

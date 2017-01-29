@@ -1,0 +1,90 @@
+{% extends 'layout.html' %}
+{% from 'macros/basic.html' import octicon without context %}
+{% block body %}
+    {% set account = user.user_account %}
+    <h1>{{ user.login }}
+        <small>&laquo;administration&raquo;</small>
+    </h1>
+
+    <div class="row">
+        <div class="col-xs-6 col-md-3">
+            <div class="thumbnail">
+                <img src="{{ user.avatar_url }}" alt="avatar">
+            </div>
+        </div>
+        <div class="col-xs-12 col-md-6">
+
+            {# TODO: make filters (if None, ...) #}
+            <table class="table table-responsive table-striped">
+                <tr>
+                    <th>Login</th>
+                    <td>{{ user.login }}</td>
+                </tr>
+                <tr>
+                    <th>Email</th>
+                    <td>{{ user.email }}</td>
+                </tr>
+                <tr>
+                    <th>Company</th>
+                    <td>{{ user.company }}</td>
+                </tr>
+                <tr>
+                    <th>Location</th>
+                    <td>{{ user.location }}</td>
+                </tr>
+                <tr>
+                    <th>Login</th>
+                    <td>{{ user.login }}</td>
+                </tr>
+                <tr>
+                    <th>URL</th>
+                    <td>{{ user.blog_url }}</td>
+                </tr>
+                <tr>
+                    <th>Hireable</th>
+                    <td>{{ user.hireable }}</td>
+                </tr>
+                <tr>
+                    <th>Bio</th>
+                    <td>{{ user.description }}</td>
+                </tr>
+            </table>
+        </div>
+        <div class="col-xs-12 col-md-3 btns-fullwidth">
+            <form action="{{ url_for('admin.account_ban', login=user.login) }}" method="POST">
+                {% if account.active %}
+                    <button class="btn btn-warning" type="submit" name="active" value="0">
+                        {{ octicon('sync') }} Disable account
+                    </button>
+                {% else %}
+                    <button class="btn btn-success" type="submit" name="active" value="1">
+                        {{ octicon('sync') }} Enable account
+                    </button>
+                {% endif %}
+            </form>
+
+            <form action="{{ url_for('admin.account_delete', login=user.login) }}" method="POST">
+                <button class="btn btn-danger" type="submit">
+                    {{ octicon('trashcan') }} Delete account (with all content)
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <h2>Roles</h2>
+    <ul>
+        {% for role in account.roles|sort(attribute='name') %}
+            <li><a href="{{ url_for('admin.role_detail', name=role.name) }}">{{ role.name }}</a></li>
+        {% endfor %}
+    </ul>
+
+    <h2>Repositories</h2>
+    <ul>
+        {% for repo in user.repositories|sort(attribute='full_name') %}
+            <li>
+                <a href="{{ url_for('admin.repo_detail', login=user.login, reponame=repo.name) }}">{{ repo.full_name }}</a>
+            </li>
+        {% endfor %}
+    </ul>
+
+{% endblock %}

@@ -19,7 +19,7 @@
             <td>{{ account.github_user.repositories|length }}</td>
             <td>{{ account.rolenames|join(', ') }}</td>
             <td>
-                <a href="{{ url_for('admin.account_detail', uid=account.id) }}" class="btn btn-primary btn-small">
+                <a href="{{ url_for('admin.account_detail', login=account.github_user.login) }}" class="btn btn-primary btn-small">
                     {{ octicon('tools') }}
                 </a>
             </td>

@@ -1,7 +1,7 @@
 import flask
 from ..security import permissions
 from ..helpers import ViewTab, Badge
-from ..models import UserAccount, Role, Repository
+from ..models import UserAccount, User, Role, Repository, db
 
 
 admin = flask.Blueprint('admin', __name__, url_prefix='/admin')
@@ -42,19 +42,60 @@ def index():
                                  tabs=tabs, active_tab='users')
 
 
-@admin.route('/account/<uid>')
+@admin.route('/account/<login>')
 @permissions.admin_role.require(404)
-def account_detail(uid):
-    flask.abort(501)
+def account_detail(login):
+    user = User.query.filter_by(login=login).first_or_404()
+    return flask.render_template('admin/account.html', user=user)
 
 
-@admin.route('/repository/<uid>')
+@admin.route('/account/<login>/ban', methods=['POST'])
 @permissions.admin_role.require(404)
-def repo_detail(uid):
-    flask.abort(501)
+def account_ban(login):
+    user = User.query.filter_by(login=login).first_or_404()
+    ban = flask.request.form.get('active') == '0'
+    unban = flask.request.form.get('active') == '1'
+    if user.user_account.active and ban:
+        user.user_account.active = False
+        db.session.commmit()
+        flask.flash('User account {} has been disabled.'.format(login),
+                    'success')
+    elif not user.user_account.active and unban:
+        user.user_account.active = True
+        db.session.commmit()
+        flask.flash('User account {} has been enabled.'.format(login),
+                    'success')
+    else:
+        flask.flash('Nope, no action has been performed', 'info')
+    return flask.redirect(
+        flask.url_for('admin.account_detail', login=login)
+    )
 
 
-@admin.route('/role/<uid>')
+@admin.route('/account/<login>/delete', methods=['POST'])
 @permissions.admin_role.require(404)
-def role_detail(uid):
-    flask.abort(501)
+def account_delete(login):
+    user = User.query.filter_by(login=login).first_or_404()
+    db.session.delete(user.user_account)
+    db.session.commit()
+    flask.flash('User account {} with everything related data'
+                ' has been deleted'.format(login), 'success')
+    return flask.redirect(
+        flask.url_for('admin.account_detail', login=login)
+    )
+
+
+@admin.route('/repository/<login>/reponame')
+@permissions.admin_role.require(404)
+def repo_detail(login, reponame):
+    repo = Repository.query.filter_by(
+        full_name=Repository.make_full_name(login, reponame)
+    ).first_or_404()
+    return flask.render_template('admin/repo.html', repo=repo)
+
+
+@admin.route('/role/<name>')
+@permissions.admin_role.require(404)
+def role_detail(name):
+    role = Role.query.filter_by(name=name).first_or_404()
+    return flask.render_template('admin/role.html', role=role)

@@ -75,3 +75,8 @@ div.user-card div.login{
 table.table > tbody > tr > td{
     vertical-align: middle;
 }
+div.btns-fullwidth a.btn,
+div.btns-fullwidth button.btn{
+    width: 100%;
+    text-align: left;
+}
