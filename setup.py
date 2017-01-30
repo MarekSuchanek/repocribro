@@ -26,6 +26,9 @@ setup(
         'console_scripts': [
             'repocribro = repocribro.repocribro:start',
         ],
+        'repocribro.ext': [
+            'repocribro-core = repocribro.ext_core:make_extension'
+        ]
     },
     install_requires=[
         'configparser',

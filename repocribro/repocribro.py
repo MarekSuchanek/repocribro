@@ -3,7 +3,7 @@ import flask_bower
 from flask_script import Manager
 from flask_migrate import Migrate, MigrateCommand
 import configparser
-import os
+from .extending import ExtensionsMaster
 
 
 # TODO: app factory and/or subclass
@@ -27,8 +27,12 @@ def create_app(cfg):
 
     from .api import create_api
     api_manager = create_api(app)
+
     # TODO: load all parts
     # TODO: load all extensions
+    ext_master = ExtensionsMaster()
+    ext_names = ext_master.call('introduce')
+    print('Loaded extensions: {}'.format(', '.join(ext_names)))
 
     # TODO: load config file(s), make config class (defaults)
     app.config['DEBUG'] = True  # TODO: from config
