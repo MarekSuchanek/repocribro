@@ -2,27 +2,43 @@
 {% from "macros/basic.html" import octicon without context %}
 {% block body %}
 
-<div class="jumbotron">
-    <h1>repocribro</h1>
-    <hr>
-    <p>Repocribro is extensible sifting tool for information from GitHub repositories powered by Python.</p>
-    {# TODO: logo, more info #}
+    <div class="jumbotron" id="landing-info">
+        <h1>repocribro</h1>
+        <hr>
+        <div class="row">
+            <div class="col-xs-12 col-md-4 thumbnail">
+                <img src="{{ url_for('static', filename='pics/repocribro-icon.png') }}" alt="logo" class="logo">
+            </div>
+            <div class="col-xs-12 col-md-8">
+                <p>
+                    <em>Repocribro</em> is an extensible sifting tool for information from GitHub repositories
+                    powered by Python (Flask, SQLAlchemy, ...). It allows the communities to gather their repositories
+                    at the one place when joining a classic GitHub organization is not suitable.
+                </p>
 
-    <p class="buttons">
-        <a class="btn btn-primary btn-lg" href="{{ url_for('core.search') }}">
-            {{ octicon('search') }} Take a look
-        </a>
-         or
-        {% if current_user.is_authenticated %}
-        <a class="btn btn-warning btn-lg" href="{{ url_for('manage.dashboard') }}">
-            {{ octicon('settings') }} cribro your repos
-        </a>
-        {% else %}
-        <a class="btn btn-success btn-lg" href="{{ url_for('auth.github') }}">
-            {{ octicon('mark-github') }} join now
-        </a>
-        {% endif %}
-        .
-    </p>
-</div>
+                <p>
+                    This project has started as a semester work during advanced Python course
+                    <a href="https://github.com/cvut/MI-PYT/" target="_blank">MI-PYT @ FIT CTU in Prague</a>.
+                </p>
+
+
+                <p class="buttons">
+                    <a class="btn btn-primary btn-lg" href="{{ url_for('core.search') }}">
+                        {{ octicon('search') }} Take a look
+                    </a>
+                    or
+                    {% if current_user.is_authenticated %}
+                        <a class="btn btn-warning btn-lg" href="{{ url_for('manage.dashboard') }}">
+                            {{ octicon('settings') }} cribro your repos
+                        </a>
+                    {% else %}
+                        <a class="btn btn-success btn-lg" href="{{ url_for('auth.github') }}">
+                            {{ octicon('mark-github') }} join now
+                        </a>
+                    {% endif %}
+                    .
+                </p>
+            </div>
+        </div>
+    </div>
 {% endblock %}

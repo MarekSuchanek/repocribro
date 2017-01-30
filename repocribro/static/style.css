@@ -81,3 +81,21 @@ div.btns-fullwidth div.btn-group{
     width: 100%;
     text-align: left;
 }
+
+a.navbar-logo > img{
+    margin: 4px 10px 4px 0;
+    max-height: 42px;
+    float:left;
+}
+a.navbar-logo:hover > span.navbar-brand{
+    color: #fff;
+}
+div#landing-info div.thumbnail{
+    border: 0;
+}
+div#landing-info p {
+    text-align: justify;
+}
+div#landing-info img.logo{
+    max-height: 10em;
+}
