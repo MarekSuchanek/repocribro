@@ -1,11 +1,21 @@
 {% extends "layout.html" %}
+{% from 'macros/basic.html' import octicon without context %}
 {% block body %}
-<div class="jumbotron">
-    <h1>Forbidden
-        <small>(error 403)</small>
-    </h1>
-    <hr>
-    <p>You are trying to access resource which is private and you don't have permissions for that!</p>
-    <p><a class="btn btn-primary btn-lg" href="{{ url_for('core.index') }}">Go to the start</a></p>
-</div>
+    <div class="jumbotron">
+        <h1>Forbidden
+            <small>(error 403)</small>
+        </h1>
+        <hr>
+        <p>You are trying to access resource which is private and you don't have permissions for that!</p>
+        <p>
+            <a class="btn btn-primary btn-lg" href="{{ url_for('core.index') }}">Go to the start</a>
+            {% if not current_user.is_authenticated %}
+                or
+                <a class="btn btn-success btn-lg" href="{{ url_for('auth.github') }}">
+                    {{ octicon('mark-github') }} join now
+                </a>
+            {% endif %}
+            .
+        </p>
+    </div>
 {% endblock %}
