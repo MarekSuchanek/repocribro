@@ -121,4 +121,4 @@ This project is licensed under the MIT License - see the `LICENSE`_ file for mor
     :target: https://travis-ci.org/MarekSuchanek/repocribro
 .. |docs| image:: https://readthedocs.org/projects/pyt-twitterwall/badge/?version=latest
     :alt: Documentation Status
-    :target: http://pyt-twitterwall.readthedocs.io/en/latest/?badge=latest
+    :target: http://repocribro.readthedocs.io/en/latest/?badge=latest

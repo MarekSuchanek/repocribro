@@ -49,8 +49,8 @@ master_doc = 'index'
 
 # General information about the project.
 project = 'repocribro'
-copyright = u'2017, Marek Suchánek'
-author = u'Marek Suchánek'
+copyright = '2017, Marek Suchánek'
+author = 'Marek Suchánek'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
