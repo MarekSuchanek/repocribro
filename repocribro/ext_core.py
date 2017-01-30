@@ -1,5 +1,7 @@
 from .extending import Extension
 from .extending.helpers import ExtensionView
+import flask_bower
+import flask_migrate
 
 
 class CoreExtension(Extension):
@@ -11,18 +13,43 @@ class CoreExtension(Extension):
     def __init__(self, app, db, *args, **kwargs):
         self.app = app
         self.db = db
+        self.bower = flask_bower.Bower(self.app)
+        self.migrate = flask_migrate.Migrate(self.app, self.db)
 
     def call(self, hook_name, default, *args, **kwargs):
-        invert_op = getattr(self, hook_name, None)
-        if callable(invert_op):
-            return invert_op(*args, **kwargs)
+        operation = getattr(self, hook_name, None)
+        if callable(operation):
+            return operation(*args, **kwargs)
         else:
             return default
 
-    def introduce(self):
+    def init_business(self, *args, **kwargs):
+        from .security import login_manager, principals
+        login_manager.init_app(self.app)
+        principals.init_app(self.app)
+
+    def init_blueprints(self, *args, **kwargs):
+        from .controllers import admin, auth, core, errors, manage, webhooks
+        self.app.register_blueprint(admin)
+        self.app.register_blueprint(auth)
+        self.app.register_blueprint(core)
+        self.app.register_blueprint(errors)
+        self.app.register_blueprint(manage)
+        self.app.register_blueprint(webhooks)
+
+    def init_filters(self, *args, **kwargs):
+        from .filters import register_filters
+        register_filters(self.app)
+
+    def init_post_injector(self, *args, **kwargs):
+        # flask_restless is not compatible with flask_injector!
+        from .api import create_api
+        api_manager = create_api(self.app)
+
+    def introduce(self, *args, **kwargs):
         return self.NAME
 
-    def view_admin_extensions(self):
+    def view_admin_extensions(self, *args, **kwargs):
         return ExtensionView(
             self.NAME,
             self.CATEGORY,

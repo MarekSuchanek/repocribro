@@ -19,5 +19,5 @@ def auth_cfg():
 def repocribro_app(auth_cfg):
     """Flask web application test client"""
     from repocribro.repocribro import create_app
-    app, manager = create_app(auth_cfg)
+    app = create_app(auth_cfg)
     return app.test_client()

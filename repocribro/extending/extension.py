@@ -21,6 +21,7 @@ class ExtensionsMaster:
             group=cls.ENTRYPOINT_GROUP, name=name
         )
 
+    # TODO: there might be some problem with ordering of extensions
     def __init__(self, *args, **kwargs):
         entry_points = self._collect_extensions()
         self.exts = []
@@ -34,5 +35,6 @@ class ExtensionsMaster:
             else:
                 self.exts.append(e)
 
-    def call(self, hook_name, *args, **kwargs):
-        return [ext.call(hook_name, args, **kwargs) for ext in self.exts]
+    def call(self, hook_name, default=None, *args, **kwargs):
+        return [ext.call(hook_name, default, args, **kwargs)
+                for ext in self.exts]
