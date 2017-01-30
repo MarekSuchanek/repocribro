@@ -4,7 +4,7 @@
 <div class="row">
     {% for org in orgs %}
         <div class="user-card panel panel-default col-md-4 col-xs-6">
-            <a href="{{ url_for('core.org_detail', login=user.login) }}">
+            <a href="{{ url_for('core.org_detail', login=org.login) }}">
                 <div class="panel-body">
                     <div class="col-md-5 avatar-block">
                         <div class="thumbnail">
