@@ -1,8 +1,10 @@
 import flask
+import injector
 import sqlalchemy
 
 from ..extending.helpers import ViewTab, Badge
 from ..models import UserAccount, User, Role, Repository, db
+from ..extending import ExtensionsMaster
 from ..security import permissions
 
 admin = flask.Blueprint('admin', __name__, url_prefix='/admin')
@@ -10,11 +12,12 @@ admin = flask.Blueprint('admin', __name__, url_prefix='/admin')
 
 @admin.route('')
 @permissions.admin_role.require(404)
-def index():
+@injector.inject(ext_master=ExtensionsMaster)
+def index(ext_master):
     accounts = UserAccount.query.all()
     roles = Role.query.all()
     repos = Repository.query.all()
-    exts = []  # TODO: gather extensions
+    exts = ext_master.call('view_admin_extensions', None)
 
     tabs = [
         ViewTab(

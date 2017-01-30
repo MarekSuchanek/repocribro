@@ -28,7 +28,7 @@ def create_app(cfg):
     principals.init_app(app)
 
     ext_master = ExtensionsMaster(app=app, db=db)
-    ext_names = ext_master.call('introduce')
+    ext_names = ext_master.call('introduce', 'unknown')
     print('Loaded extensions: {}'.format(', '.join(ext_names)))
 
     # TODO: load config file(s), make config class (defaults)

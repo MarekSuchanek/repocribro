@@ -1,3 +1,3 @@
-from .viewtab import ViewTab, Badge
+from .views import ViewTab, Badge, ExtensionView
 
-__all__ = ['ViewTab', 'Badge']
+__all__ = ['ViewTab', 'Badge', 'ExtensionView']
