@@ -1,9 +1,9 @@
 import flask
 import sqlalchemy
-from ..security import permissions
-from ..helpers import ViewTab, Badge
-from ..models import UserAccount, User, Role, Repository, db
 
+from ..extending.helpers import ViewTab, Badge
+from ..models import UserAccount, User, Role, Repository, db
+from ..security import permissions
 
 admin = flask.Blueprint('admin', __name__, url_prefix='/admin')
 

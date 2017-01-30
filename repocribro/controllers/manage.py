@@ -1,9 +1,11 @@
+import json
+
 import flask
 import flask_login
-import json
+
+from ..extending.helpers import ViewTab, Badge
 from ..github import GitHubAPI
 from ..models import Repository, db
-from ..helpers import ViewTab, Badge
 
 manage = flask.Blueprint('manage', __name__, url_prefix='/manage')
 

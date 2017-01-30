@@ -1,7 +1,8 @@
 import flask
 import flask_login
-from ..models import User, Organization, Repository, db
-from ..helpers import ViewTab, Badge
+
+from ..extending.helpers import ViewTab, Badge
+from ..models import User, Organization, Repository
 
 core = flask.Blueprint('core', __name__, url_prefix='')
 
