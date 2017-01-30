@@ -32,6 +32,23 @@ class RoleMixin:
         return hash(self.name)
 
 
+class Anonymous(flask_login.AnonymousUserMixin):
+
+    @property
+    def is_active(self):
+        return False
+
+    def has_role(self, role):
+        return False
+
+    @property
+    def rolenames(self):
+        return []
+
+    def sees_repo(self, repo):
+        return repo.is_public
+
+
 class UserMixin(flask_login.UserMixin):
 
     @property
@@ -40,6 +57,15 @@ class UserMixin(flask_login.UserMixin):
 
     def has_role(self, role):
         return role in (role.name for role in self.roles)
+
+    @property
+    def rolenames(self):
+        return [role.name for role in self.roles]
+
+    def sees_repo(self, repo):
+        return repo.is_public or \
+               repo.owner.github_id == self.github_user.github_id or \
+               self.has_role('admin')
 
 
 # Many-to-Many
@@ -71,16 +97,6 @@ class UserAccount(db.Model, UserMixin, SearchableMixin):
         if self.github_user is None:
             return '<unknown>'
         return self.github_user.login
-
-    @property
-    def rolenames(self):
-        return [role.name for role in self.roles]
-
-    def sees_repo(self, repo):
-        # TODO: admins, org repos
-        return repo.is_public or \
-               repo.owner.github_id == self.github_user.github_id or \
-               self.has_role('admin')
 
     def __repr__(self):
         return '<UserAccount {}>'.format(id)

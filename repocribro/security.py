@@ -1,10 +1,11 @@
 import flask
 import flask_login
 import flask_principal
-from .models import UserAccount
+from .models import UserAccount, Anonymous
 
 login_manager = flask_login.LoginManager()
 principals = flask_principal.Principal()
+login_manager.anonymous_user = Anonymous
 
 
 class Permissions:
