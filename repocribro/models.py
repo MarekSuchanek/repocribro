@@ -78,8 +78,9 @@ class UserAccount(db.Model, UserMixin, SearchableMixin):
 
     def sees_repo(self, repo):
         # TODO: admins, org repos
-        return repo.is_public() or \
-               repo.owner.github_id == self.github_user.github_id
+        return repo.is_public or \
+               repo.owner.github_id == self.github_user.github_id or \
+               self.has_role('admin')
 
     def __repr__(self):
         return '<UserAccount {}>'.format(id)
@@ -314,15 +315,18 @@ class Repository(db.Model, SearchableMixin):
         import hashlib
         self.secret = ''.join([
             uuid.uuid4().hex,
-            hashlib.sha1(self.full_name).hexdigest()
+            hashlib.sha1(self.full_name.encode('utf-8')).hexdigest()
         ])
 
+    @property
     def is_public(self):
         return self.visibility_type == self.VISIBILITY_PUBLIC
 
+    @property
     def is_private(self):
         return self.visibility_type == self.VISIBILITY_PRIVATE
 
+    @property
     def is_hidden(self):
         return self.visibility_type == self.VISIBILITY_HIDDEN
 

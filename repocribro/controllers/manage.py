@@ -74,7 +74,9 @@ def has_good_webhook(repo):
     if repo.webhook_id is None:
         return False
     # TODO: check if there are right events
+    print(repo.webhook_id)
     webhook = GitHubAPI.webhook_get(repo.full_name, repo.webhook_id)
+    print(webhook)
     return webhook is None
 
 
@@ -130,7 +132,8 @@ def repo_activate(reponame):
     user = flask_login.current_user.github_user
     full_name = Repository.make_full_name(user.login, reponame)
 
-    repo = Repository.query.filter_by(full_name=full_name).first_or_404()
+    repo = Repository.query.filter_by(full_name=full_name).first()
+    # TODO: some bug causing that webhook_id is NONE even when is in DB
 
     response = GitHubAPI.get('/repos/' + full_name)
     if response.status_code != 200:
@@ -148,7 +151,7 @@ def repo_activate(reponame):
         flask.flash('We were unable to create webhook for that repository',
                     'warning')
     repo.visibility_type = visibility_type
-    if repo.visibility_type == Repository.VISIBILITY_HIDDEN:
+    if repo.is_hidden:
         repo.generate_secret()
     db.session.commit()
     return flask.redirect(
