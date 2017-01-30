@@ -1,12 +1,14 @@
 import flask
 import flask_bower
+import flask_injector
+import flask_sqlalchemy
+import injector
 from flask_script import Manager
 from flask_migrate import Migrate, MigrateCommand
 import configparser
 from .extending import ExtensionsMaster
 
 
-# TODO: app factory and/or subclass
 def create_app(cfg):
     app = flask.Flask(__name__)
     flask_bower.Bower(app)
@@ -25,12 +27,7 @@ def create_app(cfg):
     login_manager.init_app(app)
     principals.init_app(app)
 
-    from .api import create_api
-    api_manager = create_api(app)
-
-    # TODO: load all parts
-    # TODO: load all extensions
-    ext_master = ExtensionsMaster()
+    ext_master = ExtensionsMaster(app=app, db=db)
     ext_names = ext_master.call('introduce')
     print('Loaded extensions: {}'.format(', '.join(ext_names)))
 
@@ -46,6 +43,20 @@ def create_app(cfg):
     register_filters(app)
 
     init_controllers(app)
+
+    def configure(binder):
+        binder.bind(ExtensionsMaster,
+                    to=ext_master, scope=injector.singleton)
+        binder.bind(flask_sqlalchemy.SQLAlchemy,
+                    to=db, scope=injector.singleton)
+
+    inj = injector.Injector([configure])
+    flask_injector.FlaskInjector(app=app, injector=inj)
+
+    # flask_restless is not compatinle with flask_injector!
+    from .api import create_api
+    api_manager = create_api(app)
+
     return app, manager
 
 
