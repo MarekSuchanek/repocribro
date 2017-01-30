@@ -1,11 +1,12 @@
-import json
-
 import flask
 import flask_login
+import flask_sqlalchemy
+import injector
+import json
 
 from ..extending.helpers import ViewTab, Badge
 from ..github import GitHubAPI
-from ..models import Repository, db
+from ..models import Repository
 
 manage = flask.Blueprint('manage', __name__, url_prefix='/manage')
 
@@ -51,9 +52,11 @@ def dashboard():
 
 
 @manage.route('/profile/update')
-def update_profile():
+@injector.inject(db=flask_sqlalchemy.SQLAlchemy,
+                 gh_api=GitHubAPI)
+def update_profile(db, gh_api):
     # TODO: protect from updating too often
-    user_data = GitHubAPI.get_data('/user')
+    user_data = gh_api.get_data('/user')
     gh_user = flask_login.current_user.github_user
     gh_user.update_from_dict(user_data)
     db.session.commit()
@@ -62,8 +65,9 @@ def update_profile():
 
 @manage.route('/repos')
 @flask_login.login_required
-def repositories():
-    repos_data = GitHubAPI.get_data('/user/repos')
+@injector.inject(gh_api=GitHubAPI)
+def repositories(gh_api):
+    repos_data = gh_api.get_data('/user/repos')
     user = flask_login.current_user.github_user
     return flask.render_template(
         'manage/repos.html',
@@ -72,22 +76,22 @@ def repositories():
     )
 
 
-def has_good_webhook(repo):
+def has_good_webhook(gh_api, repo):
     if repo.webhook_id is None:
         return False
     # TODO: check if there are right events
     print(repo.webhook_id)
-    webhook = GitHubAPI.webhook_get(repo.full_name, repo.webhook_id)
+    webhook = gh_api.webhook_get(repo.full_name, repo.webhook_id)
     print(webhook)
     return webhook is None
 
 
-def update_webhook(repo):
-    if not has_good_webhook(repo):
+def update_webhook(gh_api, repo):
+    if not has_good_webhook(gh_api, repo):
         repo.webhook_id = None
     if repo.webhook_id is None:
         # Create new webhook
-        webhook = GitHubAPI.webhook_create(repo.full_name)
+        webhook = gh_api.webhook_create(repo.full_name)
         if webhook is None:
             return False
         repo.webhook_id = webhook['id']
@@ -106,11 +110,13 @@ def repo_detail(reponame):
 
 @manage.route('/repo/<reponame>/update')
 @flask_login.login_required
-def repo_update(reponame):
+@injector.inject(db=flask_sqlalchemy.SQLAlchemy,
+                 gh_api=GitHubAPI)
+def repo_update(db, gh_api, reponame):
     user = flask_login.current_user.github_user
     full_name = Repository.make_full_name(user.login, reponame)
     repo = Repository.query.filter_by(full_name=full_name).first_or_404()
-    repo_data = GitHubAPI.get('/repos/' + full_name)
+    repo_data = gh_api.get('/repos/' + full_name)
     repo.update_from_dict(repo_data)
     db.session.commit()
     return flask.redirect(
@@ -120,7 +126,9 @@ def repo_update(reponame):
 
 @manage.route('/repo/<reponame>/activate', methods=['POST'])
 @flask_login.login_required
-def repo_activate(reponame):
+@injector.inject(db=flask_sqlalchemy.SQLAlchemy,
+                 gh_api=GitHubAPI)
+def repo_activate(db, gh_api, reponame):
     visibility_type = flask.request.form.get('enable', type=int)
     if visibility_type not in (
         Repository.VISIBILITY_HIDDEN,
@@ -137,7 +145,7 @@ def repo_activate(reponame):
     repo = Repository.query.filter_by(full_name=full_name).first()
     # TODO: some bug causing that webhook_id is NONE even when is in DB
 
-    response = GitHubAPI.get('/repos/' + full_name)
+    response = gh_api.get('/repos/' + full_name)
     if response.status_code != 200:
         flask.flash('GitHub didn\'t give us data about that repository',
                     'error')
@@ -149,7 +157,7 @@ def repo_activate(reponame):
         db.session.add(repo)
     else:
         repo.update_from_dict(gh_repo)
-    if not update_webhook(repo):
+    if not update_webhook(gh_api, repo):
         flask.flash('We were unable to create webhook for that repository',
                     'warning')
     repo.visibility_type = visibility_type
@@ -163,13 +171,15 @@ def repo_activate(reponame):
 
 @manage.route('/repo/<reponame>/deactivate', methods=['POST'])
 @flask_login.login_required
-def repo_deactivate(reponame):
+@injector.inject(db=flask_sqlalchemy.SQLAlchemy,
+                 gh_api=GitHubAPI)
+def repo_deactivate(db, gh_api, reponame):
     user = flask_login.current_user.github_user
     full_name = Repository.make_full_name(user.login, reponame)
 
     repo = Repository.query.filter_by(full_name=full_name).first_or_404()
     if repo.webhook_id is not None:
-        if GitHubAPI.webhook_delete(repo.full_name, repo.webhook_id):
+        if gh_api.webhook_delete(repo.full_name, repo.webhook_id):
             flask.flash('Webhook was deactivated', 'success')
             repo.webhook_id = None
             db.session.commit()
@@ -184,14 +194,16 @@ def repo_deactivate(reponame):
 
 @manage.route('/repos/delete', methods=['POST'])
 @flask_login.login_required
-def repo_delete():
+@injector.inject(db=flask_sqlalchemy.SQLAlchemy,
+                 gh_api=GitHubAPI)
+def repo_delete(db, gh_api):
     reponame = flask.request.form.get('reponame')
     user = flask_login.current_user.github_user
     full_name = Repository.make_full_name(user.login, reponame)
 
     repo = Repository.query.filter_by(full_name=full_name).first_or_404()
     if repo.webhook_id is not None:
-        GitHubAPI.webhook_delete(repo.full_name, repo.webhook_id)
+        gh_api.webhook_delete(repo.full_name, repo.webhook_id)
     db.session.delete(repo)
     db.session.commit()
     flask.flash('Repository {} has been deleted within app.'.format(full_name),
@@ -201,9 +213,10 @@ def repo_delete():
 
 @manage.route('/orgs')
 @flask_login.login_required
-def organizations():
+@injector.inject(gh_api=GitHubAPI)
+def organizations(gh_api):
     flask.abort(501)
-    orgs_data = GitHubAPI.get_data('/user/orgs')
+    orgs_data = gh_api.get_data('/user/orgs')
     return flask.render_template(
         'manage/orgs.html',
         orgs_json=json.dumps(

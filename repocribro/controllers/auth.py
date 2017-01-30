@@ -1,21 +1,21 @@
 import flask
-import requests
+import injector
+
 from ..github import GitHubAPI
 from ..models import User, UserAccount, db
-from ..security import login_manager, clear_session,\
-    login as security_login, logout as security_logout
-
+from ..security import login as security_login, logout as security_logout
 
 auth = flask.Blueprint('auth', __name__, url_prefix='/auth')
 
 
 @auth.route('/github')
-def github():
-    return flask.redirect(GitHubAPI.get_auth_url())
+@injector.inject(gh_api=GitHubAPI)
+def github(gh_api):
+    return flask.redirect(gh_api.get_auth_url())
 
 
-def github_callback_get_account():
-    user_data = GitHubAPI.get_data('/user')
+def github_callback_get_account(gh_api):
+    user_data = gh_api.get_data('/user')
     gh_user = User.query.filter(
         User.github_id == user_data['id']
     ).first()
@@ -31,16 +31,17 @@ def github_callback_get_account():
 
 
 @auth.route('/github/callback')
-def github_callback():
+@injector.inject(gh_api=GitHubAPI)
+def github_callback(gh_api):
     session_code = flask.request.args.get('code')
-    if GitHubAPI.login(session_code):
-        user_account, is_new = github_callback_get_account()
+    if gh_api.login(session_code):
+        user_account, is_new = github_callback_get_account(gh_api)
         security_login(user_account)
         if not user_account.active:
             flask.flash('Sorry, but your account is deactivated. '
                         'Please contact admin for details', 'error')
             security_logout()
-            GitHubAPI.logout()
+            gh_api.logout()
             return flask.redirect(flask.url_for('core.index'))
         if is_new:
             flask.flash('You account has been created via GitHub. '
@@ -55,8 +56,9 @@ def github_callback():
 
 
 @auth.route('/logout')
-def logout():
+@injector.inject(gh_api=GitHubAPI)
+def logout(gh_api):
     security_logout()
-    GitHubAPI.logout()
+    gh_api.logout()
     flask.flash('You are now logged out, see you soon!', 'info')
     return flask.redirect(flask.url_for('core.index'))

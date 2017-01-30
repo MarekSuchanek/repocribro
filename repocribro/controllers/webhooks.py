@@ -1,7 +1,10 @@
 import flask
+import flask_sqlalchemy
 import functools
+import injector
+
 from ..github import GitHubAPI
-from ..models import Repository, Push, Release, db
+from ..models import Repository, Push, Release
 
 webhooks = flask.Blueprint('webhooks', __name__, url_prefix='/webhook/github')
 
@@ -21,7 +24,7 @@ def webhook_data_requires(*fields):
 
 
 @webhook_data_requires('push', 'sender')
-def gh_webhook_push(repo, data, delivery_id):
+def gh_webhook_push(db, repo, data, delivery_id):
     # TODO: deal with limit of commits in webhook msg (20)
     push = Push.create_from_dict(data['push'], data['sender'], repo)
     db.session.add(push)
@@ -30,13 +33,13 @@ def gh_webhook_push(repo, data, delivery_id):
 
 
 @webhook_data_requires('release', 'sender')
-def gh_webhook_release(repo, data, delivery_id):
+def gh_webhook_release(db, repo, data, delivery_id):
     release = Release.create_from_dict(data['release'], data['sender'], repo)
     db.session.add(release)
 
 
 @webhook_data_requires('action', 'repository')
-def gh_webhook_repository(repo, data, delivery_id):
+def gh_webhook_repository(db, repo, data, delivery_id):
     # This can be one of "created", "deleted", "publicized", or "privatized".
     # TODO: find out where is "updated" action
     action = data['action']
@@ -61,7 +64,9 @@ hooks = {
 
 
 @webhooks.route('', methods=['POST'])
-def gh_webhook():
+@injector.inject(db=flask_sqlalchemy.SQLAlchemy,
+                 gh_api=GitHubAPI)
+def gh_webhook(db, gh_api):
     headers = flask.request.headers
     agent = headers.get('User-Agent', '')
     signature = headers.get('X-Hub-Signature', '')
@@ -73,13 +78,13 @@ def gh_webhook():
         return flask.abort(404)
     if data is None or 'repository' not in data:
         return flask.abort(400)
-    if not GitHubAPI.webhook_verify_signature(data, signature):
+    if not gh_api.webhook_verify_signature(data, signature):
         return flask.abort(404)
 
     repo = Repository.query.get_or_404(data['repository']['id'])
 
     for event_processor in hooks.get(event, []):
-        event_processor(repo=repo, data=data, deliver_id=delivery_id)
+        event_processor(db=db, repo=repo, data=data, deliver_id=delivery_id)
 
     db.session.commit()
     return ''

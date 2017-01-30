@@ -4,6 +4,7 @@ import flask_sqlalchemy
 import injector
 import configparser
 from .extending import ExtensionsMaster
+from .github import GitHubAPI
 
 
 def create_app(cfg):
@@ -39,6 +40,8 @@ def create_app(cfg):
                     to=ext_master, scope=injector.singleton)
         binder.bind(flask_sqlalchemy.SQLAlchemy,
                     to=db, scope=injector.singleton)
+        binder.bind(GitHubAPI,
+                    to=GitHubAPI(), scope=injector.singleton)
 
     inj = injector.Injector([configure])
     flask_injector.FlaskInjector(app=app, injector=inj)

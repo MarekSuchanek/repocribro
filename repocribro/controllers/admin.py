@@ -1,9 +1,10 @@
 import flask
+import flask_sqlalchemy
 import injector
 import sqlalchemy
 
 from ..extending.helpers import ViewTab, Badge
-from ..models import UserAccount, User, Role, Repository, db
+from ..models import UserAccount, User, Role, Repository
 from ..extending import ExtensionsMaster
 from ..security import permissions
 
@@ -55,7 +56,8 @@ def account_detail(login):
 
 @admin.route('/account/<login>/ban', methods=['POST'])
 @permissions.admin_role.require(404)
-def account_ban(login):
+@injector.inject(db=flask_sqlalchemy.SQLAlchemy)
+def account_ban(db, login):
     user = User.query.filter_by(login=login).first_or_404()
     ban = flask.request.form.get('active') == '0'
     unban = flask.request.form.get('active') == '1'
@@ -78,7 +80,8 @@ def account_ban(login):
 
 @admin.route('/account/<login>/delete', methods=['POST'])
 @permissions.admin_role.require(404)
-def account_delete(login):
+@injector.inject(db=flask_sqlalchemy.SQLAlchemy)
+def account_delete(db, login):
     user = User.query.filter_by(login=login).first_or_404()
     db.session.delete(user.user_account)
     db.session.commit()
@@ -103,7 +106,8 @@ def repo_detail(login, reponame):
 
 @admin.route('/repository/<login>/<reponame>/visibility', methods=['POST'])
 @permissions.admin_role.require(404)
-def repo_visibility(login, reponame):
+@injector.inject(db=flask_sqlalchemy.SQLAlchemy)
+def repo_visibility(db, login, reponame):
     repo = Repository.query.filter_by(
         full_name=Repository.make_full_name(login, reponame)
     ).first_or_404()
@@ -131,7 +135,8 @@ def repo_visibility(login, reponame):
 
 @admin.route('/repository/<login>/<reponame>/delete', methods=['POST'])
 @permissions.admin_role.require(404)
-def repo_delete(login, reponame):
+@injector.inject(db=flask_sqlalchemy.SQLAlchemy)
+def repo_delete(db, login, reponame):
     repo = Repository.query.filter_by(
         full_name=Repository.make_full_name(login, reponame)
     ).first_or_404()
@@ -151,7 +156,8 @@ def role_detail(name):
 
 @admin.route('/role/<name>/edit', methods=['POST'])
 @permissions.admin_role.require(404)
-def role_edit(name):
+@injector.inject(db=flask_sqlalchemy.SQLAlchemy)
+def role_edit(db, name):
     role = Role.query.filter_by(name=name).first_or_404()
     name = flask.request.form.get('name', '')
     desc = flask.request.form.get('description', None)
@@ -172,7 +178,8 @@ def role_edit(name):
 
 @admin.route('/role/<name>/delete', methods=['POST'])
 @permissions.admin_role.require(404)
-def role_delete(name):
+@injector.inject(db=flask_sqlalchemy.SQLAlchemy)
+def role_delete(db, name):
     role = Role.query.filter_by(name=name).first_or_404()
     db.session.delete(role)
     db.session.commit()
@@ -183,7 +190,8 @@ def role_delete(name):
 
 @admin.route('/roles/create', methods=['POST'])
 @permissions.admin_role.require(404)
-def role_create():
+@injector.inject(db=flask_sqlalchemy.SQLAlchemy)
+def role_create(db):
     name = flask.request.form.get('name', '')
     desc = flask.request.form.get('description', None)
     if name == '':
@@ -202,7 +210,8 @@ def role_create():
 
 @admin.route('/role/<name>/add', methods=['POST'])
 @permissions.admin_role.require(404)
-def role_assignment_add(name):
+@injector.inject(db=flask_sqlalchemy.SQLAlchemy)
+def role_assignment_add(db, name):
     login = flask.request.form.get('login', '')
     account = User.query.filter_by(login=login).first_or_404().user_account
     role = Role.query.filter_by(name=name).first_or_404()
@@ -219,7 +228,8 @@ def role_assignment_add(name):
 
 @admin.route('/role/<name>/remove', methods=['POST'])
 @permissions.admin_role.require(404)
-def role_assignment_remove(name):
+@injector.inject(db=flask_sqlalchemy.SQLAlchemy)
+def role_assignment_remove(db, name):
     login = flask.request.form.get('login', '')
     account = User.query.filter_by(login=login).first_or_404().user_account
     role = Role.query.filter_by(name=name).first_or_404()
