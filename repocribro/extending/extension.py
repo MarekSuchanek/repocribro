@@ -1,5 +1,6 @@
 import abc
 import pkg_resources
+import sys
 
 
 class Extension(abc.ABC):
@@ -11,6 +12,8 @@ class Extension(abc.ABC):
 
 class ExtensionsMaster:
     ENTRYPOINT_GROUP = 'repocribro.ext'
+    LOAD_ERROR_MSG = 'Extension "{}" ({}) is not making an Extension ' \
+                     '(sub)class instance. It will be ignored!'
 
     @classmethod
     def _collect_extensions(cls, name=None):
@@ -25,8 +28,8 @@ class ExtensionsMaster:
             ext_maker = ep.load()
             e = ext_maker(*args, **kwargs)
             if not isinstance(e, Extension):
-                print('Extension {} not making an Extension instance'.format(
-                    ep.module_name
+                print(self.LOAD_ERROR_MSG.format(
+                    ep.name, ep.module_name, file=sys.stderr
                 ))
             else:
                 self.exts.append(e)
