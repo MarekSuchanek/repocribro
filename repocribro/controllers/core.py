@@ -14,6 +14,7 @@ def index():
     return flask.render_template('core/index.html')
 
 
+@core.route('/search/')
 @core.route('/search')
 @core.route('/search/<query>')
 @injector.inject(db=flask_sqlalchemy.SQLAlchemy)
