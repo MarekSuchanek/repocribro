@@ -1,6 +1,7 @@
 include setup.cfg
 include pytest.ini
-include config/auth.example.cfg
+include config/*.example.cfg
 include tests/*.py
+graft tests/fixtures
 graft docs
 prune docs/_build

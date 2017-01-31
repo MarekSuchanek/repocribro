@@ -7,7 +7,7 @@
 
     <link rel="icon" href="{{ url_for('static', filename='pics/repocribro-icon.png') }}" type="image/png">
 
-    <link rel="stylesheet" href="{{ url_for('bower.static', filename='bootstrap/dist/css/bootstrap.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap.min.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/octicons/4.4.0/octicons.min.css"/>
@@ -29,8 +29,8 @@
         {% include "footer.html" %}
     </main>
 
-    <script src="{{ url_for('bower.static', filename='jquery/dist/jquery.js') }}"></script>
-    <script src="{{ url_for('bower.static', filename='bootstrap/dist/js/bootstrap.js') }}"></script>
+    <script src="{{ url_for('static', filename='jquery.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='bootstrap.min.js') }}"></script>
     <script src="{{ url_for('static', filename='script.js') }}"></script>
     {% block scripts %}{% endblock %}
     <script type="application/javascript">

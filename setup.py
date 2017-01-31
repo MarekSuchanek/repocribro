@@ -17,7 +17,10 @@ setup(
     packages=find_packages(),
     package_data={
         'repocribro': [
-            'static/*',
+            'static/*.js',
+            'static/*.css',
+            'static/fonts/*.*',
+            'static/pics/*.png',
             'templates/*.html',
             'templates/core/*.html'
         ]
