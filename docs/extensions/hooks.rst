@@ -1,4 +1,6 @@
 Hooks for extension
 ===================
 
-*Here should be table with hook names and expected return type*
+.. csv-table:: Extension hooks
+    :header: "Name", "Description", "Return type"
+    :file: hooks.csv

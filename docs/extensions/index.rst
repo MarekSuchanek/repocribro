@@ -13,7 +13,8 @@ in the group ``[repocribro.ext]`` on that function. Extending is done
 via implementing actions on :doc:`hooks` which can return something.
 
 While writing new plugin use please the same model, so even your extension
-is also easily extensible.
+is also easily extensible. Big part of core repocribro is extension itself
+see the module ``repocribro.ext_core``.
 
 
 my_ext.py

@@ -4,6 +4,7 @@ import flask_bower
 import flask_migrate
 
 
+# TODO: some methods can be generic or simplified
 class CoreExtension(Extension):
     NAME = 'core'
     CATEGORY = 'basic'
