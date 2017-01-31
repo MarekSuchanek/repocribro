@@ -121,7 +121,7 @@ def org_detail(login):
 def repo_redir(login):
     flask.flash('Seriously?! You forget to specify repository name, didn\'t '
                 'you? We redirected you but be careful next time!', 'notice')
-    return flask.redirect(flask.url_for('user', login=login))
+    return flask.redirect(flask.url_for('core.user_detail', login=login))
 
 
 @core.route('/repo/<login>/<reponame>')

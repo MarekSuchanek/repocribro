@@ -60,7 +60,7 @@ def update_profile(db, gh_api):
     gh_user = flask_login.current_user.github_user
     gh_user.update_from_dict(user_data)
     db.session.commit()
-    return flask.redirect(flask.url_for('user.dashboard', tab='profile'))
+    return flask.redirect(flask.url_for('manage.dashboard', tab='profile'))
 
 
 @manage.route('/repos')
