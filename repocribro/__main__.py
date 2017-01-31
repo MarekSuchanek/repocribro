@@ -1,3 +1,3 @@
-from .repocribro import start
+from .manage import run
 
-start()
+run()

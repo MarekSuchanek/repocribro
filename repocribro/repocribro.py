@@ -61,9 +61,3 @@ def create_app(cfg_files=DEFAULT_CONFIG_FILES):
     ext_master.call('init_post_injector')
 
     return app
-
-
-# TODO: CLI with specifing config file(s)
-def start():
-    app = create_app()
-    app.run()

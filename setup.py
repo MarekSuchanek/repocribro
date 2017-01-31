@@ -24,7 +24,7 @@ setup(
     },
     entry_points={
         'console_scripts': [
-            'repocribro = repocribro.repocribro:start',
+            'repocribro = repocribro:run',
         ],
         'repocribro.ext': [
             'repocribro-core = repocribro.ext_core:make_extension'
