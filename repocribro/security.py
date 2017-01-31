@@ -1,11 +1,24 @@
 import flask
 import flask_login
 import flask_principal
+
 from .models import UserAccount, Anonymous
 
-login_manager = flask_login.LoginManager()
-principals = flask_principal.Principal()
-login_manager.anonymous_user = Anonymous
+
+def init_login_manager(db):
+    login_manager = flask_login.LoginManager()
+    principals = flask_principal.Principal()
+    login_manager.anonymous_user = Anonymous
+
+    @login_manager.unauthorized_handler
+    def unauthorized():
+        flask.abort(403)
+
+    @login_manager.user_loader
+    def load_user(user_id):
+        return db.session.query(UserAccount).get(int(user_id))
+
+    return login_manager, principals
 
 
 class Permissions:
@@ -15,16 +28,6 @@ class Permissions:
     )
 
 permissions = Permissions()
-
-
-@login_manager.unauthorized_handler
-def unauthorized():
-    flask.abort(403)
-
-
-@login_manager.user_loader
-def load_user(user_id):
-    return UserAccount.query.get(int(user_id))
 
 
 def login(user_account):

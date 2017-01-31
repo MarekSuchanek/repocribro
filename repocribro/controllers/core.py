@@ -1,5 +1,7 @@
 import flask
 import flask_login
+import flask_sqlalchemy
+import injector
 
 from ..extending.helpers import ViewTab, Badge
 from ..models import User, Organization, Repository
@@ -14,12 +16,19 @@ def index():
 
 @core.route('/search')
 @core.route('/search/<query>')
-def search(query=''):
+@injector.inject(db=flask_sqlalchemy.SQLAlchemy)
+def search(db, query=''):
     # TODO: more attrs
     # TODO: limits, nonempty search?
-    users = User.fulltext_query(query).all()
-    orgs = Organization.fulltext_query(query).all()
-    repos = Repository.fulltext_query(query).all()
+    users = User.fulltext_query(
+        query, db.session.query(User)
+    ).all()
+    orgs = Organization.fulltext_query(
+        query, db.session.query(Organization)
+    ).all()
+    repos = Repository.fulltext_query(
+        query, db.session.query(Repository)
+    ).all()
 
     # TODO: gather & prepare tabs & pass to template
     tabs = [
@@ -47,10 +56,11 @@ def search(query=''):
 
 
 @core.route('/user/<login>')
-def user_detail(login):
-    user = User.query.filter_by(login=login).first()
+@injector.inject(db=flask_sqlalchemy.SQLAlchemy)
+def user_detail(db, login):
+    user = db.session.query(User).filter_by(login=login).first()
     if user is None:
-        is_org = Organization.query.filter(
+        is_org = db.session.query(Organization).filter(
             Organization.login == login
         ).exists()
         if is_org:
@@ -84,10 +94,11 @@ def user_detail(login):
 
 
 @core.route('/org/<login>')
-def org_detail(login):
-    org = User.query.filter_by(login=login).first()
+@injector.inject(db=flask_sqlalchemy.SQLAlchemy)
+def org_detail(db, login):
+    org = db.session.query(User).filter_by(login=login).first()
     if org is None:
-        is_user = User.query.filter_by(login=login).exists()
+        is_user = db.session.query(User).filter_by(login=login).exists()
         if is_user:
             # TODO: implement 410 (org deleted/archived)
             # TODO: org renaming
@@ -125,8 +136,9 @@ def repo_redir(login):
 
 
 @core.route('/repo/<login>/<reponame>')
-def repo_detail(login, reponame):
-    repo = Repository.query.filter_by(
+@injector.inject(db=flask_sqlalchemy.SQLAlchemy)
+def repo_detail(db, login, reponame):
+    repo = db.session.query(Repository).filter_by(
         full_name='{}/{}'.format(login, reponame),
     ).first()
     if repo is None:
@@ -164,8 +176,9 @@ def repo_detail(login, reponame):
 
 # TODO: DRY (similar to repo_detail)
 @core.route('/hidden-repo/<secret>')
-def repo_detail_hidden(secret):
-    repo = Repository.query.filter_by(secret=secret).first()
+@injector.inject(db=flask_sqlalchemy.SQLAlchemy)
+def repo_detail_hidden(db, secret):
+    repo = db.session.query(Repository).filter_by(secret=secret).first()
     if repo is None:
         # TODO: implement 410 (repo deleted/archived)
         # TODO: repository renaming

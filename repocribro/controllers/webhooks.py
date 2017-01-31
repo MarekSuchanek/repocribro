@@ -81,7 +81,7 @@ def gh_webhook(db, gh_api):
     if not gh_api.webhook_verify_signature(data, signature):
         return flask.abort(404)
 
-    repo = Repository.query.get_or_404(data['repository']['id'])
+    repo = db.session.query(Repository).get_or_404(data['repository']['id'])
 
     for event_processor in hooks.get(event, []):
         event_processor(db=db, repo=repo, data=data, deliver_id=delivery_id)

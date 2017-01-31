@@ -17,7 +17,7 @@ def github(gh_api):
 
 def github_callback_get_account(gh_api, db):
     user_data = gh_api.get_data('/user')
-    gh_user = User.query.filter(
+    gh_user = db.session.query(User).filter(
         User.github_id == user_data['id']
     ).first()
     is_new = False

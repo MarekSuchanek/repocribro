@@ -24,7 +24,8 @@ class CoreExtension(Extension):
             return default
 
     def init_business(self, *args, **kwargs):
-        from .security import login_manager, principals
+        from .security import init_login_manager
+        login_manager, principals = init_login_manager(self.db)
         login_manager.init_app(self.app)
         principals.init_app(self.app)
 

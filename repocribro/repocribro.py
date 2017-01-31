@@ -3,6 +3,7 @@ import flask_ini
 import flask_injector
 import flask_sqlalchemy
 import injector
+
 from .extending import ExtensionsMaster
 from .github import GitHubAPI
 

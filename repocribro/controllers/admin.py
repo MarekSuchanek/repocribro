@@ -13,11 +13,12 @@ admin = flask.Blueprint('admin', __name__, url_prefix='/admin')
 
 @admin.route('')
 @permissions.admin_role.require(404)
-@injector.inject(ext_master=ExtensionsMaster)
-def index(ext_master):
-    accounts = UserAccount.query.all()
-    roles = Role.query.all()
-    repos = Repository.query.all()
+@injector.inject(db=flask_sqlalchemy.SQLAlchemy,
+                 ext_master=ExtensionsMaster)
+def index(db, ext_master):
+    accounts = db.session.query(UserAccount).query.all()
+    roles = db.session.query(Role.query).all()
+    repos = db.session.query(Repository).query.all()
     exts = ext_master.call('view_admin_extensions', None)
 
     tabs = [
@@ -49,8 +50,11 @@ def index(ext_master):
 
 @admin.route('/account/<login>')
 @permissions.admin_role.require(404)
-def account_detail(login):
-    user = User.query.filter_by(login=login).first_or_404()
+@injector.inject(db=flask_sqlalchemy.SQLAlchemy)
+def account_detail(db, login):
+    user = db.session.query(User).filter_by(login=login).first()
+    if user is None:
+        flask.abort(404)
     return flask.render_template('admin/account.html', user=user)
 
 
@@ -58,7 +62,9 @@ def account_detail(login):
 @permissions.admin_role.require(404)
 @injector.inject(db=flask_sqlalchemy.SQLAlchemy)
 def account_ban(db, login):
-    user = User.query.filter_by(login=login).first_or_404()
+    user = db.session.query(User).filter_by(login=login).first()
+    if user is None:
+        flask.abort(404)
     ban = flask.request.form.get('active') == '0'
     unban = flask.request.form.get('active') == '1'
     if user.user_account.active and ban:
@@ -82,7 +88,9 @@ def account_ban(db, login):
 @permissions.admin_role.require(404)
 @injector.inject(db=flask_sqlalchemy.SQLAlchemy)
 def account_delete(db, login):
-    user = User.query.filter_by(login=login).first_or_404()
+    user = db.session.query(User).filter_by(login=login).first()
+    if user is None:
+        flask.abort(404)
     db.session.delete(user.user_account)
     db.session.commit()
     flask.flash('User account {} with the all related data'
@@ -94,10 +102,13 @@ def account_delete(db, login):
 
 @admin.route('/repository/<login>/<reponame>')
 @permissions.admin_role.require(404)
-def repo_detail(login, reponame):
-    repo = Repository.query.filter_by(
+@injector.inject(db=flask_sqlalchemy.SQLAlchemy)
+def repo_detail(db, login, reponame):
+    repo = db.session.query(Repository).filter_by(
         full_name=Repository.make_full_name(login, reponame)
-    ).first_or_404()
+    ).first()
+    if repo is None:
+        flask.abort(404)
     return flask.render_template(
         'admin/repo.html',
         repo=repo, Repository=Repository
@@ -108,9 +119,11 @@ def repo_detail(login, reponame):
 @permissions.admin_role.require(404)
 @injector.inject(db=flask_sqlalchemy.SQLAlchemy)
 def repo_visibility(db, login, reponame):
-    repo = Repository.query.filter_by(
+    repo = db.session.query(Repository).filter_by(
         full_name=Repository.make_full_name(login, reponame)
-    ).first_or_404()
+    ).first()
+    if repo is None:
+        flask.abort(404)
     visibility_type = flask.request.form.get('enable', type=int)
     if visibility_type not in (
             Repository.VISIBILITY_HIDDEN,
@@ -137,9 +150,11 @@ def repo_visibility(db, login, reponame):
 @permissions.admin_role.require(404)
 @injector.inject(db=flask_sqlalchemy.SQLAlchemy)
 def repo_delete(db, login, reponame):
-    repo = Repository.query.filter_by(
+    repo = db.session.query(Repository).filter_by(
         full_name=Repository.make_full_name(login, reponame)
-    ).first_or_404()
+    ).first()
+    if repo is None:
+        flask.abort(404)
     db.session.delete(repo)
     db.session.commit()
     flask.flash('Repository {} with the all related data has '
@@ -149,8 +164,11 @@ def repo_delete(db, login, reponame):
 
 @admin.route('/role/<name>')
 @permissions.admin_role.require(404)
-def role_detail(name):
-    role = Role.query.filter_by(name=name).first_or_404()
+@injector.inject(db=flask_sqlalchemy.SQLAlchemy)
+def role_detail(db, name):
+    role = db.session.query(Role).filter_by(name=name).first()
+    if role is None:
+        flask.abort(404)
     return flask.render_template('admin/role.html', role=role)
 
 
@@ -158,7 +176,9 @@ def role_detail(name):
 @permissions.admin_role.require(404)
 @injector.inject(db=flask_sqlalchemy.SQLAlchemy)
 def role_edit(db, name):
-    role = Role.query.filter_by(name=name).first_or_404()
+    role = db.session.query(Role).filter_by(name=name).first()
+    if role is None:
+        flask.abort(404)
     name = flask.request.form.get('name', '')
     desc = flask.request.form.get('description', None)
     if name == '':
@@ -180,7 +200,9 @@ def role_edit(db, name):
 @permissions.admin_role.require(404)
 @injector.inject(db=flask_sqlalchemy.SQLAlchemy)
 def role_delete(db, name):
-    role = Role.query.filter_by(name=name).first_or_404()
+    role = db.session.query(Role).filter_by(name=name).first()
+    if role is None:
+        flask.abort(404)
     db.session.delete(role)
     db.session.commit()
     flask.flash('Role {} with the all related data has '
@@ -213,8 +235,11 @@ def role_create(db):
 @injector.inject(db=flask_sqlalchemy.SQLAlchemy)
 def role_assignment_add(db, name):
     login = flask.request.form.get('login', '')
-    account = User.query.filter_by(login=login).first_or_404().user_account
-    role = Role.query.filter_by(name=name).first_or_404()
+    user = db.session.query(User).filter_by(login=login).first()
+    role = db.session.query(Role).filter_by(name=name).first()
+    if user is None or role is None:
+        flask.abort(404)
+    account = user.user_account
     if account in role.user_accounts:
         flask.flash('User {} already has role {}'.format(login, name),
                     'error')
@@ -231,8 +256,11 @@ def role_assignment_add(db, name):
 @injector.inject(db=flask_sqlalchemy.SQLAlchemy)
 def role_assignment_remove(db, name):
     login = flask.request.form.get('login', '')
-    account = User.query.filter_by(login=login).first_or_404().user_account
-    role = Role.query.filter_by(name=name).first_or_404()
+    user = db.session.query(User).filter_by(login=login).first()
+    role = db.session.query(Role).filter_by(name=name).first()
+    if user is None or role is None:
+        flask.abort(404)
+    account = user.user_account
     if account not in role.user_accounts:
         flask.flash('User {} doesn\'t have role {}'.format(login, name),
                     'error')

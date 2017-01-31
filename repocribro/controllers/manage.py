@@ -100,10 +100,13 @@ def update_webhook(gh_api, repo):
 
 @manage.route('/repo/<reponame>')
 @flask_login.login_required
-def repo_detail(reponame):
+@injector.inject(db=flask_sqlalchemy.SQLAlchemy)
+def repo_detail(db, reponame):
     user = flask_login.current_user.github_user
     full_name = Repository.make_full_name(user.login, reponame)
-    repo = Repository.query.filter_by(full_name=full_name).first_or_404()
+    repo = db.session.query(Repository).filter_by(full_name=full_name).first()
+    if repo is None:
+        flask.abort(404)
     return flask.render_template('manage/repo.html',
                                  repo=repo, user=user, Repository=Repository)
 
@@ -115,7 +118,9 @@ def repo_detail(reponame):
 def repo_update(db, gh_api, reponame):
     user = flask_login.current_user.github_user
     full_name = Repository.make_full_name(user.login, reponame)
-    repo = Repository.query.filter_by(full_name=full_name).first_or_404()
+    repo = db.session.query(Repository).filter_by(full_name=full_name).first()
+    if repo is None:
+        flask.abort(404)
     repo_data = gh_api.get('/repos/' + full_name)
     repo.update_from_dict(repo_data)
     db.session.commit()
@@ -142,7 +147,7 @@ def repo_activate(db, gh_api, reponame):
     user = flask_login.current_user.github_user
     full_name = Repository.make_full_name(user.login, reponame)
 
-    repo = Repository.query.filter_by(full_name=full_name).first()
+    repo = db.session.query(Repository).filter_by(full_name=full_name).first()
     # TODO: some bug causing that webhook_id is NONE even when is in DB
 
     response = gh_api.get('/repos/' + full_name)
@@ -177,7 +182,9 @@ def repo_deactivate(db, gh_api, reponame):
     user = flask_login.current_user.github_user
     full_name = Repository.make_full_name(user.login, reponame)
 
-    repo = Repository.query.filter_by(full_name=full_name).first_or_404()
+    repo = db.session.query(Repository).filter_by(full_name=full_name).first()
+    if repo is None:
+        flask.abort(404)
     if repo.webhook_id is not None:
         if gh_api.webhook_delete(repo.full_name, repo.webhook_id):
             flask.flash('Webhook was deactivated', 'success')
@@ -201,7 +208,9 @@ def repo_delete(db, gh_api):
     user = flask_login.current_user.github_user
     full_name = Repository.make_full_name(user.login, reponame)
 
-    repo = Repository.query.filter_by(full_name=full_name).first_or_404()
+    repo = db.session.query(Repository).filter_by(full_name=full_name).first()
+    if repo is None:
+        flask.abort(404)
     if repo.webhook_id is not None:
         gh_api.webhook_delete(repo.full_name, repo.webhook_id)
     db.session.delete(repo)

@@ -10,12 +10,12 @@ class SearchableMixin:
     __searchable__ = []
 
     @classmethod
-    def fulltext_query(cls, query_str):
+    def fulltext_query(cls, query_str, db_query):
         query_str = '%{}%'.format(query_str)
         condition = sqlalchemy.or_(
             *[getattr(cls, col).like(query_str) for col in cls.__searchable__]
         )
-        return cls.query.filter(condition)
+        return db_query.filter(condition)
 
 
 class RoleMixin:
