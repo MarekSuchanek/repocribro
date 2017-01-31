@@ -16,6 +16,7 @@ Contents
    extensions/index
    testing
    credits
+   api/index
 
 
 Indices and tables
