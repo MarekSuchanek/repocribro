@@ -1,6 +1,7 @@
 import flask_script
 import flask_migrate
 
+from .commands import RepocheckCommand
 from .repocribro import create_app
 
 
@@ -10,7 +11,9 @@ def run():
                        required=False, action='append')
 
     manager.add_command('db', flask_migrate.MigrateCommand)
+    manager.add_command('repocheck', RepocheckCommand)
 
+    # TODO: allow extension add options & commands
     manager.run()
 
 if __name__ == '__main__':
