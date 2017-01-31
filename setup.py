@@ -31,9 +31,9 @@ setup(
         ]
     },
     install_requires=[
-        'configparser',
         'Flask>=0.12',
         'flask-bower',
+        'flask-ini',
         'flask-injector',
         'flask-login',
         'flask-migrate',

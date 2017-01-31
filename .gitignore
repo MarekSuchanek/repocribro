@@ -91,7 +91,10 @@ ENV/
 # Custom
 .idea
 playground
-config/auth.cfg
+
+# Config files
+config/*
+!config/*.example.cfg
 
 # Bower downloaded dependencies
 # should be installed via setup.py & bower

@@ -1,23 +1,11 @@
 import pytest
 
-
-@pytest.fixture
-def auth_cfg():
-    return {
-        'github': {
-            'client_id': 'SOME_CLIENT_ID',
-            'client_secret': 'SOME_CLIENT_SECRET',
-            'webhooks_secret': 'SOME_WEBHOOKS_SECRET',
-        },
-        'flask': {
-            'secret_key': 'FLASK_SECRET_KEY'
-        }
-    }
+FLASK_CONFIG_FILE = 'tests/fixtures/config.cfg'
 
 
 @pytest.fixture
-def repocribro_app(auth_cfg):
+def repocribro_app():
     """Flask web application test client"""
     from repocribro.repocribro import create_app
-    app = create_app(auth_cfg)
+    app = create_app(FLASK_CONFIG_FILE)
     return app.test_client()

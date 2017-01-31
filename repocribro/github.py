@@ -14,31 +14,29 @@ class GitHubAPI:
     WEBHOOKS = ['push', 'release', 'repository']
     WEBHOOK_CONTROLLER = 'webhooks.gh_webhook'
 
+    def __init__(self, client_id, client_secret, webhooks_secret):
+        self.client_id = client_id
+        self.client_secret = client_secret
+        self.webhooks_secret = webhooks_secret
+
     @staticmethod
     def _get_auth_header():
         return {
             'Authorization': 'token {}'.format(flask.session['github_token'])
         }
 
-    @classmethod
-    def get_auth_url(cls):
-        return cls.AUTH_URL.format(
-            ' '.join(cls.SCOPES),
-            flask.current_app.config['GH_BASIC_CLIENT_ID']
-        )
+    def get_auth_url(self):
+        return self.AUTH_URL.format(' '.join(self.SCOPES), self.client_id)
 
-    @classmethod
-    def login(cls, session_code):
-        client_id = flask.current_app.config['GH_BASIC_CLIENT_ID']
-        client_secret = flask.current_app.config['GH_BASIC_CLIENT_SECRET']
+    def login(self, session_code):
         response = requests.post(
-            cls.TOKEN_URL,
+            self.TOKEN_URL,
             headers={
                 'Accept': 'application/json'
             },
             data={
-                'client_id': client_id,
-                'client_secret': client_secret,
+                'client_id': self.client_id,
+                'client_secret': self.client_secret,
                 'code': session_code,
             }
         )
@@ -91,12 +89,11 @@ class GitHubAPI:
             return response.json()
         return []
 
-    @classmethod
-    def webhook_create(cls, full_name, events=None, hook_url=None):
+    def webhook_create(self, full_name, events=None, hook_url=None):
         if events is None:
-            events = cls.WEBHOOKS
+            events = self.WEBHOOKS
         if hook_url is None:
-            hook_url = flask.url_for(cls.WEBHOOK_CONTROLLER, _external=True)
+            hook_url = flask.url_for(self.WEBHOOK_CONTROLLER, _external=True)
         data = {
             'name': 'web',
             'active': True,
@@ -104,13 +101,13 @@ class GitHubAPI:
             'config': {
                 'url': hook_url,
                 'content_type': 'json',
-                'secret': flask.current_app.config['GH_BASIC_WEBHOOKS_SECRET']
+                'secret': self.webhooks_secret
             }
         }
         response = requests.post(
-            cls.API_URL + '/repos/{}/hooks'.format(full_name),
+            self.API_URL + '/repos/{}/hooks'.format(full_name),
             data=json.dumps(data),
-            headers=cls._get_auth_header()
+            headers=self._get_auth_header()
         )
         if response.status_code == 201:
             return response.json()
@@ -136,10 +133,9 @@ class GitHubAPI:
         )
         return response.status_code == 204
 
-    @staticmethod
-    def webhook_verify_signature(payload, signature):
+    def webhook_verify_signature(self, payload, signature):
         h = hmac.new(
-            flask.current_app.config['GH_BASIC_WEBHOOKS_SECRET'],
+            self.webhooks_secret,
             payload,
             hashlib.sha1
         )
