@@ -69,10 +69,11 @@ def update_profile(db, gh_api):
 def repositories(gh_api):
     repos_data = gh_api.get_data('/user/repos')
     user = flask_login.current_user.github_user
+    active_ids = [repo.github_id for repo in user.repositories]
     return flask.render_template(
         'manage/repos.html',
         repos=[Repository.create_from_dict(d, user) for d in repos_data],
-        Repository=Repository
+        Repository=Repository, active_ids=active_ids
     )
 
 

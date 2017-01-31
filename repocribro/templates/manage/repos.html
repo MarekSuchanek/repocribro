@@ -2,26 +2,36 @@
 {% block body %}
 
     <h1>Repositories</h1>
-    {# TODO: rework! check if activated, better view #}
-    {% for repo in repos %}
-        <div class="panel panel-default">
-            <div class="panel-heading">
-                <h3 class="panel-title">{{ repo.full_name }}</h3>
-            </div>
-            <div class="panel-body">
-                <p>{{ repo.description }}</p>
-
-                <form action="{{ url_for('manage.repo_activate', reponame=repo.name) }}" method="POST">
-                    <div class="btn-group" role="group">
-                        <button type="submit" class="btn btn-success" name="enable" value="{{ Repository.VISIBILITY_PUBLIC }}">Public</button>
-                        <button type="submit" class="btn btn-primary" name="enable" value="{{ Repository.VISIBILITY_HIDDEN }}">Hidden</button>
-                        <button type="submit" class="btn btn-warning" name="enable" value="{{ Repository.VISIBILITY_PRIVATE }}">Private</button>
-                    </div>
-                </form>
-                <form action="{{ url_for('manage.repo_deactivate', reponame=repo.name) }}" method="POST">
-                    <button type="submit" class="btn btn-danger disabled" name="disable">Deactivate</button>
-                </form>
-            </div>
-        </div>
-    {% endfor %}
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th>Name</th>
+            <th>Description</th>
+            <th></th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for repo in repos if repo.github_id not in active_ids %}
+            <tr>
+                <td>{{ repo.full_name }}</td>
+                <td>{% if repo.description %}{{ repo.description }}{% endif %}</td>
+                <td class="btn-group">
+                    <form action="{{ url_for('manage.repo_activate', reponame=repo.name) }}" method="POST">
+                        <div class="btn-group" role="group">
+                            <button type="submit" class="btn btn-success" name="enable"
+                                    value="{{ Repository.VISIBILITY_PUBLIC }}">Public
+                            </button>
+                            <button type="submit" class="btn btn-primary" name="enable"
+                                    value="{{ Repository.VISIBILITY_HIDDEN }}">Hidden
+                            </button>
+                            <button type="submit" class="btn btn-warning" name="enable"
+                                    value="{{ Repository.VISIBILITY_PRIVATE }}">Private
+                            </button>
+                        </div>
+                    </form>
+                </td>
+            </tr>
+            </tbody>
+        {% endfor %}
+    </table>
 {% endblock %}
