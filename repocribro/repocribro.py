@@ -37,7 +37,7 @@ def create_app(cfg_files='DEFAULT'):
         app.iniconfig.read(cfg_files)
     app.secret_key = app.iniconfig.get('flask', 'secret_key')
 
-    db = flask_sqlalchemy.SQLAlchemy()
+    from .database import db
     db.init_app(app)
 
     ext_master = ExtensionsMaster(app=app, db=db)

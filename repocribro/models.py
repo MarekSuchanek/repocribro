@@ -3,6 +3,8 @@ import sqlalchemy
 import flask_login
 import datetime
 
+from .database import db
+
 Base = flask_sqlalchemy.declarative_base()
 
 
@@ -68,9 +70,8 @@ class UserMixin(flask_login.UserMixin):
 
 
 # Many-to-Many
-roles_users = sqlalchemy.Table(
+roles_users = db.Table(
     'RolesAccounts',
-    Base.metadata,
     sqlalchemy.Column('account_id',
                       sqlalchemy.Integer(),
                       sqlalchemy.ForeignKey('UserAccount.id')),
@@ -80,7 +81,7 @@ roles_users = sqlalchemy.Table(
 )
 
 
-class UserAccount(Base, UserMixin, SearchableMixin):
+class UserAccount(db.Model, UserMixin, SearchableMixin):
     """UserAccount in the repocribro app"""
     __tablename__ = 'UserAccount'
 
@@ -108,7 +109,7 @@ class UserAccount(Base, UserMixin, SearchableMixin):
         return '<UserAccount {}>'.format(id)
 
 
-class Role(Base, RoleMixin):
+class Role(db.Model, RoleMixin):
     """User account role in the application"""
     __tablename__ = 'Role'
 
@@ -124,7 +125,7 @@ class Role(Base, RoleMixin):
         self.description = description
 
 
-class RepositoryOwner(Base):
+class RepositoryOwner(db.Model):
     """RepositoryOwner (User or Organization) from GitHub"""
     __tablename__ = 'RepositoryOwner'
 
@@ -249,7 +250,7 @@ class Organization(RepositoryOwner, SearchableMixin):
     }
 
 
-class Repository(Base, SearchableMixin):
+class Repository(db.Model, SearchableMixin):
     """Repository from GitHub"""
     __tablename__ = 'Repository'
     __searchable__ = ['full_name', 'languages', 'description']
@@ -362,7 +363,7 @@ class Repository(Base, SearchableMixin):
         return '<GH Repository {} ({})>'.format(self.full_name, self.github_id)
 
 
-class Push(Base, SearchableMixin):
+class Push(db.Model, SearchableMixin):
     """Push from GitHub"""
     __tablename__ = 'Push'
     __searchable__ = ['after', 'before', 'sender_login', 'pusher_name',
@@ -424,7 +425,7 @@ class Push(Base, SearchableMixin):
         return '<GH Push {}-{}>'.format(self.before[0:7], self.after[0:7])
 
 
-class Commit(Base, SearchableMixin):
+class Commit(db.Model, SearchableMixin):
     """Commit from GitHub"""
     __tablename__ = 'Commit'
     __searchable__ = ['sha', 'message', 'tree_sha',
@@ -487,7 +488,7 @@ class Commit(Base, SearchableMixin):
         return '<GH Commit {}>'.format(self.sha[0:7])
 
 
-class Release(Base, SearchableMixin):
+class Release(db.Model, SearchableMixin):
     """Release from GitHub"""
     __tablename__ = 'Release'
     __searchable__ = ['tag_name', 'name', 'body',
