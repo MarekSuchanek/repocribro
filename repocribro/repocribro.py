@@ -12,6 +12,11 @@ DEFAULT_CONFIG_FILES = [
     'config/db.cfg'
 ]
 
+AUTHOR = 'Marek Suchánek'
+PROG_NAME = 'repocribro'
+RELEASE = '0.0-dev'
+VERSION = '0.0'
+
 
 def make_githup_api(cfg):
     return GitHubAPI(
@@ -21,7 +26,10 @@ def make_githup_api(cfg):
     )
 
 
-def create_app(cfg_files=DEFAULT_CONFIG_FILES):
+def create_app(cfg_files='DEFAULT'):
+    if cfg_files == 'DEFAULT':
+        cfg_files = DEFAULT_CONFIG_FILES
+
     app = flask.Flask(__name__)
     with app.app_context():
         app.iniconfig = flask_ini.FlaskIni()
