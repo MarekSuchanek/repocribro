@@ -409,10 +409,10 @@ class Push(db.Model, SearchableMixin):
             push_dict['after'],
             push_dict['before'],
             push_dict['ref'],
-            push_dict['timestamp'],
-            push_dict['compare_url'],
-            push_dict['pusher_name'],
-            push_dict['pusher_email'],
+            datetime.datetime.now(),
+            push_dict['compare'],
+            push_dict['pusher']['name'],
+            push_dict['pusher']['email'],
             sender_dict['login'],
             sender_dict['id'],
             repository
@@ -436,7 +436,7 @@ class Commit(db.Model, SearchableMixin):
     sha = sqlalchemy.Column(sqlalchemy.String(40))
     tree_sha = sqlalchemy.Column(sqlalchemy.String(40))
     message = sqlalchemy.Column(sqlalchemy.UnicodeText())
-    timestamp = sqlalchemy.Column(sqlalchemy.DateTime())
+    timestamp = sqlalchemy.Column(sqlalchemy.String(60))
     url = sqlalchemy.Column(sqlalchemy.UnicodeText())
     author_name = sqlalchemy.Column(sqlalchemy.UnicodeText())
     author_email = sqlalchemy.Column(sqlalchemy.String(255))
@@ -497,8 +497,8 @@ class Release(db.Model, SearchableMixin):
     id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
     github_id = sqlalchemy.Column(sqlalchemy.Integer())
     tag_name = sqlalchemy.Column(sqlalchemy.String(255))
-    created_at = sqlalchemy.Column(sqlalchemy.DateTime())
-    published_at = sqlalchemy.Column(sqlalchemy.DateTime())
+    created_at = sqlalchemy.Column(sqlalchemy.String(60))
+    published_at = sqlalchemy.Column(sqlalchemy.String(60))
     url = sqlalchemy.Column(sqlalchemy.UnicodeText())
     prerelease = sqlalchemy.Column(sqlalchemy.Boolean())
     draft = sqlalchemy.Column(sqlalchemy.Boolean())
