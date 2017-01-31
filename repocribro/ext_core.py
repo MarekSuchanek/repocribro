@@ -28,6 +28,10 @@ class CoreExtension(Extension):
         login_manager.init_app(self.app)
         principals.init_app(self.app)
 
+    def init_models(self, *args, **kwargs):
+        from .models import all_models
+        return all_models
+
     def init_blueprints(self, *args, **kwargs):
         from .controllers import admin, auth, core, errors, manage, webhooks
         self.app.register_blueprint(admin)
@@ -44,7 +48,7 @@ class CoreExtension(Extension):
     def init_post_injector(self, *args, **kwargs):
         # flask_restless is not compatible with flask_injector!
         from .api import create_api
-        api_manager = create_api(self.app)
+        api_manager = create_api(self.app, self.db)
 
     def introduce(self, *args, **kwargs):
         return self.NAME

@@ -1,8 +1,9 @@
 import flask
+import flask_sqlalchemy
 import injector
 
 from ..github import GitHubAPI
-from ..models import User, UserAccount, db
+from ..models import User, UserAccount
 from ..security import login as security_login, logout as security_logout
 
 auth = flask.Blueprint('auth', __name__, url_prefix='/auth')
@@ -14,7 +15,7 @@ def github(gh_api):
     return flask.redirect(gh_api.get_auth_url())
 
 
-def github_callback_get_account(gh_api):
+def github_callback_get_account(gh_api, db):
     user_data = gh_api.get_data('/user')
     gh_user = User.query.filter(
         User.github_id == user_data['id']
@@ -31,11 +32,12 @@ def github_callback_get_account(gh_api):
 
 
 @auth.route('/github/callback')
-@injector.inject(gh_api=GitHubAPI)
-def github_callback(gh_api):
+@injector.inject(db=flask_sqlalchemy.SQLAlchemy(),
+                 gh_api=GitHubAPI)
+def github_callback(db, gh_api):
     session_code = flask.request.args.get('code')
     if gh_api.login(session_code):
-        user_account, is_new = github_callback_get_account(gh_api)
+        user_account, is_new = github_callback_get_account(db, gh_api)
         security_login(user_account)
         if not user_account.active:
             flask.flash('Sorry, but your account is deactivated. '

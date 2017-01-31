@@ -36,7 +36,7 @@ def create_app(cfg_files='DEFAULT'):
         app.iniconfig.read(cfg_files)
     app.secret_key = app.iniconfig.get('flask', 'secret_key')
 
-    from .models import db
+    db = flask_sqlalchemy.SQLAlchemy()
     db.init_app(app)
 
     ext_master = ExtensionsMaster(app=app, db=db)
@@ -44,6 +44,7 @@ def create_app(cfg_files='DEFAULT'):
     print('Loaded extensions: {}'.format(', '.join(ext_names)))
 
     ext_master.call('init_first')
+    ext_master.call('init_models')
     ext_master.call('init_business')
     ext_master.call('init_filters')
     ext_master.call('init_blueprints')

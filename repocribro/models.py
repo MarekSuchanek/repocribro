@@ -1,10 +1,9 @@
-# TODO: rearrange app structure
 import flask_sqlalchemy
 import sqlalchemy
 import flask_login
 import datetime
 
-db = flask_sqlalchemy.SQLAlchemy()
+Base = flask_sqlalchemy.declarative_base()
 
 
 class SearchableMixin:
@@ -69,25 +68,32 @@ class UserMixin(flask_login.UserMixin):
 
 
 # Many-to-Many
-roles_users = db.Table(
+roles_users = sqlalchemy.Table(
     'RolesAccounts',
-    db.Column('account_id', db.Integer(), db.ForeignKey('UserAccount.id')),
-    db.Column('role_id', db.Integer(), db.ForeignKey('Role.id'))
+    Base.metadata,
+    sqlalchemy.Column('account_id',
+                      sqlalchemy.Integer(),
+                      sqlalchemy.ForeignKey('UserAccount.id')),
+    sqlalchemy.Column('role_id',
+                      sqlalchemy.Integer(),
+                      sqlalchemy.ForeignKey('Role.id'))
 )
 
 
-class UserAccount(db.Model, UserMixin, SearchableMixin):
+class UserAccount(Base, UserMixin, SearchableMixin):
     """UserAccount in the repocribro app"""
     __tablename__ = 'UserAccount'
 
-    id = db.Column(db.Integer, primary_key=True)
-    created_at = db.Column(db.DateTime, default=datetime.datetime.now())
-    active = db.Column(db.Boolean, default=True)
-    github_user = db.relationship(
+    id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
+    created_at = sqlalchemy.Column(
+        sqlalchemy.DateTime, default=datetime.datetime.now()
+    )
+    active = sqlalchemy.Column(sqlalchemy.Boolean, default=True)
+    github_user = sqlalchemy.orm.relationship(
         'User', back_populates='user_account',
         uselist=False, cascade='all, delete-orphan'
     )
-    roles = db.relationship(
+    roles = sqlalchemy.orm.relationship(
         'Role', back_populates='user_accounts',
         secondary=roles_users,
     )
@@ -102,39 +108,39 @@ class UserAccount(db.Model, UserMixin, SearchableMixin):
         return '<UserAccount {}>'.format(id)
 
 
-class Role(db.Model, RoleMixin):
+class Role(Base, RoleMixin):
     """User account role in the application"""
     __tablename__ = 'Role'
 
-    id = db.Column(db.Integer(), primary_key=True)
-    name = db.Column(db.String(80), unique=True)
-    description = db.Column(db.UnicodeText)
-    user_accounts = db.relationship('UserAccount', back_populates='roles',
-                                    secondary=roles_users)
+    id = sqlalchemy.Column(sqlalchemy.Integer(), primary_key=True)
+    name = sqlalchemy.Column(sqlalchemy.String(80), unique=True)
+    description = sqlalchemy.Column(sqlalchemy.UnicodeText)
+    user_accounts = sqlalchemy.orm.relationship(
+        'UserAccount', back_populates='roles', secondary=roles_users
+    )
 
     def __init__(self, name, description):
         self.name = name
         self.description = description
 
 
-class RepositoryOwner(db.Model):
+class RepositoryOwner(Base):
     """RepositoryOwner (User or Organization) from GitHub"""
     __tablename__ = 'RepositoryOwner'
 
-    id = db.Column(db.Integer, primary_key=True)
-    github_id = db.Column(db.Integer, unique=True)
-    login = db.Column(db.String(40), unique=True)
-    email = db.Column(db.String(255))
-    name = db.Column(db.UnicodeText)
-    company = db.Column(db.UnicodeText)
-    description = db.Column(db.UnicodeText)
-    location = db.Column(db.UnicodeText)
-    blog_url = db.Column(db.UnicodeText)
-    avatar_url = db.Column(db.String(255))
-    type = db.Column(db.String(30))
-    repositories = db.relationship(
-        'Repository', back_populates='owner',
-        cascade='all, delete-orphan'
+    id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
+    github_id = sqlalchemy.Column(sqlalchemy.Integer, unique=True)
+    login = sqlalchemy.Column(sqlalchemy.String(40), unique=True)
+    email = sqlalchemy.Column(sqlalchemy.String(255))
+    name = sqlalchemy.Column(sqlalchemy.UnicodeText)
+    company = sqlalchemy.Column(sqlalchemy.UnicodeText)
+    description = sqlalchemy.Column(sqlalchemy.UnicodeText)
+    location = sqlalchemy.Column(sqlalchemy.UnicodeText)
+    blog_url = sqlalchemy.Column(sqlalchemy.UnicodeText)
+    avatar_url = sqlalchemy.Column(sqlalchemy.String(255))
+    type = sqlalchemy.Column(sqlalchemy.String(30))
+    repositories = sqlalchemy.orm.relationship(
+        'Repository', back_populates='owner', cascade='all, delete-orphan'
     )
     __mapper_args__ = {
         'polymorphic_on': type,
@@ -147,9 +153,11 @@ class User(RepositoryOwner, SearchableMixin):
     __searchable__ = ['login', 'email', 'name', 'company',
                       'description', 'location']
 
-    hireable = db.Column(db.Boolean)
-    user_account_id = db.Column(db.Integer, db.ForeignKey('UserAccount.id'))
-    user_account = db.relationship(
+    hireable = sqlalchemy.Column(sqlalchemy.Boolean)
+    user_account_id = sqlalchemy.Column(
+        sqlalchemy.Integer, sqlalchemy.ForeignKey('UserAccount.id')
+    )
+    user_account = sqlalchemy.orm.relationship(
         'UserAccount', back_populates='github_user'
     )
 
@@ -241,30 +249,34 @@ class Organization(RepositoryOwner, SearchableMixin):
     }
 
 
-class Repository(db.Model, SearchableMixin):
+class Repository(Base, SearchableMixin):
     """Repository from GitHub"""
     __tablename__ = 'Repository'
     __searchable__ = ['full_name', 'languages', 'description']
 
-    id = db.Column(db.Integer, primary_key=True)
-    github_id = db.Column(db.Integer, unique=True)
-    fork_of = db.Column(db.Integer)
-    full_name = db.Column(db.String(150), unique=True)
-    name = db.Column(db.String(100))
-    languages = db.Column(db.UnicodeText)
-    url = db.Column(db.UnicodeText)
-    description = db.Column(db.UnicodeText)
-    private = db.Column(db.Boolean)
-    visibility_type = db.Column(db.Integer)
-    secret = db.Column(db.String(255), unique=True)
-    webhook_id = db.Column(db.Integer)
-    owner_id = db.Column(db.Integer, db.ForeignKey('RepositoryOwner.id'))
-    owner = db.relationship('RepositoryOwner', back_populates='repositories')
-    pushes = db.relationship(
+    id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
+    github_id = sqlalchemy.Column(sqlalchemy.Integer, unique=True)
+    fork_of = sqlalchemy.Column(sqlalchemy.Integer)
+    full_name = sqlalchemy.Column(sqlalchemy.String(150), unique=True)
+    name = sqlalchemy.Column(sqlalchemy.String(100))
+    languages = sqlalchemy.Column(sqlalchemy.UnicodeText)
+    url = sqlalchemy.Column(sqlalchemy.UnicodeText)
+    description = sqlalchemy.Column(sqlalchemy.UnicodeText)
+    private = sqlalchemy.Column(sqlalchemy.Boolean)
+    visibility_type = sqlalchemy.Column(sqlalchemy.Integer)
+    secret = sqlalchemy.Column(sqlalchemy.String(255), unique=True)
+    webhook_id = sqlalchemy.Column(sqlalchemy.Integer)
+    owner_id = sqlalchemy.Column(
+        sqlalchemy.Integer, sqlalchemy.ForeignKey('RepositoryOwner.id')
+    )
+    owner = sqlalchemy.orm.relationship(
+        'RepositoryOwner', back_populates='repositories'
+    )
+    pushes = sqlalchemy.orm.relationship(
         'Push', back_populates='repository',
         cascade='all, delete-orphan'
     )
-    releases = db.relationship(
+    releases = sqlalchemy.orm.relationship(
         'Release', back_populates='repository',
         cascade='all, delete-orphan'
     )
@@ -350,25 +362,29 @@ class Repository(db.Model, SearchableMixin):
         return '<GH Repository {} ({})>'.format(self.full_name, self.github_id)
 
 
-class Push(db.Model, SearchableMixin):
+class Push(Base, SearchableMixin):
     """Push from GitHub"""
     __tablename__ = 'Push'
     __searchable__ = ['after', 'before', 'sender_login', 'pusher_name',
                       'pusher_email']
 
-    id = db.Column(db.Integer, primary_key=True)
-    after = db.Column(db.Integer)
-    before = db.Column(db.Integer)
-    ref = db.Column(db.String(255))
-    timestamp = db.Column(db.DateTime())
-    compare_url = db.Column(db.UnicodeText())
-    pusher_name = db.Column(db.UnicodeText())
-    pusher_email = db.Column(db.String(255))
-    sender_login = db.Column(db.String(40))
-    sender_id = db.Column(db.Integer())
-    repository_id = db.Column(db.Integer, db.ForeignKey('Repository.id'))
-    repository = db.relationship('Repository', back_populates='pushes')
-    commits = db.relationship(
+    id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
+    after = sqlalchemy.Column(sqlalchemy.Integer)
+    before = sqlalchemy.Column(sqlalchemy.Integer)
+    ref = sqlalchemy.Column(sqlalchemy.String(255))
+    timestamp = sqlalchemy.Column(sqlalchemy.DateTime())
+    compare_url = sqlalchemy.Column(sqlalchemy.UnicodeText())
+    pusher_name = sqlalchemy.Column(sqlalchemy.UnicodeText())
+    pusher_email = sqlalchemy.Column(sqlalchemy.String(255))
+    sender_login = sqlalchemy.Column(sqlalchemy.String(40))
+    sender_id = sqlalchemy.Column(sqlalchemy.Integer())
+    repository_id = sqlalchemy.Column(
+        sqlalchemy.Integer, sqlalchemy.ForeignKey('Repository.id')
+    )
+    repository = sqlalchemy.orm.relationship(
+        'Repository', back_populates='pushes'
+    )
+    commits = sqlalchemy.orm.relationship(
         'Commit', back_populates='push',
         cascade='all, delete-orphan'
     )
@@ -408,27 +424,29 @@ class Push(db.Model, SearchableMixin):
         return '<GH Push {}-{}>'.format(self.before[0:7], self.after[0:7])
 
 
-class Commit(db.Model, SearchableMixin):
+class Commit(Base, SearchableMixin):
     """Commit from GitHub"""
     __tablename__ = 'Commit'
     __searchable__ = ['sha', 'message', 'tree_sha',
                       'author_name', 'author_name', 'author_login',
                       'committer_name', 'committer_email', 'committer_login']
 
-    id = db.Column(db.Integer, primary_key=True)
-    sha = db.Column(db.String(40))
-    tree_sha = db.Column(db.String(40))
-    message = db.Column(db.UnicodeText())
-    timestamp = db.Column(db.DateTime())
-    url = db.Column(db.UnicodeText())
-    author_name = db.Column(db.UnicodeText())
-    author_email = db.Column(db.String(255))
-    author_login = db.Column(db.String(40))
-    committer_name = db.Column(db.UnicodeText())
-    committer_email = db.Column(db.String(255))
-    committer_login = db.Column(db.String(40))
-    push_id = db.Column(db.Integer, db.ForeignKey('Push.id'))
-    push = db.relationship('Push', back_populates='commits')
+    id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
+    sha = sqlalchemy.Column(sqlalchemy.String(40))
+    tree_sha = sqlalchemy.Column(sqlalchemy.String(40))
+    message = sqlalchemy.Column(sqlalchemy.UnicodeText())
+    timestamp = sqlalchemy.Column(sqlalchemy.DateTime())
+    url = sqlalchemy.Column(sqlalchemy.UnicodeText())
+    author_name = sqlalchemy.Column(sqlalchemy.UnicodeText())
+    author_email = sqlalchemy.Column(sqlalchemy.String(255))
+    author_login = sqlalchemy.Column(sqlalchemy.String(40))
+    committer_name = sqlalchemy.Column(sqlalchemy.UnicodeText())
+    committer_email = sqlalchemy.Column(sqlalchemy.String(255))
+    committer_login = sqlalchemy.Column(sqlalchemy.String(40))
+    push_id = sqlalchemy.Column(
+        sqlalchemy.Integer, sqlalchemy.ForeignKey('Push.id')
+    )
+    push = sqlalchemy.orm.relationship('Push', back_populates='commits')
 
     def __init__(self, sha, tree_sha, message, timestamp, url,
                  author_name, author_email, author_login,
@@ -469,28 +487,32 @@ class Commit(db.Model, SearchableMixin):
         return '<GH Commit {}>'.format(self.sha[0:7])
 
 
-class Release(db.Model, SearchableMixin):
+class Release(Base, SearchableMixin):
     """Release from GitHub"""
     __tablename__ = 'Release'
     __searchable__ = ['tag_name', 'name', 'body',
                       'author_login', 'sender_login']
 
-    id = db.Column(db.Integer, primary_key=True)
-    github_id = db.Column(db.Integer())
-    tag_name = db.Column(db.String(255))
-    created_at = db.Column(db.DateTime())
-    published_at = db.Column(db.DateTime())
-    url = db.Column(db.UnicodeText())
-    prerelease = db.Column(db.Boolean())
-    draft = db.Column(db.Boolean())
-    name = db.Column(db.UnicodeText())
-    body = db.Column(db.UnicodeText())
-    author_login = db.Column(db.String(40))
-    author_id = db.Column(db.Integer())
-    sender_login = db.Column(db.String(40))
-    sender_id = db.Column(db.Integer())
-    repository_id = db.Column(db.Integer, db.ForeignKey('Repository.id'))
-    repository = db.relationship('Repository', back_populates='releases')
+    id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
+    github_id = sqlalchemy.Column(sqlalchemy.Integer())
+    tag_name = sqlalchemy.Column(sqlalchemy.String(255))
+    created_at = sqlalchemy.Column(sqlalchemy.DateTime())
+    published_at = sqlalchemy.Column(sqlalchemy.DateTime())
+    url = sqlalchemy.Column(sqlalchemy.UnicodeText())
+    prerelease = sqlalchemy.Column(sqlalchemy.Boolean())
+    draft = sqlalchemy.Column(sqlalchemy.Boolean())
+    name = sqlalchemy.Column(sqlalchemy.UnicodeText())
+    body = sqlalchemy.Column(sqlalchemy.UnicodeText())
+    author_login = sqlalchemy.Column(sqlalchemy.String(40))
+    author_id = sqlalchemy.Column(sqlalchemy.Integer())
+    sender_login = sqlalchemy.Column(sqlalchemy.String(40))
+    sender_id = sqlalchemy.Column(sqlalchemy.Integer())
+    repository_id = sqlalchemy.Column(
+        sqlalchemy.Integer, sqlalchemy.ForeignKey('Repository.id')
+    )
+    repository = sqlalchemy.orm.relationship(
+        'Repository', back_populates='releases'
+    )
 
     def __init__(self, github_id, tag_name, created_at, published_at, url,
                  prerelease, draft, name, body, author_id, author_login,
@@ -531,3 +553,14 @@ class Release(db.Model, SearchableMixin):
 
     def __repr__(self):
         return '<GH Commit {}>'.format(self.sha[0:7])
+
+
+all_models = [
+    Commit,
+    Push,
+    Release,
+    Repository,
+    Role,
+    User,
+    UserAccount,
+]

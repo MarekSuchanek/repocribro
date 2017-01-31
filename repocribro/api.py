@@ -1,8 +1,9 @@
 import flask_restless
-from .models import User, Organization, Repository, Push, Commit, Release, db
+
+from .models import User, Organization, Repository, Push, Commit, Release
 
 
-def create_api(app):
+def create_api(app, db):
     # TODO: allow get by login (user/org) and full_name (repo)
     api_manager = flask_restless.APIManager(app, flask_sqlalchemy_db=db)
     api_manager.create_api(
