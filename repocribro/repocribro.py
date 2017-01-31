@@ -15,8 +15,8 @@ DEFAULT_CONFIG_FILES = [
 
 AUTHOR = 'Marek Suchánek'
 PROG_NAME = 'repocribro'
-RELEASE = '0.0-dev'
-VERSION = '0.0'
+RELEASE = '0.1-alpha'
+VERSION = '0.1'
 
 
 def make_githup_api(cfg):

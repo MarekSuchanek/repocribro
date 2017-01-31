@@ -5,7 +5,7 @@ with open('README.rst') as f:
 
 setup(
     name='repocribro',
-    version='0.0.0',
+    version='0.1-alpha',
     keywords='github repositories sieve projects community',
     description='Extensible sifting tool for information from GitHub repositories',
     long_description=long_description,
