@@ -15,7 +15,7 @@ def github(gh_api):
     return flask.redirect(gh_api.get_auth_url())
 
 
-def github_callback_get_account(gh_api, db):
+def github_callback_get_account(db, gh_api):
     user_data = gh_api.get_data('/user')
     gh_user = db.session.query(User).filter(
         User.github_id == user_data['id']
@@ -32,7 +32,7 @@ def github_callback_get_account(gh_api, db):
 
 
 @auth.route('/github/callback')
-@injector.inject(db=flask_sqlalchemy.SQLAlchemy(),
+@injector.inject(db=flask_sqlalchemy.SQLAlchemy,
                  gh_api=GitHubAPI)
 def github_callback(db, gh_api):
     session_code = flask.request.args.get('code')
