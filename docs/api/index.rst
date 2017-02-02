@@ -6,4 +6,4 @@ API
 .. toctree::
    :maxdepth: 3
 
-   repocribro
+   repocribro/extending.rst

@@ -1,7 +1,7 @@
 Credits
 =======
 
-This project was created as final semester work for the subject `MI-PYT (Advanced Python)`_
+This project was created as final semester work for the awesome subject `MI-PYT (Advanced Python)`_
 taught at the `Faculty of Information Technology`_, `Czech Technical
 University in Prague`_ (FIT CTU) by `@hroncok`_ and `@encukou`_.
 
