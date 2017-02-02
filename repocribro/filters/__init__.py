@@ -1,3 +1,9 @@
-from .main import register_filters, register_filters_from_dict
+from .common import common_filters
+from .models import model_filters
 
-__all__ = ['register_filters', 'register_filters_from_dict']
+all_filters = {
+    **common_filters,
+    **model_filters
+}
+
+__all__ = ['all_filters', 'register_filters_from_dict']

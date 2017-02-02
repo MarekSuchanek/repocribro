@@ -5,4 +5,11 @@ from .errors import errors
 from .manage import manage
 from .webhooks import webhooks
 
-__all__ = ['admin', 'auth', 'core', 'errors', 'manage', 'webhooks']
+all_blueprints = [
+    admin, auth, core, errors, manage, webhooks
+]
+
+__all__ = [
+    'all_blueprints',
+    'admin', 'auth', 'core', 'errors', 'manage', 'webhooks'
+]

@@ -28,3 +28,14 @@ class ExtensionView:
         self.admin_url = admin_url
         self.home_url = home_url
         self.gh_url = gh_url
+
+    @staticmethod
+    def from_class(cls):
+        return ExtensionView(
+            getattr(cls, 'NAME', 'uknown'),
+            getattr(cls, 'CATEGORY', ''),
+            getattr(cls, 'AUTHOR', ''),
+            getattr(cls, 'ADMIN_URL', None),
+            getattr(cls, 'HOME_URL', None),
+            getattr(cls, 'GH_URL', None),
+        )

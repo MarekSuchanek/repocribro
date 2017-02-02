@@ -1,40 +1,60 @@
-import abc
-import pkg_resources
-import sys
+from .helpers import ExtensionView
 
 
-class Extension(abc.ABC):
-
-    @abc.abstractmethod
-    def call(self, hook_name, args, **kwargs):
-        pass
+def no_models():
+    return []
 
 
-class ExtensionsMaster:
-    ENTRYPOINT_GROUP = 'repocribro.ext'
-    LOAD_ERROR_MSG = 'Extension "{}" ({}) is not making an Extension ' \
-                     '(sub)class instance. It will be ignored!'
+class Extension:
+    NAME = 'unknown'
+    CATEGORY = ''
+    AUTHOR = ''
+    ADMIN_URL = None
+    HOME_URL = None
+    GH_URL = None
 
-    @classmethod
-    def _collect_extensions(cls, name=None):
-        return pkg_resources.iter_entry_points(
-            group=cls.ENTRYPOINT_GROUP, name=name
-        )
+    def __init__(self, app, db, *args, **kwargs):
+        self.app = app
+        self.db = db
 
-    # TODO: there might be some problem with ordering of extensions
-    def __init__(self, *args, **kwargs):
-        entry_points = self._collect_extensions()
-        self.exts = []
-        for ep in entry_points:
-            ext_maker = ep.load()
-            e = ext_maker(*args, **kwargs)
-            if not isinstance(e, Extension):
-                print(self.LOAD_ERROR_MSG.format(
-                    ep.name, ep.module_name, file=sys.stderr
-                ))
-            else:
-                self.exts.append(e)
+    def call(self, hook_name, default, *args, **kwargs):
+        operation = getattr(self, hook_name, None)
+        if callable(operation):
+            return operation(*args, **kwargs)
+        else:
+            return default
 
-    def call(self, hook_name, default=None, *args, **kwargs):
-        return [ext.call(hook_name, default, args, **kwargs)
-                for ext in self.exts]
+    def register_filters_from_dict(self, filters):
+        for name, func in filters.items():
+            self.app.jinja_env.filters[name] = func
+
+    def register_blueprints_from_list(self, blueprints):
+        for blueprint in blueprints:
+            self.app.register_blueprint(blueprint)
+
+    @staticmethod
+    def provide_models():
+        return []
+
+    @staticmethod
+    def provide_blueprints():
+        return []
+
+    @staticmethod
+    def provide_filters():
+        return {}
+
+    def init_models(self, *args, **kwargs):
+        return self.provide_models()
+
+    def init_blueprints(self, *args, **kwargs):
+        self.register_blueprints_from_list(self.provide_blueprints())
+
+    def init_filters(self, *args, **kwargs):
+        self.register_filters_from_dict(self.provide_filters())
+
+    def introduce(self, *args, **kwargs):
+        return getattr(self, 'NAME', 'unknown')
+
+    def view_admin_extensions(self, *args, **kwargs):
+        return ExtensionView.from_class(self.__class__)
