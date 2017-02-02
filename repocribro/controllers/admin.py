@@ -16,9 +16,9 @@ admin = flask.Blueprint('admin', __name__, url_prefix='/admin')
 @injector.inject(db=flask_sqlalchemy.SQLAlchemy,
                  ext_master=ExtensionsMaster)
 def index(db, ext_master):
-    accounts = db.session.query(UserAccount).query.all()
-    roles = db.session.query(Role.query).all()
-    repos = db.session.query(Repository).query.all()
+    accounts = db.session.query(UserAccount).all()
+    roles = db.session.query(Role).all()
+    repos = db.session.query(Repository).all()
     exts = ext_master.call('view_admin_extensions', None)
 
     tabs = [
