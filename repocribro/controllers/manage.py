@@ -21,10 +21,11 @@ def dashboard(ext_master, gh_api):
     tabs = {}
     ext_master.call('view_manage_dashboard_tabs', tabs_dict=tabs,
                     gh_api=gh_api)
+    tabs = sorted(tabs.values())
+    active_tab = flask.request.args.get('tab', tabs[0].id)
 
     return flask.render_template(
-        'manage/dashboard.html', tabs=tabs.values(),
-        active_tab=flask.request.args.get('tab', 'repositories')
+        'manage/dashboard.html', tabs=tabs, active_tab=active_tab
     )
 
 

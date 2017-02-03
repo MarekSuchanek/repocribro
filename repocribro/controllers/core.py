@@ -21,13 +21,15 @@ def index():
 def search(ext_master, query=''):
     # TODO: more attrs, limits & pages
     tabs = {}
+    active_tab = ''
     if query != '':
         ext_master.call('view_core_search_tabs',
                         query=query, tabs_dict=tabs)
+        tabs = sorted(tabs.values())
+        active_tab = flask.request.args.get('tab', tabs[0].id)
 
     return flask.render_template(
-        'core/search.html', query=query, tabs=tabs.values(),
-        active_tab=flask.request.args.get('tab', 'repositories')
+        'core/search.html', query=query, tabs=tabs, active_tab=active_tab
     )
 
 
@@ -51,10 +53,11 @@ def user_detail(db, ext_master, login):
     tabs = {}
     ext_master.call('view_core_user_detail_tabs',
                     user=user, tabs_dict=tabs)
+    tabs = sorted(tabs.values())
+    active_tab = flask.request.args.get('tab', tabs[0].id)
 
     return flask.render_template(
-        'core/user.html', user=user, tabs=tabs.values(),
-        active_tab=flask.request.args.get('tab', 'details')
+        'core/user.html', user=user, tabs=tabs, active_tab=active_tab
     )
 
 
@@ -75,10 +78,11 @@ def org_detail(db, ext_master, login):
     tabs = {}
     ext_master.call('view_core_org_detail_tabs',
                     org=org, tabs_dict=tabs)
+    tabs = sorted(tabs.values())
+    active_tab = flask.request.args.get('tab', tabs[0].id)
 
     return flask.render_template(
-        'core/org.html', org=org, tabs=tabs.values(),
-        active_tab=flask.request.args.get('tab', 'details')
+        'core/org.html', org=org, tabs=tabs, active_tab=active_tab
     )
 
 
@@ -102,10 +106,11 @@ def repo_detail_common(db, ext_master, repo):
     tabs = {}
     ext_master.call('view_core_repo_detail_tabs',
                     repo=repo, tabs_dict=tabs)
+    tabs = sorted(tabs.values())
+    active_tab = flask.request.args.get('tab', tabs[0].id)
 
     return flask.render_template(
-        'core/repo.html', repo=repo, tabs=tabs.values(),
-        active_tab=flask.request.args.get('tab', 'details')
+        'core/repo.html', repo=repo, tabs=tabs, active_tab=active_tab
     )
 
 

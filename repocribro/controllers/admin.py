@@ -3,9 +3,8 @@ import flask_sqlalchemy
 import injector
 import sqlalchemy
 
-from ..extending.helpers import ViewTab, Badge
-from ..models import UserAccount, User, Role, Repository
 from ..extending import ExtensionsMaster
+from ..models import User, Role, Repository
 from ..security import permissions
 
 admin = flask.Blueprint('admin', __name__, url_prefix='/admin')
@@ -18,9 +17,12 @@ def index(ext_master):
     tabs = {}
     ext_master.call('view_admin_index_tabs',
                     tabs_dict=tabs)
+    tabs = sorted(tabs.values())
+    active_tab = flask.request.args.get('tab', tabs[0].id)
 
-    return flask.render_template('admin/index.html', tabs=tabs.values(),
-                                 active_tab='users')
+    return flask.render_template(
+        'admin/index.html', tabs=tabs, active_tab=active_tab
+    )
 
 
 @admin.route('/account/<login>')

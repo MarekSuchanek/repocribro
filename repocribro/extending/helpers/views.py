@@ -12,6 +12,9 @@ class ViewTab:
         self.octicon = octicon
         self.badge = badge
 
+    def __lt__(self, other):
+        return self.priority < other.priority
+
 
 class Badge:
 
