@@ -13,39 +13,14 @@ admin = flask.Blueprint('admin', __name__, url_prefix='/admin')
 
 @admin.route('')
 @permissions.admin_role.require(404)
-@injector.inject(db=flask_sqlalchemy.SQLAlchemy,
-                 ext_master=ExtensionsMaster)
-def index(db, ext_master):
-    accounts = db.session.query(UserAccount).all()
-    roles = db.session.query(Role).all()
-    repos = db.session.query(Repository).all()
-    exts = ext_master.call('view_admin_extensions', None)
+@injector.inject(ext_master=ExtensionsMaster)
+def index(ext_master):
+    tabs = {}
+    ext_master.call('view_admin_index_tabs',
+                    tabs_dict=tabs)
 
-    tabs = [
-        ViewTab(
-            'users', 'Users', 0,
-            flask.render_template('admin/tabs/users.html', accounts=accounts),
-            octicon='person', badge=Badge(len(accounts))
-        ),
-        ViewTab(
-            'roles', 'Roles', 0,
-            flask.render_template('admin/tabs/roles.html', roles=roles),
-            octicon='briefcase', badge=Badge(len(roles))
-        ),
-        ViewTab(
-            'repos', 'Repositories', 0,
-            flask.render_template('admin/tabs/repos.html', repos=repos),
-            octicon='repo', badge=Badge(len(repos))
-        ),
-        ViewTab(
-            'exts', 'Extensions', 0,
-            flask.render_template('admin/tabs/exts.html', exts=exts),
-            octicon='code', badge=Badge(len(exts))
-        ),
-    ]
-
-    return flask.render_template('admin/index.html',
-                                 tabs=tabs, active_tab='users')
+    return flask.render_template('admin/index.html', tabs=tabs.values(),
+                                 active_tab='users')
 
 
 @admin.route('/account/<login>')

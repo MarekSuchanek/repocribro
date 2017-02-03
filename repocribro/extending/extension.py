@@ -24,9 +24,11 @@ class Extension:
     HOME_URL = None
     GH_URL = None
 
-    def __init__(self, app, db, *args, **kwargs):
+    def __init__(self, master, app, db, *args, **kwargs):
         """Inits the basic two parts of repocribro - flask app and DB
 
+        :param master: Master for this extension
+        :type master: ``ExtensionsMaster``
         :param app: Flask application of repocribro
         :type app: ``flask.Flask``
         :param db: SQLAlchemy database of repocribro
@@ -34,6 +36,7 @@ class Extension:
         :param args: not used
         :param kwargs: not used
         """
+        self.master = master
         self.app = app
         self.db = db
 

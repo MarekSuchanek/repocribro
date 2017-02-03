@@ -42,7 +42,7 @@ class ExtensionsMaster:
         self.exts = []
         for ep in entry_points:
             ext_maker = ep.load()
-            e = ext_maker(*args, **kwargs)
+            e = ext_maker(master=self, *args, **kwargs)
             if not isinstance(e, Extension):
                 print(self.LOAD_ERROR_MSG.format(
                     ep.name, ep.module_name, file=sys.stderr

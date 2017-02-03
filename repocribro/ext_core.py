@@ -12,8 +12,8 @@ class CoreExtension(Extension):
     AUTHOR = 'Marek Suchánek'
     GH_URL = 'https://github.com/MarekSuchanek/repocribro'
 
-    def __init__(self, app, db, *args, **kwargs):
-        super().__init__(app, db)
+    def __init__(self, master, app, db, *args, **kwargs):
+        super().__init__(master, app, db)
         self.bower = flask_bower.Bower(self.app)
         self.migrate = flask_migrate.Migrate(self.app, self.db)
 
@@ -126,6 +126,37 @@ class CoreExtension(Extension):
             'updates', 'Updates', 2,
             flask.render_template('core/repo/updates_tab.html', repo=repo),
             octicon='git-commit', badge=Badge(len(repo.pushes))
+        )
+
+    def view_admin_index_tabs(self, *args, **kwargs):
+        tabs_dict = kwargs.get('tabs_dict')
+
+        from .models import Repository, Role, UserAccount
+        accounts = self.db.session.query(UserAccount).all()
+        roles = self.db.session.query(Role).all()
+        repos = self.db.session.query(Repository).all()
+        exts = [e for e in self.master.call('view_admin_extensions', None)
+                if e is not None]
+
+        tabs_dict['users'] = ViewTab(
+            'users', 'Users', 0,
+            flask.render_template('admin/tabs/users.html', accounts=accounts),
+            octicon='person', badge=Badge(len(accounts))
+        )
+        tabs_dict['roles'] = ViewTab(
+            'roles', 'Roles', 1,
+            flask.render_template('admin/tabs/roles.html', roles=roles),
+            octicon='briefcase', badge=Badge(len(roles))
+        )
+        tabs_dict['repositories'] = ViewTab(
+            'repositories', 'Repositories', 2,
+            flask.render_template('admin/tabs/repos.html', repos=repos),
+            octicon='repo', badge=Badge(len(repos))
+        )
+        tabs_dict['extensions'] = ViewTab(
+            'extensions', 'Extensions', 3,
+            flask.render_template('admin/tabs/exts.html', exts=exts),
+            octicon='code', badge=Badge(len(exts))
         )
 
 
