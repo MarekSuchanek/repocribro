@@ -4,7 +4,7 @@ import flask_sqlalchemy
 import injector
 import json
 
-from ..extending.helpers import ViewTab, Badge
+from ..extending import ExtensionsMaster
 from ..github import GitHubAPI
 from ..models import Repository
 
@@ -13,40 +13,17 @@ manage = flask.Blueprint('manage', __name__, url_prefix='/manage')
 
 @manage.route('')
 @flask_login.login_required
-def dashboard():
-    repos = flask_login.current_user.github_user.repositories
-
-    tabs = [
-        ViewTab(
-            'repositories', 'Repositories', 0,
-            flask.render_template(
-                'manage/dashboard/repos_tab.html',
-                repos=repos
-            ),
-            octicon='repo', badge=Badge(len(repos))
-        ),
-        ViewTab(
-            'profile', 'Profile', 1,
-            flask.render_template(
-                'manage/dashboard/profile_tab.html',
-                user=flask_login.current_user.github_user
-            ),
-            octicon='person'
-        ),
-        ViewTab(
-            'session', 'Session', 2,
-            flask.render_template(
-                'manage/dashboard/session_tab.html',
-                token=GitHubAPI.get_token(),
-                scopes=GitHubAPI.get_scope()
-            ),
-            octicon='mark-github'
-        ),
-    ]
+@injector.inject(ext_master=ExtensionsMaster,
+                 gh_api=GitHubAPI)
+def dashboard(ext_master, gh_api):
+    # TODO: make service container for extensions so services
+    # dont need to be passed from controllers
+    tabs = {}
+    ext_master.call('view_manage_dashboard_tabs', tabs_dict=tabs,
+                    gh_api=gh_api)
 
     return flask.render_template(
-        'manage/dashboard.html',
-        tabs=tabs,
+        'manage/dashboard.html', tabs=tabs.values(),
         active_tab=flask.request.args.get('tab', 'repositories')
     )
 

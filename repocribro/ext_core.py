@@ -1,5 +1,6 @@
 import flask
 import flask_bower
+import flask_login
 import flask_migrate
 
 from .extending import Extension
@@ -157,6 +158,38 @@ class CoreExtension(Extension):
             'extensions', 'Extensions', 3,
             flask.render_template('admin/tabs/exts.html', exts=exts),
             octicon='code', badge=Badge(len(exts))
+        )
+
+    def view_manage_dashboard_tabs(self, *args, **kwargs):
+        tabs_dict = kwargs.get('tabs_dict')
+        gh_api = kwargs.get('gh_api')
+
+        repos = flask_login.current_user.github_user.repositories
+
+        tabs_dict['repositories'] = ViewTab(
+            'repositories', 'Repositories', 0,
+            flask.render_template(
+                'manage/dashboard/repos_tab.html',
+                repos=repos
+            ),
+            octicon='repo', badge=Badge(len(repos))
+        )
+        tabs_dict['profile'] = ViewTab(
+            'profile', 'Profile', 1,
+            flask.render_template(
+                'manage/dashboard/profile_tab.html',
+                user=flask_login.current_user.github_user
+            ),
+            octicon='person'
+        )
+        tabs_dict['session'] = ViewTab(
+            'session', 'Session', 2,
+            flask.render_template(
+                'manage/dashboard/session_tab.html',
+                token=gh_api.get_token(),
+                scopes=gh_api.get_scope()
+            ),
+            octicon='mark-github'
         )
 
 
