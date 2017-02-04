@@ -1,4 +1,5 @@
 import pytest
+import flask
 import os
 import json
 
@@ -10,13 +11,21 @@ TESTDB_PATH = '/tmp/repocribro_test.db'
 FIXTURES_PATH = os.path.abspath(os.path.dirname(__file__)) + '/fixtures'
 GITHUB_DATA = FIXTURES_PATH + '/github_data/{}.json'
 
+test_errors_bp = flask.Blueprint('test-error', __name__,
+                                 url_prefix='/test-error')
+
+
+@test_errors_bp.route('/<int:err_code>')
+def error_invoker(err_code):
+    flask.abort(err_code)
+
+
 # @see http://alexmic.net/flask-sqlalchemy-pytest/
-
-
 @pytest.fixture(scope='session')
 def app(request):
     """Session-wide test `Flask` application."""
     app = create_app(FLASK_CONFIG_FILE)
+    app.register_blueprint(test_errors_bp)
 
     # Establish an application context before running the tests.
     ctx = app.app_context()
