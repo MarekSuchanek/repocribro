@@ -77,3 +77,77 @@ def github_data_loader():
         with open(GITHUB_DATA.format(name)) as f:
             return json.load(f)
     return get_github_data
+
+
+@pytest.fixture(scope='function')
+def empty_db(db):
+    meta = db.metadata
+    for table in reversed(meta.sorted_tables):
+        db.session.execute(table.delete())
+    db.session.commit()
+    return db
+
+
+@pytest.fixture(scope='function')
+def filled_db(empty_db):
+    session = empty_db.session
+    import datetime
+    from repocribro.models import Role, UserAccount, User, \
+        Organization, Repository, Commit, Release, Push
+
+    # Setup admin role
+    admin_role = Role('admin', 'Administrators')
+    session.add(admin_role)
+
+    account_banned = UserAccount()
+    account_banned.active = False
+    session.add(account_banned)
+    account_user = UserAccount()
+    session.add(account_user)
+    account_admin = UserAccount()
+    account_admin.roles.append(admin_role)
+    session.add(account_admin)
+
+    user1 = User(64, 'banned', 'banned@repocribro.yolo', 'Mister Banned',
+                 None, 'Cribropolis', 'Trolling everywhere', None, None,
+                 None, account_banned)
+    session.add(user1)
+    user2 = User(65, 'regular', 'regular@repocribro.yolo', 'Mister Regular',
+                 None, 'Cribropolis', 'Polite person', None, None,
+                 None, account_user)
+    session.add(user2)
+    user3 = User(66, 'admin', 'admin@repocribro.yolo', 'Mister Admin',
+                 None, 'Cribropolis', 'Big boss', None, None,
+                 None, account_admin)
+    session.add(user3)
+    org1 = Organization(69, 'org', 'org@repocribro.yolo', 'Org Dept. 666',
+                        'Repocribro', 'Cribropolis', 'Just awesome', None,
+                        None)
+    session.add(org1)
+
+    repo1 = Repository(100, None, 'regular/repo1', 'repo1', 'Python', '',
+                       '', False, None, user2, Repository.VISIBILITY_PUBLIC)
+    session.add(repo1)
+    repo2 = Repository(101, None, 'regular/repo2', 'repo2', 'Python', '',
+                       '', False, None, user2, Repository.VISIBILITY_HIDDEN)
+    repo2.generate_secret()
+    session.add(repo2)
+    repo3 = Repository(102, None, 'regular/repo3', 'repo3', 'Haskell', '',
+                       '', False, None, user2, Repository.VISIBILITY_PRIVATE)
+    session.add(repo3)
+
+    release = Release(666, 'v1.0', '', '', '', False, False, 'First release',
+                      'Some description', 'author_id', 'author_login',
+                      'sender_login', 'sender_id', repo1)
+    session.add(release)
+    push = Push('abc', 'def', 'refs/heads/changes', datetime.datetime.now(),
+                '', 'pusher_name', 'pusher_email', 'sender_login', 'sender_id',
+                repo1)
+    session.add(push)
+    commit = Commit('def', 'tsha', 'Dummy commit', '',
+                    '', 'author_name', 'author_email', 'author_login',
+                    'committer_name', 'committer_email', 'committer_login',
+                    push)
+    session.add(commit)
+    session.commit()
+    return db

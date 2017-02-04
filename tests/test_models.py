@@ -2,7 +2,9 @@ from repocribro.models import User, UserAccount, Organization, \
     Repository, Release, Push
 
 
-def test_user_account(session):
+def test_user_account(empty_db):
+    # clean DB for this testfile
+    session = empty_db.session
     user_account = UserAccount()
 
     session.add(user_account)
