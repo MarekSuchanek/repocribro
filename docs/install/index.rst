@@ -5,5 +5,6 @@ Installation
    :maxdepth: 2
 
    install
+   database
    config
    requirements

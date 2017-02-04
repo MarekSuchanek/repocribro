@@ -1,7 +1,7 @@
 import flask_script
 import flask_migrate
 
-from .commands import RepocheckCommand
+from .commands import DbCreateCommand, RepocheckCommand
 from .repocribro import create_app, PROG_NAME, VERSION
 
 
@@ -14,6 +14,7 @@ def run():
                        version='{} v{}'.format(PROG_NAME, VERSION))
 
     manager.add_command('db', flask_migrate.MigrateCommand)
+    manager.add_command('db-create', DbCreateCommand)
     manager.add_command('repocheck', RepocheckCommand)
 
     # TODO: allow extension add options & commands
