@@ -30,6 +30,7 @@ def dashboard(ext_master, gh_api):
 
 
 @manage.route('/profile/update')
+@flask_login.login_required
 @injector.inject(db=flask_sqlalchemy.SQLAlchemy,
                  gh_api=GitHubAPI)
 def update_profile(db, gh_api):
