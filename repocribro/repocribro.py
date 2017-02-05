@@ -3,6 +3,7 @@ import flask_ini
 import flask_injector
 import flask_sqlalchemy
 import injector
+import os
 
 from .extending import ExtensionsMaster
 from .github import GitHubAPI
@@ -29,7 +30,8 @@ def make_githup_api(cfg):
 
 def create_app(cfg_files='DEFAULT'):
     if cfg_files == 'DEFAULT':
-        cfg_files = DEFAULT_CONFIG_FILES
+        cfg_files = os.environ.get('REPOCRIBRO_CONFIG_FILE',
+                                   DEFAULT_CONFIG_FILES)
 
     app = flask.Flask(__name__)
     with app.app_context():

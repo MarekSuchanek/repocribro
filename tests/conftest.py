@@ -6,9 +6,10 @@ import json
 from repocribro import create_app
 from repocribro.database import db as _db
 
-FLASK_CONFIG_FILE = 'tests/fixtures/config.cfg'
+ABS_PATH = os.path.abspath(os.path.dirname(__file__))
+FLASK_CONFIG_FILE = ABS_PATH + '/fixtures/config.cfg'
 TESTDB_PATH = '/tmp/repocribro_test.db'
-FIXTURES_PATH = os.path.abspath(os.path.dirname(__file__)) + '/fixtures'
+FIXTURES_PATH = ABS_PATH + '/fixtures'
 GITHUB_DATA = FIXTURES_PATH + '/github_data/{}.json'
 
 test_errors_bp = flask.Blueprint('test-error', __name__,
@@ -24,6 +25,7 @@ def error_invoker(err_code):
 @pytest.fixture(scope='session')
 def app(request):
     """Session-wide test `Flask` application."""
+    os.environ['REPOCRIBRO_CONFIG_FILE'] = FLASK_CONFIG_FILE
     app = create_app(FLASK_CONFIG_FILE)
     app.register_blueprint(test_errors_bp)
 
