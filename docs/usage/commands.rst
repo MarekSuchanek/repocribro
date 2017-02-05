@@ -5,6 +5,31 @@ There are various command for the app management some are
 provided by Flask extensions, some by repocribro. You can
 use option ``--help`` to get more information.
 
+assign-role
+-----------
+
+Main purpose for this command is to set the initial admin
+of the app without touching DB directly. Others can be then
+set within administration zone of web interface.
+
+::
+
+    $ repocribro assign-role --login MarekSuchanek --role admin
+    Loaded extensions: core
+    Role admin not in DB... adding
+    Role admin added to MarekSuchanek
+
+    $ repocribro assign-role --login MarekSuchanek --role admin
+    Loaded extensions: core
+    User MarekSuchanek already has role admin
+
+
+For more information:
+::
+
+    $ repocribro assign-role --help
+
+
 db (database)
 -------------
 

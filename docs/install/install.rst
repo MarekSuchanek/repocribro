@@ -39,3 +39,17 @@ After the successful installation you should be able to run:
 .. _GitHub: https://github.com/MarekSuchanek/repocribro
 .. _PyPi: https://pypi.python.org
 .. _Python docs - Installing Python Module: https://docs.python.org/3.5/installing/index.html
+
+
+Become an admin
+---------------
+
+After first start you should login into web app via GitHub and
+then you can use ``assign-role`` command to become an ``admin``.
+
+::
+
+    $ repocribro assign-role --login MarekSuchanek --role admin
+    Loaded extensions: core
+    Role admin not in DB... adding
+    Role admin added to MarekSuchanek

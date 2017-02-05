@@ -1,10 +1,9 @@
-from flask_script import Command
+import flask_script
 
 
-class DbCreateCommand(Command):
+class DbCreateCommand(flask_script.Command):
     """Perform basic create all tables"""
 
-    # TODO: think about clear, drop_all, dump, ..
     def run(self):
         from ..database import db
         print('Performing db.create_all()')

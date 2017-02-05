@@ -1,7 +1,8 @@
 import flask_script
 import flask_migrate
 
-from .commands import DbCreateCommand, RepocheckCommand
+from .commands import DbCreateCommand, RepocheckCommand, \
+                      AssignRoleCommand
 from .repocribro import create_app, PROG_NAME, VERSION
 
 
@@ -16,6 +17,7 @@ def run():
     manager.add_command('db', flask_migrate.MigrateCommand)
     manager.add_command('db-create', DbCreateCommand)
     manager.add_command('repocheck', RepocheckCommand)
+    manager.add_command('assign-role', AssignRoleCommand)
 
     # TODO: allow extension add options & commands
     manager.run()
