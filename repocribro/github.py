@@ -21,6 +21,8 @@ class GitHubAPI:
 
     @staticmethod
     def _get_auth_header():
+        if 'github_token' not in flask.session:
+            return {}
         return {
             'Authorization': 'token {}'.format(flask.session['github_token'])
         }
