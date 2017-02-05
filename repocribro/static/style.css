@@ -29,6 +29,9 @@ body{
         padding-right: 20px;
     }
 }
+p.muted.credit{
+    margin: 10px;
+}
 
 div.tab-pane{
     padding-top: 1em;

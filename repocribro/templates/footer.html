@@ -1,9 +1,10 @@
+{% from "macros/basic.html" import octicon without context %}
 <footer class="footer-sticky" id="main-footer">
     <div class="container">
         <p class="muted credit">
-            <a href="http://webdev.fit.cvut.cz/~suchama4/" target="_blank">
-                Marek Suchánek
-            </a> &copy; 2016
+            <a href="https://github.com/MarekSuchanek/repocribro" target="_blank">
+                {{ octicon('mark-github') }}
+                repocribro</a> &copy; 2017, v{{ config['RELEASE'] }}
         </p>
     </div>
 </footer>

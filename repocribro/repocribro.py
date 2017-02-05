@@ -34,6 +34,7 @@ def create_app(cfg_files='DEFAULT'):
                                    DEFAULT_CONFIG_FILES)
 
     app = flask.Flask(__name__)
+    app.config['RELEASE'] = RELEASE
     with app.app_context():
         app.iniconfig = flask_ini.FlaskIni()
         app.iniconfig.read(cfg_files)
