@@ -106,7 +106,7 @@ class UserAccount(db.Model, UserMixin, SearchableMixin):
         return self.github_user.login
 
     def __repr__(self):
-        return '<UserAccount {}>'.format(id)
+        return '<UserAccount (#{})>'.format(self.id)
 
 
 class Role(db.Model, RoleMixin):
@@ -123,6 +123,11 @@ class Role(db.Model, RoleMixin):
     def __init__(self, name, description):
         self.name = name
         self.description = description
+
+    def __repr__(self):
+        return '<Role {} (#{})>'.format(
+            self.name, self.id
+        )
 
 
 class RepositoryOwner(db.Model):
@@ -208,7 +213,9 @@ class User(RepositoryOwner, SearchableMixin):
         )
 
     def __repr__(self):
-        return '<GH User {} ({})>'.format(self.login, self.github_id)
+        return '<GH User {}, {} (#{})>'.format(
+            self.login, self.github_id, self.id
+        )
 
 
 class Organization(RepositoryOwner, SearchableMixin):
@@ -243,7 +250,9 @@ class Organization(RepositoryOwner, SearchableMixin):
         )
 
     def __repr__(self):
-        return '<GH Organization {} ({})>'.format(self.login, self.github_id)
+        return '<GH Organization {}, {} (#{})>'.format(
+            self.login, self.github_id, self.id
+        )
 
     __mapper_args__ = {
         'polymorphic_identity': 'Organization'
@@ -360,7 +369,9 @@ class Repository(db.Model, SearchableMixin):
         return self.visibility_type == self.VISIBILITY_HIDDEN
 
     def __repr__(self):
-        return '<GH Repository {} ({})>'.format(self.full_name, self.github_id)
+        return '<GH Repository {}, {} (#{})>'.format(
+            self.full_name, self.github_id, self.id
+        )
 
 
 class Push(db.Model, SearchableMixin):
@@ -422,7 +433,9 @@ class Push(db.Model, SearchableMixin):
         return push
 
     def __repr__(self):
-        return '<GH Push {}-{}>'.format(self.before[0:7], self.after[0:7])
+        return '<GH Push {}-{} (#{})>'.format(
+            self.before[0:7], self.after[0:7], self.id
+        )
 
 
 class Commit(db.Model, SearchableMixin):
@@ -485,7 +498,9 @@ class Commit(db.Model, SearchableMixin):
         )
 
     def __repr__(self):
-        return '<GH Commit {}>'.format(self.sha[0:7])
+        return '<GH Commit {}, (#{})>'.format(
+            self.sha, self.id
+        )
 
 
 class Release(db.Model, SearchableMixin):
@@ -553,7 +568,9 @@ class Release(db.Model, SearchableMixin):
         )
 
     def __repr__(self):
-        return '<GH Commit {}>'.format(self.sha[0:7])
+        return '<GH Release {}, {} (#{})>'.format(
+            self.tag_name, self.github_id, self.id
+        )
 
 
 all_models = [
