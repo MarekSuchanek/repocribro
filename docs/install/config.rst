@@ -16,6 +16,18 @@ Names of variables are case insensitive. Configuration can be in separate
 configuration files but if there are same variables within same sections
 there will overriding depending on the order of files.
 
+Default config file can be also specified with environment variable:
+
+::
+
+    $ export REPOCRIBRO_CONFIG_FILE='/path/to/config.cfg'
+    $ python
+    Python 3.5.2 (default, Oct 14 2016, 12:54:53)
+    [GCC 6.2.1 20160916 (Red Hat 6.2.1-2)] on linux
+    Type "help", "copyright", "credits" or "license" for more information.
+    >>> from repocribro.app import app
+    >>> app.run()
+
 Application
 -----------
 

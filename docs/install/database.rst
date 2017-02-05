@@ -9,7 +9,7 @@ by `Flask-Migrate`_:
     $ repocribro db --help
 
 
-Or you can use standard `SQLAlchemy procedure`_ ``db.create_all()``via:
+Or you can use standard `SQLAlchemy procedure`_ ``db.create_all()`` via:
 
 ::
 
