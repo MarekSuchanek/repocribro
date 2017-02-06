@@ -4,7 +4,17 @@ from .models import User, Organization, Repository, Push, Commit, Release
 
 
 def create_api(app, db):
-    # TODO: allow get by login (user/org) and full_name (repo)
+    """Create REST API (with GET) for resources in DB
+
+    :param app: Actual web application
+    :type app: ``flask.Flask``
+    :param db: Actual database with stored resources
+    :type db:
+    :return: API manager extension
+    :rtype: ``flask_restless.APIManager``
+
+    :todo: Implement own or go into bigger detail (privacy, usernames, etc.)
+    """
     api_manager = flask_restless.APIManager(app, flask_sqlalchemy_db=db)
     api_manager.create_api(
         User, methods=['GET'], collection_name='user'

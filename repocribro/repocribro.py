@@ -8,19 +8,31 @@ import os
 from .extending import ExtensionsMaster
 from .github import GitHubAPI
 
+#: Paths to default configuration files
 DEFAULT_CONFIG_FILES = [
     'config/app.cfg',
     'config/auth.cfg',
     'config/db.cfg'
 ]
 
+#: Author of the application
 AUTHOR = 'Marek Suchánek'
+#: Name of the application
 PROG_NAME = 'repocribro'
+#: Actual release tag
 RELEASE = '0.1-alpha'
+#: Actual version
 VERSION = '0.1'
 
 
 def make_githup_api(cfg):
+    """Simple factory for making the GitHub API client
+
+    :param cfg: Configuration of the application
+    :type cfg: ``configparser.ConfigParser``
+    :return: GitHub API client
+    :rtype: ``repocribro.github.GitHubAPI``
+    """
     return GitHubAPI(
         cfg.get('github', 'client_id'),
         cfg.get('github', 'client_secret'),
@@ -29,6 +41,12 @@ def make_githup_api(cfg):
 
 
 def create_app(cfg_files='DEFAULT'):
+    """Factory for making the web Flask application
+
+    :param cfg_files: Single or more config file(s)
+    :return: Constructed web application
+    :rtype: ``flask.Flask``
+    """
     if cfg_files == 'DEFAULT':
         cfg_files = os.environ.get('REPOCRIBRO_CONFIG_FILE',
                                    DEFAULT_CONFIG_FILES)
