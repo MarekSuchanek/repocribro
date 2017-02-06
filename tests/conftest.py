@@ -91,17 +91,17 @@ def github_data_loader():
 
 
 @pytest.fixture(scope='function')
-def empty_db(db):
+def empty_db_session(db):
     meta = db.metadata
     for table in reversed(meta.sorted_tables):
         db.session.execute(table.delete())
     db.session.commit()
-    return db
+    return db.session
 
 
 @pytest.fixture(scope='function')
-def filled_db(empty_db):
-    session = empty_db.session
+def filled_db_session(empty_db_session):
+    session = empty_db_session
     import datetime
     from repocribro.models import Role, UserAccount, User, \
         Organization, Repository, Commit, Release, Push
@@ -161,4 +161,4 @@ def filled_db(empty_db):
                     push)
     session.add(commit)
     session.commit()
-    return db
+    return session

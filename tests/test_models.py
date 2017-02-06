@@ -1,16 +1,15 @@
 from repocribro.models import *
 
 
-def test_user_account(empty_db):
+def test_user_account(empty_db_session):
     # clean DB for this testfile
-    session = empty_db.session
     user_account = UserAccount()
 
-    session.add(user_account)
-    session.commit()
+    empty_db_session.add(user_account)
+    empty_db_session.commit()
 
     assert user_account.id > 0
-    assert session.query(UserAccount).first() == user_account
+    assert empty_db_session.query(UserAccount).first() == user_account
     assert str(user_account.id) in repr(user_account)
     assert 'UserAccount' in repr(user_account)
 
