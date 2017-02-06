@@ -5,6 +5,7 @@ import flask_script
 class RepocheckCommand(flask_script.Command):
     """Perform check procedure of repository events"""
 
+    #: CLI command options for repocheck
     option_list = (
         flask_script.Option('--name', '-n', dest='full_name'),
     )

@@ -4,6 +4,7 @@ import flask_script
 class AssignRoleCommand(flask_script.Command):
     """Assign desired role to desired user"""
 
+    #: CLI command options for assign-role
     option_list = (
         flask_script.Option('--login', '-l', dest='login'),
         flask_script.Option('--role', '-r', dest='role_name'),

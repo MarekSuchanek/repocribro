@@ -9,19 +9,19 @@ class Extension:
     can override those attributes and methods to make so behavior
     and extend repocribro. It also provides some useful methods to
     those subclasses.
-
-    :var NAME: Name of extension
-    :var CATEGORY: Category of extension (basic, security, data, ...)
-    :var AUTHOR: Author(s) of extension
-    :var ADMIN_URL: Administration URL within site (best via url_for)
-    :var HOME_URL: Homepage url of extension (rtd, pocoo, ...)
-    :var GH_URL: GitHub url of extension project
     """
+
+    #: Name of extension
     NAME = 'unknown'
+    #: Category of extension (basic, security, data, ...)
     CATEGORY = ''
+    #: Author(s) of extension
     AUTHOR = ''
+    #: Administration URL within site (best via url_for)
     ADMIN_URL = None
+    #: Homepage url of extension (rtd, pocoo, ...)
     HOME_URL = None
+    #: GitHub url of extension project
     GH_URL = None
 
     def __init__(self, master, app, db, *args, **kwargs):

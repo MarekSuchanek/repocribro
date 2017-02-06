@@ -9,11 +9,11 @@ class ExtensionsMaster:
 
     Extension master finds and holds all the **repocribro** extensions
     and is used for calling operations on them and collecting the results.
-
-    :var ENTRYPOINT_GROUP: String used for looking up the extensions
-    :var LOAD_ERROR_MSG: Error message mask for extension load error
     """
+
+    #: String used for looking up the extensions
     ENTRYPOINT_GROUP = 'repocribro.ext'
+    #: Error message mask for extension load error
     LOAD_ERROR_MSG = 'Extension "{}" ({}) is not making an Extension ' \
                      '(sub)class instance. It will be ignored!'
 
@@ -25,7 +25,6 @@ class ExtensionsMaster:
         :type name: str
         :return: Generator of selected entry points
         :rtype: ``pkg_resources.WorkingSet.iter_entry_points``
-
         """
         return pkg_resources.iter_entry_points(
             group=cls.ENTRYPOINT_GROUP, name=name
