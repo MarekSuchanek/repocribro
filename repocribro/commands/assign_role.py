@@ -2,7 +2,7 @@ import flask_script
 
 
 class AssignRoleCommand(flask_script.Command):
-    """Assign role to user"""
+    """Assign desired role to desired user"""
 
     option_list = (
         flask_script.Option('--login', '-l', dest='login'),
@@ -10,6 +10,15 @@ class AssignRoleCommand(flask_script.Command):
     )
 
     def run(self, login, role_name):
+        """Run the assign-role command with given options in
+        order to assign role to user
+
+        :param login: Login name of desired user
+        :type login: str
+        :param role_name: Name of desired role
+        :type role_name: str
+        :raises SystemExit: If user does not exists or already had the role
+        """
         from ..database import db
         from ..models import Role, User
         user = db.session.query(User).filter_by(login=login).first()

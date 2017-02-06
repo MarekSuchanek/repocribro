@@ -2,9 +2,12 @@ import flask_script
 
 
 class DbCreateCommand(flask_script.Command):
-    """Perform basic create all tables"""
+    """Perform procedure create all tables"""
 
     def run(self):
+        """Run the db-create command to create all tables and
+        constraints
+        """
         from ..database import db
         print('Performing db.create_all()')
         db.create_all()

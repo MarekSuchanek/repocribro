@@ -10,6 +10,17 @@ class RepocheckCommand(flask_script.Command):
     )
 
     def run(self, full_name=None):
+        """Run the repocheck command to check repo(s) new events
+
+        Obviously this procedure can check events only on public
+        repositories. If name of repository is not specified, then
+        procedure will be called on all registered public repositories
+        in DB.
+
+        :param full_name: Name of repository to be checked (if None -> all)
+        :type full_name: str
+        :raises SystemExit: If repository with given full_name does not exist
+        """
         from ..database import db
         from ..models import Repository
         repos = []
@@ -31,6 +42,14 @@ class RepocheckCommand(flask_script.Command):
             self._do_check(repo)
 
     def _do_check(self, repo):
+        """Perform single repository check for new events
+
+        :param repo: Repository to be checked
+        :type repo: ``repocribro.models.Repository``
+        :todo: Handle pagination of GitHub events
+
+        :raises SystemExit: if GitHub API request fails
+        """
         from repocribro.repocribro import make_githup_api
         github = make_githup_api(flask.current_app.iniconfig)
         gh_repo = github.get('/repos/{}'.format(repo.full_name))
@@ -39,7 +58,6 @@ class RepocheckCommand(flask_script.Command):
                 gh_repo.json()['message']
             ))
             exit(3)
-        # TODO: handle pagination
         gh_events = github.get('/repos/{}/events'.format(repo.full_name))
         for event in gh_events.json():
             new = self._process_event(repo, event)
@@ -47,6 +65,15 @@ class RepocheckCommand(flask_script.Command):
                 break
 
     def _process_event(self, repo, event):
-        # TODO: check if new event or already registered
-        # TODO: implement processing event
-        pass
+        """Process potentially new event for repository
+
+        :param repo: Repository related to event
+        :type repo: ``repocribro.models.Repository``
+        :param event: GitHub event data
+        :type event: dict
+        :return: If the event was new or already registered before
+        :rtype: bool
+
+        :todo: Implement processing the event (check if new and add)
+        """
+        return False

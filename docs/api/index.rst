@@ -7,3 +7,4 @@ API
    :maxdepth: 3
 
    repocribro/extending.rst
+   repocribro/commands.rst
