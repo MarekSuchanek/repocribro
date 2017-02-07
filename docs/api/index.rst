@@ -9,5 +9,7 @@ API
    repocribro/api.rst
    repocribro/commands.rst
    repocribro/extending.rst
+   repocribro/manage.rst
    repocribro/models.rst
    repocribro/repocribro.rst
+   repocribro/security.rst
