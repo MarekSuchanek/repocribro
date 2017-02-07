@@ -7,8 +7,6 @@ from .database import db
 
 Base = flask_sqlalchemy.declarative_base()
 
-# TODO: docstrings for attributes
-
 
 class SearchableMixin:
     """Mixin for models that support fulltext query"""
@@ -190,15 +188,20 @@ class UserAccount(db.Model, UserMixin, SearchableMixin):
     """UserAccount in the repocribro app"""
     __tablename__ = 'UserAccount'
 
+    #: Unique identifier of the user account
     id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
+    #: Timestamp where account was created
     created_at = sqlalchemy.Column(
         sqlalchemy.DateTime, default=datetime.datetime.now()
     )
+    #: Flag if the account is active or banned
     active = sqlalchemy.Column(sqlalchemy.Boolean, default=True)
+    #: Relation to the GitHub user connected to account
     github_user = sqlalchemy.orm.relationship(
         'User', back_populates='user_account',
         uselist=False, cascade='all, delete-orphan'
     )
+    #: Roles assigned to the user account
     roles = sqlalchemy.orm.relationship(
         'Role', back_populates='user_accounts',
         secondary=roles_users,
@@ -228,9 +231,13 @@ class Role(db.Model, RoleMixin):
     """User account role in the application"""
     __tablename__ = 'Role'
 
+    #: Unique identifier of the role
     id = sqlalchemy.Column(sqlalchemy.Integer(), primary_key=True)
+    #: Unique name of the role
     name = sqlalchemy.Column(sqlalchemy.String(80), unique=True)
+    #: Description (purpose, notes, ...) of the role
     description = sqlalchemy.Column(sqlalchemy.UnicodeText)
+    #: User accounts assigned to the role
     user_accounts = sqlalchemy.orm.relationship(
         'UserAccount', back_populates='roles', secondary=roles_users
     )
@@ -254,17 +261,29 @@ class RepositoryOwner(db.Model):
     """RepositoryOwner (User or Organization) from GitHub"""
     __tablename__ = 'RepositoryOwner'
 
+    #: Unique identifier of the repository owner
     id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
+    #: GitHub unique identifier
     github_id = sqlalchemy.Column(sqlalchemy.Integer, unique=True)
+    #: Unique login name
     login = sqlalchemy.Column(sqlalchemy.String(40), unique=True)
+    #: Email address
     email = sqlalchemy.Column(sqlalchemy.String(255))
+    #: Name (organization name or person name)
     name = sqlalchemy.Column(sqlalchemy.UnicodeText)
+    #: Company to which this org/user belongs
     company = sqlalchemy.Column(sqlalchemy.UnicodeText)
+    #: Description of organization or bio of user
     description = sqlalchemy.Column(sqlalchemy.UnicodeText)
+    #: Location where org/user is working, at home
     location = sqlalchemy.Column(sqlalchemy.UnicodeText)
+    #: URL to blog or some other personal site
     blog_url = sqlalchemy.Column(sqlalchemy.UnicodeText)
+    #: URL to avatar (personal picture)
     avatar_url = sqlalchemy.Column(sqlalchemy.String(255))
+    #: Type of owner ("User" or "Organization")
     type = sqlalchemy.Column(sqlalchemy.String(30))
+    #: Repositories owned by the org/user
     repositories = sqlalchemy.orm.relationship(
         'Repository', back_populates='owner', cascade='all, delete-orphan'
     )
@@ -279,10 +298,13 @@ class User(RepositoryOwner, SearchableMixin):
     __searchable__ = ['login', 'email', 'name', 'company',
                       'description', 'location']
 
+    #: Flag whether is user hireable
     hireable = sqlalchemy.Column(sqlalchemy.Boolean)
+    #: ID of user's account within app
     user_account_id = sqlalchemy.Column(
         sqlalchemy.Integer, sqlalchemy.ForeignKey('UserAccount.id')
     )
+    #: User's account within app
     user_account = sqlalchemy.orm.relationship(
         'UserAccount', back_populates='github_user'
     )
@@ -415,28 +437,44 @@ class Repository(db.Model, SearchableMixin):
     __tablename__ = 'Repository'
     __searchable__ = ['full_name', 'languages', 'description']
 
+    #: Unique identifier of the repository
     id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
+    #: GitHub unique identifier
     github_id = sqlalchemy.Column(sqlalchemy.Integer, unique=True)
+    #: GitHub id of repository which this is fork of
     fork_of = sqlalchemy.Column(sqlalchemy.Integer)
+    #: Full name (owner login + repository name)
     full_name = sqlalchemy.Column(sqlalchemy.String(150), unique=True)
+    # Repository name
     name = sqlalchemy.Column(sqlalchemy.String(100))
+    # Language(s) within repository
     languages = sqlalchemy.Column(sqlalchemy.UnicodeText)
+    # GitHub URL where is the repository
     url = sqlalchemy.Column(sqlalchemy.UnicodeText)
+    # Description of the project in repo
     description = sqlalchemy.Column(sqlalchemy.UnicodeText)
+    # GitHub visibility
     private = sqlalchemy.Column(sqlalchemy.Boolean)
+    # Internal visibility within app
     visibility_type = sqlalchemy.Column(sqlalchemy.Integer)
+    # Unique secret string for hidden URL (if any)
     secret = sqlalchemy.Column(sqlalchemy.String(255), unique=True)
+    # Webhook ID for sending events
     webhook_id = sqlalchemy.Column(sqlalchemy.Integer)
+    # ID of the owner of repository
     owner_id = sqlalchemy.Column(
         sqlalchemy.Integer, sqlalchemy.ForeignKey('RepositoryOwner.id')
     )
+    #: Owner of repository
     owner = sqlalchemy.orm.relationship(
         'RepositoryOwner', back_populates='repositories'
     )
+    #: Registered pushes to repository
     pushes = sqlalchemy.orm.relationship(
         'Push', back_populates='repository',
         cascade='all, delete-orphan'
     )
+    #: Registered releases for repository
     releases = sqlalchemy.orm.relationship(
         'Release', back_populates='repository',
         cascade='all, delete-orphan'
@@ -579,22 +617,35 @@ class Push(db.Model, SearchableMixin):
     __searchable__ = ['after', 'before', 'sender_login', 'pusher_name',
                       'pusher_email']
 
+    #: Unique identifier of the push
     id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
+    #: SHA after push
     after = sqlalchemy.Column(sqlalchemy.Integer)
+    #: SHA before push
     before = sqlalchemy.Column(sqlalchemy.Integer)
+    #: Ref of push (branch)
     ref = sqlalchemy.Column(sqlalchemy.String(255))
+    #: Timestamp of push (when it was registered)
     timestamp = sqlalchemy.Column(sqlalchemy.DateTime())
+    #: URL to page with commits comparison
     compare_url = sqlalchemy.Column(sqlalchemy.UnicodeText())
+    #: Name of the pusher
     pusher_name = sqlalchemy.Column(sqlalchemy.UnicodeText())
+    #: Email of the pusher
     pusher_email = sqlalchemy.Column(sqlalchemy.String(255))
+    #: Login of the sender
     sender_login = sqlalchemy.Column(sqlalchemy.String(40))
+    #: ID of the sender
     sender_id = sqlalchemy.Column(sqlalchemy.Integer())
+    #: ID of the repository where push belongs to
     repository_id = sqlalchemy.Column(
         sqlalchemy.Integer, sqlalchemy.ForeignKey('Repository.id')
     )
+    #: Repository where push belongs to
     repository = sqlalchemy.orm.relationship(
         'Repository', back_populates='pushes'
     )
+    #: Commits within this push
     commits = sqlalchemy.orm.relationship(
         'Commit', back_populates='push',
         cascade='all, delete-orphan'
@@ -662,21 +713,35 @@ class Commit(db.Model, SearchableMixin):
                       'author_name', 'author_name', 'author_login',
                       'committer_name', 'committer_email', 'committer_login']
 
+    #: Unique identifier of the commit
     id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
+    #: SHA identifier of the commit
     sha = sqlalchemy.Column(sqlalchemy.String(40))
+    #: Tree SHA identifier
     tree_sha = sqlalchemy.Column(sqlalchemy.String(40))
+    #: Commit messate
     message = sqlalchemy.Column(sqlalchemy.UnicodeText())
+    #: Commit timestamp
     timestamp = sqlalchemy.Column(sqlalchemy.String(60))
+    #: URL to the commit page
     url = sqlalchemy.Column(sqlalchemy.UnicodeText())
+    #: Name of author
     author_name = sqlalchemy.Column(sqlalchemy.UnicodeText())
+    #: Email of author
     author_email = sqlalchemy.Column(sqlalchemy.String(255))
+    #: Login of author
     author_login = sqlalchemy.Column(sqlalchemy.String(40))
+    #: Name of committer
     committer_name = sqlalchemy.Column(sqlalchemy.UnicodeText())
+    #: Email of committer
     committer_email = sqlalchemy.Column(sqlalchemy.String(255))
+    #: Login of committer
     committer_login = sqlalchemy.Column(sqlalchemy.String(40))
+    #: ID of push where the commit belongs to
     push_id = sqlalchemy.Column(
         sqlalchemy.Integer, sqlalchemy.ForeignKey('Push.id')
     )
+    #: Push where the commit belongs to
     push = sqlalchemy.orm.relationship('Push', back_populates='commits')
 
     def __init__(self, sha, tree_sha, message, timestamp, url,
@@ -740,23 +805,39 @@ class Release(db.Model, SearchableMixin):
     __searchable__ = ['tag_name', 'name', 'body',
                       'author_login', 'sender_login']
 
+    #: Unique identifier of the release
     id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
+    #: GitHub unique identifier
     github_id = sqlalchemy.Column(sqlalchemy.Integer())
+    #: Tag of the release
     tag_name = sqlalchemy.Column(sqlalchemy.String(255))
+    #: Timestamp when the release was created
     created_at = sqlalchemy.Column(sqlalchemy.String(60))
+    #: Timestamp when the release was published
     published_at = sqlalchemy.Column(sqlalchemy.String(60))
+    #: URL to release page
     url = sqlalchemy.Column(sqlalchemy.UnicodeText())
+    #: Flag if it's just a prerelease
     prerelease = sqlalchemy.Column(sqlalchemy.Boolean())
+    #: Flag if it's just a draft
     draft = sqlalchemy.Column(sqlalchemy.Boolean())
+    #: Name
     name = sqlalchemy.Column(sqlalchemy.UnicodeText())
+    #: Body with some description
     body = sqlalchemy.Column(sqlalchemy.UnicodeText())
+    #: Login of author
     author_login = sqlalchemy.Column(sqlalchemy.String(40))
+    #: ID of author
     author_id = sqlalchemy.Column(sqlalchemy.Integer())
+    #: Login of sender
     sender_login = sqlalchemy.Column(sqlalchemy.String(40))
+    #: ID of sender
     sender_id = sqlalchemy.Column(sqlalchemy.Integer())
+    #: ID of the repository where release belongs to
     repository_id = sqlalchemy.Column(
         sqlalchemy.Integer, sqlalchemy.ForeignKey('Repository.id')
     )
+    #: Repository where release belongs to
     repository = sqlalchemy.orm.relationship(
         'Repository', back_populates='releases'
     )
