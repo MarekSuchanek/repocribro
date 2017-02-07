@@ -7,6 +7,11 @@ from .repocribro import create_app, PROG_NAME, VERSION
 
 
 def run():
+    """Run the CLI manager for the web application
+
+    :todo: allow extension add options & commands,
+           separate create and run part of function
+    """
     manager = flask_script.Manager(create_app)
     manager.add_option('-c', '--config', dest='cfg_files',
                        required=False, action='append',
@@ -19,7 +24,6 @@ def run():
     manager.add_command('repocheck', RepocheckCommand)
     manager.add_command('assign-role', AssignRoleCommand)
 
-    # TODO: allow extension add options & commands
     manager.run()
 
 if __name__ == '__main__':
