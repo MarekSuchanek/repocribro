@@ -8,9 +8,13 @@ from .extending.helpers import ViewTab, Badge
 
 
 class CoreExtension(Extension):
+    #: Name of core extension
     NAME = 'core'
+    #: Category of core extension
     CATEGORY = 'basic'
+    #: Author of core extension
     AUTHOR = 'Marek Suchánek'
+    #: GitHub URL of core extension
     GH_URL = 'https://github.com/MarekSuchanek/repocribro'
 
     def __init__(self, master, app, db, *args, **kwargs):
@@ -34,17 +38,33 @@ class CoreExtension(Extension):
         return all_filters
 
     def init_business(self, *args, **kwargs):
+        """Init business layer (other extensions, what is needed)
+
+        :param args: not used
+        :param kwargs: not used
+        """
         from .security import init_login_manager
         login_manager, principals = init_login_manager(self.db)
         login_manager.init_app(self.app)
         principals.init_app(self.app)
 
     def init_post_injector(self, *args, **kwargs):
-        # flask_restless is not compatible with flask_injector!
+        """Init what needs to be done after setting up injector
+
+        :param args: not used
+        :param kwargs: not used
+
+        :todo: flask_restless is not compatible with flask_injector!
+        """
         from .api import create_api
         api_manager = create_api(self.app, self.db)
 
     def view_core_search_tabs(self, *args, **kwargs):
+        """Prepare tabs for search view of core controller
+
+        :param args: not used
+        :param kwargs: Must contain ``query`` and ``tabs_dict``
+        """
         query = kwargs.get('query', '')
         tabs_dict = kwargs.get('tabs_dict')
 
@@ -76,6 +96,11 @@ class CoreExtension(Extension):
         )
 
     def view_core_user_detail_tabs(self, *args, **kwargs):
+        """Prepare tabs for user detail view of core controller
+
+        :param args: not used
+        :param kwargs: Must contain target ``tabs_dict`` and ``user``
+        """
         user = kwargs.get('user')
         tabs_dict = kwargs.get('tabs_dict')
 
@@ -93,6 +118,11 @@ class CoreExtension(Extension):
         )
 
     def view_core_org_detail_tabs(self, *args, **kwargs):
+        """Prepare tabs for org detail view of core controller
+
+        :param args: not used
+        :param kwargs: Must contain target ``tabs_dict`` and ``org``
+        """
         org = kwargs.get('org')
         tabs_dict = kwargs.get('tabs_dict')
 
@@ -110,6 +140,11 @@ class CoreExtension(Extension):
         )
 
     def view_core_repo_detail_tabs(self, *args, **kwargs):
+        """Prepare tabs for repo detail view of core controller
+
+        :param args: not used
+        :param kwargs: Must contain target ``tabs_dict`` and ``repo``
+        """
         repo = kwargs.get('repo')
         tabs_dict = kwargs.get('tabs_dict')
 
@@ -130,6 +165,11 @@ class CoreExtension(Extension):
         )
 
     def view_admin_index_tabs(self, *args, **kwargs):
+        """Prepare tabs for index view of admin controller
+
+        :param args: not used
+        :param kwargs: Must contain target ``tabs_dict``
+        """
         tabs_dict = kwargs.get('tabs_dict')
 
         from .models import Repository, Role, UserAccount
@@ -161,6 +201,11 @@ class CoreExtension(Extension):
         )
 
     def view_manage_dashboard_tabs(self, *args, **kwargs):
+        """Prepare tabs for dashboard view of manage controller
+
+        :param args: not used
+        :param kwargs: Must contain target ``tabs_dict`` and ``gh_api``
+        """
         tabs_dict = kwargs.get('tabs_dict')
         gh_api = kwargs.get('gh_api')
 
@@ -194,4 +239,9 @@ class CoreExtension(Extension):
 
 
 def make_extension(*args, **kwargs):
+    """Alias for instantiating the extension
+
+    Actually not needed, just example that here can be something
+    more complex to do before creating the extension.
+    """
     return CoreExtension(*args, **kwargs)

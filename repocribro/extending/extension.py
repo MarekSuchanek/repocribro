@@ -108,7 +108,6 @@ class Extension:
 
         :param args: not used
         :param kwargs: not used
-        :return: None
         """
         return self.provide_models()
 

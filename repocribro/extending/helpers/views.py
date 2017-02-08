@@ -2,7 +2,7 @@ import jinja2
 
 
 class ViewTab:
-
+    """Tab for the tabbed view at pages"""
     def __init__(self, id, name, priority=100, content='',
                  octicon=None, badge=None):
         self.id = id
@@ -17,12 +17,13 @@ class ViewTab:
 
 
 class Badge:
-
+    """Simple Twitter Bootstrap badge representation"""
     def __init__(self, content):
         self.content = content
 
 
 class ExtensionView:
+    """View object for extensions"""
     def __init__(self, name, category, author,
                  admin_url=None, home_url=None, gh_url=None):
         self.name = name
@@ -34,6 +35,7 @@ class ExtensionView:
 
     @staticmethod
     def from_class(cls):
+        """Make view from Extension class"""
         return ExtensionView(
             getattr(cls, 'NAME', 'uknown'),
             getattr(cls, 'CATEGORY', ''),

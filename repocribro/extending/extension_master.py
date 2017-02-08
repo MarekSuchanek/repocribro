@@ -31,12 +31,13 @@ class ExtensionsMaster:
             group=cls.ENTRYPOINT_GROUP, name=name
         )
 
-    # TODO: there might be some problem with ordering of extensions
     def __init__(self, *args, **kwargs):
         """Collects all the extensions to be mantained by this object
 
         :param args: positional args to be passed to extensions
         :param kwargs: keywords args to be passed to extensions
+
+        :todo: there might be some problem with ordering of extensions
         """
         entry_points = self._collect_extensions()
         self.exts = []
