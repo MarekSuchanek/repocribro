@@ -8,6 +8,7 @@ from ..extending import ExtensionsMaster
 from ..github import GitHubAPI
 from ..models import Repository
 
+#: Manage controller blueprint
 manage = flask.Blueprint('manage', __name__, url_prefix='/manage')
 
 
@@ -16,8 +17,7 @@ manage = flask.Blueprint('manage', __name__, url_prefix='/manage')
 @injector.inject(ext_master=ExtensionsMaster,
                  gh_api=GitHubAPI)
 def dashboard(ext_master, gh_api):
-    # TODO: make service container for extensions so services
-    # dont need to be passed from controllers
+    """Management zone dashboard (GET handler)"""
     tabs = {}
     ext_master.call('view_manage_dashboard_tabs', tabs_dict=tabs,
                     gh_api=gh_api)
@@ -34,7 +34,10 @@ def dashboard(ext_master, gh_api):
 @injector.inject(db=flask_sqlalchemy.SQLAlchemy,
                  gh_api=GitHubAPI)
 def update_profile(db, gh_api):
-    # TODO: protect from updating too often
+    """Update user info from GitHub (GET handler)
+
+    :todo: protect from updating too often
+    """
     user_data = gh_api.get_data('/user')
     gh_user = flask_login.current_user.github_user
     gh_user.update_from_dict(user_data)
@@ -46,6 +49,7 @@ def update_profile(db, gh_api):
 @flask_login.login_required
 @injector.inject(gh_api=GitHubAPI)
 def repositories(gh_api):
+    """List user repositories from GitHub (GET handler)"""
     repos_data = gh_api.get_data('/user/repos')
     user = flask_login.current_user.github_user
     active_ids = [repo.github_id for repo in user.repositories]
@@ -57,9 +61,19 @@ def repositories(gh_api):
 
 
 def has_good_webhook(gh_api, repo):
+    """Check webhook at GitHub for repo
+
+    :param gh_api: GitHub API client for communication
+    :type gh_api: ``repocribro.github.GitHubAPI``
+    :param repo: Repository which webhook should be checked
+    :type repo: ``repocribro.models.Repository``
+    :return: If webhook is already in good shape
+    :rtype: bool
+
+    :todo: move somewhere else, check registered events
+    """
     if repo.webhook_id is None:
         return False
-    # TODO: check if there are right events
     print(repo.webhook_id)
     webhook = gh_api.webhook_get(repo.full_name, repo.webhook_id)
     print(webhook)
@@ -67,6 +81,17 @@ def has_good_webhook(gh_api, repo):
 
 
 def update_webhook(gh_api, repo):
+    """Update webhook at GitHub for repo if needed
+
+    :param gh_api: GitHub API client for communication
+    :type gh_api: ``repocribro.github.GitHubAPI``
+    :param repo: Repository which webhook should be updated
+    :type repo: ``repocribro.models.Repository``
+    :return: If webhook is now in good shape
+    :rtype: bool
+
+    :todo: move somewhere else
+    """
     if not has_good_webhook(gh_api, repo):
         repo.webhook_id = None
     if repo.webhook_id is None:
@@ -82,6 +107,7 @@ def update_webhook(gh_api, repo):
 @flask_login.login_required
 @injector.inject(db=flask_sqlalchemy.SQLAlchemy)
 def repo_detail(db, reponame):
+    """Repository detail (GET handler)"""
     user = flask_login.current_user.github_user
     full_name = Repository.make_full_name(user.login, reponame)
     repo = db.session.query(Repository).filter_by(full_name=full_name).first()
@@ -96,6 +122,10 @@ def repo_detail(db, reponame):
 @injector.inject(db=flask_sqlalchemy.SQLAlchemy,
                  gh_api=GitHubAPI)
 def repo_update(db, gh_api, reponame):
+    """Update repo info from GitHub (GET handler)
+
+    :todo: protect from updating too often
+    """
     user = flask_login.current_user.github_user
     full_name = Repository.make_full_name(user.login, reponame)
     repo = db.session.query(Repository).filter_by(full_name=full_name).first()
@@ -114,6 +144,10 @@ def repo_update(db, gh_api, reponame):
 @injector.inject(db=flask_sqlalchemy.SQLAlchemy,
                  gh_api=GitHubAPI)
 def repo_activate(db, gh_api, reponame):
+    """Activate repo in app from GitHub (POST handler)
+
+    :todo: protect from activating too often
+    """
     visibility_type = flask.request.form.get('enable', type=int)
     if visibility_type not in (
         Repository.VISIBILITY_HIDDEN,
@@ -123,7 +157,6 @@ def repo_activate(db, gh_api, reponame):
         flask.flash('You\'ve requested something weird...', 'error')
         return flask.redirect(flask.url_for('manage.repositories'))
 
-    # TODO: protect from activating too often
     user = flask_login.current_user.github_user
     full_name = Repository.make_full_name(user.login, reponame)
 
@@ -159,6 +192,7 @@ def repo_activate(db, gh_api, reponame):
 @injector.inject(db=flask_sqlalchemy.SQLAlchemy,
                  gh_api=GitHubAPI)
 def repo_deactivate(db, gh_api, reponame):
+    """Deactivate repo in app from GitHub (POST handler)"""
     user = flask_login.current_user.github_user
     full_name = Repository.make_full_name(user.login, reponame)
 
@@ -184,6 +218,7 @@ def repo_deactivate(db, gh_api, reponame):
 @injector.inject(db=flask_sqlalchemy.SQLAlchemy,
                  gh_api=GitHubAPI)
 def repo_delete(db, gh_api):
+    """Delete repo (in app) from GitHub (POST handler)"""
     reponame = flask.request.form.get('reponame')
     user = flask_login.current_user.github_user
     full_name = Repository.make_full_name(user.login, reponame)
@@ -204,6 +239,7 @@ def repo_delete(db, gh_api):
 @flask_login.login_required
 @injector.inject(gh_api=GitHubAPI)
 def organizations(gh_api):
+    """List user organizations from GitHub (GET handler)"""
     flask.abort(501)
     orgs_data = gh_api.get_data('/user/orgs')
     return flask.render_template(

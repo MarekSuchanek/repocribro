@@ -6,11 +6,13 @@ import injector
 from ..extending import ExtensionsMaster
 from ..models import User, Organization, Repository
 
+#: Core controller blueprint
 core = flask.Blueprint('core', __name__, url_prefix='')
 
 
 @core.route('/')
 def index():
+    """Landing page (GET handler)"""
     return flask.render_template('core/index.html')
 
 
@@ -19,7 +21,10 @@ def index():
 @core.route('/search/<query>')
 @injector.inject(ext_master=ExtensionsMaster)
 def search(ext_master, query=''):
-    # TODO: more attrs, limits & pages
+    """Search page (GET handler)
+
+    :todo: more attrs, limits & pages
+    """
     tabs = {}
     active_tab = ''
     if query != '':
@@ -37,14 +42,16 @@ def search(ext_master, query=''):
 @injector.inject(db=flask_sqlalchemy.SQLAlchemy,
                  ext_master=ExtensionsMaster)
 def user_detail(db, ext_master, login):
+    """User detail (GET handler)
+
+    :todo: implement 410 (user deleted/archived/renamed)
+    """
     user = db.session.query(User).filter_by(login=login).first()
     if user is None:
         is_org = db.session.query(Organization).filter(
             Organization.login == login
         ).exists()
         if is_org:
-            # TODO: implement 410 (user deleted/archived)
-            # TODO: user renaming
             flask.abort(404)
         flask.flash('Oy! You wanted to access user, but it\'s an organization.'
                     'We redirected you but be careful next time!', 'notice')
@@ -65,16 +72,17 @@ def user_detail(db, ext_master, login):
 @injector.inject(db=flask_sqlalchemy.SQLAlchemy,
                  ext_master=ExtensionsMaster)
 def org_detail(db, ext_master, login):
+    """Organization detail (GET handler)
+
+    :todo: implement 410 (org deleted/archived/renamed)
+    """
     org = db.session.query(User).filter_by(login=login).first()
     if org is None:
         is_user = db.session.query(User).filter_by(login=login).exists()
         if is_user:
-            # TODO: implement 410 (org deleted/archived)
-            # TODO: org renaming
             flask.abort(404)
         flask.flash('Oy! You wanted to access organization, but it\'s  auser.'
                     'We redirected you but be careful next time!', 'notice')
-
     tabs = {}
     ext_master.call('view_core_org_detail_tabs',
                     org=org, tabs_dict=tabs)
@@ -95,12 +103,13 @@ def repo_redir(login):
 
 
 def repo_detail_common(db, ext_master, repo):
+    """Repo detail (for GET handlers)
+
+    :todo: implement 410 (repo deleted/archived/renamed)
+    """
     if repo is None:
-        # TODO: implement 410 (repo deleted/archived)
-        # TODO: repository renaming
         flask.abort(404)
     if not flask_login.current_user.sees_repo(repo):
-        # TODO: 404 or 410 (if were public in the past)?
         flask.abort(404)
 
     tabs = {}
@@ -118,6 +127,7 @@ def repo_detail_common(db, ext_master, repo):
 @injector.inject(db=flask_sqlalchemy.SQLAlchemy,
                  ext_master=ExtensionsMaster)
 def repo_detail(db, ext_master, login, reponame):
+    """Repo detail (GET handler)"""
     repo = db.session.query(Repository).filter_by(
         full_name='{}/{}'.format(login, reponame),
     ).first()
@@ -128,5 +138,6 @@ def repo_detail(db, ext_master, login, reponame):
 @injector.inject(db=flask_sqlalchemy.SQLAlchemy,
                  ext_master=ExtensionsMaster)
 def repo_detail_hidden(db, ext_master, secret):
+    """Hidden repo detail (GET handler)"""
     repo = db.session.query(Repository).filter_by(secret=secret).first()
     return repo_detail_common(db, ext_master, repo)

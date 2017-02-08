@@ -11,8 +11,16 @@ webhooks = flask.Blueprint('webhooks', __name__, url_prefix='/webhook/github')
 # TODO: move webhooks logic somewhere else
 
 
-# Decorator for checking data fields
 def webhook_data_requires(*fields):
+    """Decorator for checking *data* fields
+
+    :param fields: Required fields
+    :type fields: list of str
+    :return: Decorated function
+    :rtype: function
+
+    :raises: HTTPException(404)
+    """
     def check_data_requires(func):
         @functools.wraps(func)
         def webhook_processor(repo, data, delivery_id):
@@ -25,7 +33,10 @@ def webhook_data_requires(*fields):
 
 @webhook_data_requires('push', 'sender')
 def gh_webhook_push(db, repo, data, delivery_id):
-    # TODO: deal with limit of commits in webhook msg (20)
+    """Process push webhook msg
+
+    :todo: deal with limit of commits in webhook msg (20)
+    """
     push = Push.create_from_dict(data['push'], data['sender'], repo)
     db.session.add(push)
     for commit in push.commits:
@@ -34,14 +45,19 @@ def gh_webhook_push(db, repo, data, delivery_id):
 
 @webhook_data_requires('release', 'sender')
 def gh_webhook_release(db, repo, data, delivery_id):
+    """Process release webhook msg"""
     release = Release.create_from_dict(data['release'], data['sender'], repo)
     db.session.add(release)
 
 
 @webhook_data_requires('action', 'repository')
 def gh_webhook_repository(db, repo, data, delivery_id):
-    # This can be one of "created", "deleted", "publicized", or "privatized".
-    # TODO: find out where is "updated" action
+    """Process repository webhook msg
+
+    This can be one of "created", "deleted", "publicized", or "privatized".
+
+    :todo: find out where is "updated" action
+    """
     action = data['action']
     if action == 'privatized':
         repo.private = True
@@ -67,6 +83,7 @@ hooks = {
 @injector.inject(db=flask_sqlalchemy.SQLAlchemy,
                  gh_api=GitHubAPI)
 def gh_webhook(db, gh_api):
+    """Point for GitHub webhook msgs (POST handler)"""
     headers = flask.request.headers
     agent = headers.get('User-Agent', '')
     signature = headers.get('X-Hub-Signature', '')

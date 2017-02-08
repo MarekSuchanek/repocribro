@@ -4,6 +4,7 @@ import sys
 from .extension import Extension
 
 
+#: TODO: make shared some service container
 class ExtensionsMaster:
     """Collector & master of Extensions
 
