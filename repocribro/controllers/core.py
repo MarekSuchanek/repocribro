@@ -51,7 +51,7 @@ def user_detail(db, ext_master, login):
         is_org = db.session.query(Organization).filter(
             Organization.login == login
         ).exists()
-        if is_org:
+        if not is_org:
             flask.abort(404)
         flask.flash('Oy! You wanted to access user, but it\'s an organization.'
                     'We redirected you but be careful next time!', 'notice')
@@ -79,10 +79,11 @@ def org_detail(db, ext_master, login):
     org = db.session.query(User).filter_by(login=login).first()
     if org is None:
         is_user = db.session.query(User).filter_by(login=login).exists()
-        if is_user:
+        if not is_user:
             flask.abort(404)
         flask.flash('Oy! You wanted to access organization, but it\'s  auser.'
                     'We redirected you but be careful next time!', 'notice')
+        return flask.redirect(flask.url_for('core.user', login=login))
     tabs = {}
     ext_master.call('view_core_org_detail_tabs',
                     org=org, tabs_dict=tabs)
