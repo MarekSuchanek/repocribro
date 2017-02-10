@@ -5,11 +5,9 @@ import flask_migrate
 
 from .extending import Extension
 from .extending.helpers import ViewTab, Badge
-from .extending.helpers.decorators import webhook_data_requires
 from .models import Push, Release, Repository
 
 
-@webhook_data_requires('push', 'sender')
 def gh_webhook_push(db, repo, data, delivery_id):
     """Process push webhook msg
 
@@ -21,14 +19,12 @@ def gh_webhook_push(db, repo, data, delivery_id):
         db.session.add(commit)
 
 
-@webhook_data_requires('release', 'sender')
 def gh_webhook_release(db, repo, data, delivery_id):
     """Process release webhook msg"""
     release = Release.create_from_dict(data['release'], data['sender'], repo)
     db.session.add(release)
 
 
-@webhook_data_requires('action', 'repository')
 def gh_webhook_repository(db, repo, data, delivery_id):
     """Process repository webhook msg
 
@@ -47,6 +43,33 @@ def gh_webhook_repository(db, repo, data, delivery_id):
         # TODO: consider some signalization of not being @GitHub anymore
         repo.webhook_id = None
         repo.visibility_type = Repository.VISIBILITY_PRIVATE
+
+
+# AWESOME EVENTS ARE DIFFERENT THAN WEBHOOK MSGS!!
+def gh_event_push(db, repo, payload):
+    """Process push event msg
+
+    :todo: implement
+    """
+    pass
+
+
+def gh_event_release(db, repo, payload):
+    """Process release event msg
+
+    :todo: implement
+    """
+    pass
+
+
+def gh_event_repository(db, repo, payload):
+    """Process repository event msg
+
+    This can be one of "created", "deleted", "publicized", or "privatized".
+
+    :todo: implement
+    """
+    pass
 
 
 class CoreExtension(Extension):
@@ -80,12 +103,21 @@ class CoreExtension(Extension):
         return all_filters
 
     @staticmethod
-    def get_gh_event_processors(*args, **kwargs):
+    def get_gh_webhook_processors(*args, **kwargs):
         """"""
         return {
             'push': [gh_webhook_push],
             'release': [gh_webhook_release],
             'repository': [gh_webhook_repository],
+        }
+
+    @staticmethod
+    def get_gh_event_processors(*args, **kwargs):
+        """"""
+        return {
+            'push': [gh_event_push],
+            'release': [gh_event_release],
+            'repository': [gh_event_repository],
         }
 
     def init_business(self, *args, **kwargs):

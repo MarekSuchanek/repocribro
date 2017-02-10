@@ -1,11 +1,17 @@
 import iso8601
 import flask
 import flask_script
+import pytz
 from werkzeug.exceptions import HTTPException
 
 
 class RepocheckCommand(flask_script.Command):
     """Perform check procedure of repository events"""
+    event2webhook = {
+        'PushEvent': 'push',
+        'ReleaseEvent': 'release',
+        'RepositoryEvent': 'repository',
+    }
 
     #: CLI command options for repocheck
     option_list = (
@@ -89,12 +95,14 @@ class RepocheckCommand(flask_script.Command):
         :return: If the event was new or already registered before
         :rtype: bool
         """
-        if iso8601.parse_date(event['created_at']) <= repo.last_event:
+        last = pytz.utc.localize(repo.last_event)
+        if iso8601.parse_date(event['created_at']) <= last:
             return False
-        for event_processor in self.hooks.get(event['type'], []):
+        hook_type = self.event2webhook.get(event['type'], 'uknown')
+        for event_processor in self.hooks.get(hook_type, []):
             try:
                 event_processor(db=self.db, repo=repo,
-                                data=event['payload'], delivery_id=None)
+                                payload=event['payload'])
                 print('Processed {} from {} event for {}'.format(
                     event['type'], event['created_at'], repo.full_name
                 ))
