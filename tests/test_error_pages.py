@@ -12,7 +12,7 @@ import pytest
     ]
 )
 def test_error_page(app_client, code, message):
-    response = app_client.get('/test-error/{}'.format(code))
+    response = app_client.get('/test/error/{}'.format(code))
     assert response.status == '{} {}'.format(code, message.upper())
     assert '</html>' in response.data.decode('utf-8')
     assert message in response.data.decode('utf-8')
