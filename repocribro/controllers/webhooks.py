@@ -1,86 +1,24 @@
 import flask
-import functools
 
-from ..models import Repository, Push, Release
+from ..models import Repository
 
 webhooks = flask.Blueprint('webhooks', __name__, url_prefix='/webhook/github')
-
-# TODO: move webhooks logic somewhere else
-
-
-def webhook_data_requires(*fields):
-    """Decorator for checking *data* fields
-
-    :param fields: Required fields
-    :type fields: list of str
-    :return: Decorated function
-    :rtype: function
-
-    :raises: HTTPException(404)
-    """
-    def check_data_requires(func):
-        @functools.wraps(func)
-        def webhook_processor(repo, data, delivery_id):
-            for field in fields:
-                if field not in data:
-                    flask.abort(400)
-            return func(repo, data, delivery_id)
-    return check_data_requires
-
-
-@webhook_data_requires('push', 'sender')
-def gh_webhook_push(db, repo, data, delivery_id):
-    """Process push webhook msg
-
-    :todo: deal with limit of commits in webhook msg (20)
-    """
-    push = Push.create_from_dict(data['push'], data['sender'], repo)
-    db.session.add(push)
-    for commit in push.commits:
-        db.session.add(commit)
-
-
-@webhook_data_requires('release', 'sender')
-def gh_webhook_release(db, repo, data, delivery_id):
-    """Process release webhook msg"""
-    release = Release.create_from_dict(data['release'], data['sender'], repo)
-    db.session.add(release)
-
-
-@webhook_data_requires('action', 'repository')
-def gh_webhook_repository(db, repo, data, delivery_id):
-    """Process repository webhook msg
-
-    This can be one of "created", "deleted", "publicized", or "privatized".
-
-    :todo: find out where is "updated" action
-    """
-    action = data['action']
-    if action == 'privatized':
-        repo.private = True
-        repo.visibility_type = Repository.VISIBILITY_PRIVATE
-    elif action == 'publicized':
-        repo.private = False
-        repo.visibility_type = Repository.VISIBILITY_PUBLIC
-    elif action == 'deleted':
-        # TODO: consider some signalization of not being @GitHub anymore
-        repo.webhook_id = None
-        repo.visibility_type = Repository.VISIBILITY_PRIVATE
-
-
-# TODO: extensible registered hooks
-hooks = {
-    'push': [gh_webhook_push],
-    'release': [gh_webhook_release],
-    'repository': [gh_webhook_repository],
-}
 
 
 @webhooks.route('', methods=['POST'])
 def gh_webhook():
     """Point for GitHub webhook msgs (POST handler)"""
     db = flask.current_app.container.get('db')
+    ext_master = flask.current_app.container.get('ext_master')
     gh_api = flask.current_app.container.get('gh_api')
+
+    hooks_list = ext_master.call('get_gh_event_processors', default={})
+    hooks = {}
+    for ext_hooks in hooks_list:
+        for hook_event in ext_hooks:
+            if hook_event not in hooks:
+                hooks[hook_event] = []
+            hooks[hook_event].extend(ext_hooks[hook_event])
 
     headers = flask.request.headers
     agent = headers.get('User-Agent', '')

@@ -1,3 +1,4 @@
+``get_gh_event_processors``, "Get GitHub events processors", ``dict`` of ``str``: ``list`` of ``function``
 ``init_business``, "Init business layer of the extension", ``None``
 ``init_blueprints``, "Init Flask blueprints (register them)", ``None``
 ``init_filters``, "Init Jinja2 filters for views (register them)", ``None``

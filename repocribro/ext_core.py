@@ -5,6 +5,48 @@ import flask_migrate
 
 from .extending import Extension
 from .extending.helpers import ViewTab, Badge
+from .extending.helpers.decorators import webhook_data_requires
+from .models import Push, Release, Repository
+
+
+@webhook_data_requires('push', 'sender')
+def gh_webhook_push(db, repo, data, delivery_id):
+    """Process push webhook msg
+
+    :todo: deal with limit of commits in webhook msg (20)
+    """
+    push = Push.create_from_dict(data['push'], data['sender'], repo)
+    db.session.add(push)
+    for commit in push.commits:
+        db.session.add(commit)
+
+
+@webhook_data_requires('release', 'sender')
+def gh_webhook_release(db, repo, data, delivery_id):
+    """Process release webhook msg"""
+    release = Release.create_from_dict(data['release'], data['sender'], repo)
+    db.session.add(release)
+
+
+@webhook_data_requires('action', 'repository')
+def gh_webhook_repository(db, repo, data, delivery_id):
+    """Process repository webhook msg
+
+    This can be one of "created", "deleted", "publicized", or "privatized".
+
+    :todo: find out where is "updated" action
+    """
+    action = data['action']
+    if action == 'privatized':
+        repo.private = True
+        repo.visibility_type = Repository.VISIBILITY_PRIVATE
+    elif action == 'publicized':
+        repo.private = False
+        repo.visibility_type = Repository.VISIBILITY_PUBLIC
+    elif action == 'deleted':
+        # TODO: consider some signalization of not being @GitHub anymore
+        repo.webhook_id = None
+        repo.visibility_type = Repository.VISIBILITY_PRIVATE
 
 
 class CoreExtension(Extension):
@@ -36,6 +78,15 @@ class CoreExtension(Extension):
     def provide_filters():
         from .filters import all_filters
         return all_filters
+
+    @staticmethod
+    def get_gh_event_processors(*args, **kwargs):
+        """"""
+        return {
+            'push': [gh_webhook_push],
+            'release': [gh_webhook_release],
+            'repository': [gh_webhook_repository],
+        }
 
     def init_business(self, *args, **kwargs):
         """Init business layer (other extensions, what is needed)
