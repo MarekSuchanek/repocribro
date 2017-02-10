@@ -44,7 +44,7 @@ with betamax.Betamax.configure() as config:
 
 @pytest.fixture
 def github_api(betamax_session):
-    """TwitterConnection with betamax session"""
+    """GitHub API client with betamax session"""
     betamax_session.headers.update({'accept-encoding': 'identity'})
     api_key = os.environ.get('GH_CLIENT_ID', 'fake_key')
     api_secret = os.environ.get('GH_CLIENT_SECRET', 'fake_secret')
@@ -75,6 +75,21 @@ def fake_login(username):
 def fake_logout():
     from repocribro.security import logout
     logout()
+    return 'OK'
+
+
+@test.route('/fake-github')
+def fake_github():
+    gh_api = flask.current_app.container.get('gh_api')
+    flask.current_app.container.set_singleton('real_gh_api', gh_api)
+    flask.current_app.container.set_singleton('gh_api', FakeGitHubAPI())
+    return 'OK'
+
+
+@test.route('/unfake-github')
+def unfake_github():
+    gh_api = flask.current_app.container.get('real_gh_api')
+    flask.current_app.container.set_singleton('gh_api', gh_api)
     return 'OK'
 
 
@@ -219,3 +234,121 @@ def filled_db_session(empty_db_session):
     session.add(commit)
     session.commit()
     return session
+
+
+class FakeGitHubAPI:
+    """Fake GitHub API"""
+    DATA = {
+        '/user': {
+            'id': 65, 'login': 'regular', 'email': 'new@mail.com',
+            'name': 'new_n', 'company': 'new_c', 'location': 'new_l',
+            'bio': 'new_b', 'blog': 'new_u', 'avatar_url': 'a',
+            'hireable': True
+        },
+        '/user/repos': [
+            {
+                'id': 100, 'full_name': 'regular/repo1', 'name': 'repo1',
+                'language': 'Python', 'html_url': '', 'description': '',
+                'private': False
+            },
+            {
+                'id': 101, 'full_name': 'regular/repo2', 'name': 'repo2',
+                'language': 'Python', 'html_url': '', 'description': '',
+                'private': False
+            },
+            {
+                'id': 102, 'full_name': 'regular/repo3', 'name': 'repo3',
+                'language': 'Haskell', 'html_url': '', 'description': '',
+                'private': False
+            }
+        ],
+        '/repos/regular/repo1': {
+            'id': 100, 'full_name': 'regular/repo1', 'name': 'repo1',
+            'language': 'Python', 'html_url': '', 'description': '',
+            'private': False
+        },
+        '/repos/regular/repo2': {
+            'id': 101, 'full_name': 'regular/repo2', 'name': 'repo2',
+            'language': 'Javascript', 'html_url': '', 'description': '',
+            'private': False
+        },
+        '/repos/regular/repo3': {
+            'id': 102, 'full_name': 'regular/repo3', 'name': 'repo3',
+            'language': 'Haskell', 'html_url': '', 'description': '',
+            'private': False
+        },
+        '/repos/regular/newOne': {
+            'id': 103, 'full_name': 'regular/newOne', 'name': 'newOne',
+            'language': 'C++', 'html_url': '', 'description': '',
+            'private': False
+        },
+    }
+
+    def __init__(self, client_id='', client_secret='', webhooks_secret='',
+                 session=None):
+        self.client_id = client_id
+        self.client_secret = client_secret
+        self.webhooks_secret = webhooks_secret
+        self.session = session
+
+    @staticmethod
+    def _get_auth_header():
+        if 'github_token' not in flask.session:
+            return {}
+        return {
+            'Authorization': 'token {}'.format(flask.session['github_token'])
+        }
+
+    def get_auth_url(self):
+        return flask.url_for('auth.github_callback')
+
+    def login(self, session_code):
+        flask.session['github_token'] = 'GH_TOKEN'
+        flask.session['github_scope'] = 'GH_SCOPE'
+        return True
+
+    def get_token(self):
+        return flask.session['github_token']
+
+    def get_scope(self):
+        return flask.session['github_scope']
+
+    def logout(self):
+        for key in ('github_token', 'github_scope'):
+            flask.session.pop(key, None)
+
+    def get(self, what):
+        if what in self.DATA:
+            return FakeResponse(200, self.DATA[what])
+        return FakeResponse(204, None)
+
+    def get_data(self, what):
+        return self.get(what).json()
+
+    def webhook_get(self, full_name, id):
+        return None
+
+    def webhooks_get(self, full_name):
+        return []
+
+    def webhook_create(self, full_name, events=None, hook_url=None):
+        return {'id': 777}
+
+    def webhook_tests(self, full_name, hook_id):
+        return True
+
+    def webhook_delete(self, full_name, hook_id):
+        return True
+
+    def webhook_verify_signature(self, payload, signature):
+        return True
+
+
+class FakeResponse:
+
+    def __init__(self, status_code, data):
+        self.status_code = status_code
+        self.data = data
+
+    def json(self):
+        return self.data
