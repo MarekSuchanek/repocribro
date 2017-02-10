@@ -28,10 +28,12 @@ class GitHubAPI:
     #: Controller for incoming webhook events
     WEBHOOK_CONTROLLER = 'webhooks.gh_webhook'
 
-    def __init__(self, client_id, client_secret, webhooks_secret):
+    def __init__(self, client_id, client_secret, webhooks_secret,
+                 session=None):
         self.client_id = client_id
         self.client_secret = client_secret
         self.webhooks_secret = webhooks_secret
+        self.session = session or requests.Session()
 
     @staticmethod
     def _get_auth_header():
@@ -64,7 +66,7 @@ class GitHubAPI:
 
         :todo: check granted scope vs GH_SCOPES
         """
-        response = requests.post(
+        response = self.session.post(
             self.TOKEN_URL,
             headers={
                 'Accept': 'application/json'
@@ -84,8 +86,7 @@ class GitHubAPI:
         flask.session['github_scope'] = scope
         return True
 
-    @classmethod
-    def get_token(cls):
+    def get_token(self):
         """Retrieve GitHub OAuth token for current user
 
         :return: GitHub token for current user
@@ -93,8 +94,7 @@ class GitHubAPI:
         """
         return flask.session['github_token']
 
-    @classmethod
-    def get_scope(cls):
+    def get_scope(self):
         """Retrieve GitHub OAuth scope for current user
 
         :return: GitHub scope for current user
@@ -102,14 +102,12 @@ class GitHubAPI:
         """
         return flask.session['github_scope']
 
-    @classmethod
-    def logout(cls):
+    def logout(self):
         """Logout the current user from GitHub session (destroy token)"""
         for key in ('github_token', 'github_scope'):
             flask.session.pop(key, None)
 
-    @classmethod
-    def get(cls, what):
+    def get(self, what):
         """Perform GET request on GitHub API
 
         :param what: URI of requested resource
@@ -119,13 +117,12 @@ class GitHubAPI:
 
         :todo: pagination of content
         """
-        return requests.get(
-            cls.API_URL + what,
-            headers=cls._get_auth_header()
+        return self.session.get(
+            self.API_URL + what,
+            headers=self._get_auth_header()
         )
 
-    @classmethod
-    def get_data(cls, what):
+    def get_data(self, what):
         """Perform GET request on GitHub API
 
         :param what: URI of requested resource
@@ -135,10 +132,9 @@ class GitHubAPI:
 
         :todo: pagination of content
         """
-        return cls.get(what).json()
+        return self.get(what).json()
 
-    @classmethod
-    def webhook_get(cls, full_name, id):
+    def webhook_get(self, full_name, id):
         """Perform GET request for repo's webhook
 
         :param full_name: Full name of repository that contains the hook
@@ -148,13 +144,12 @@ class GitHubAPI:
         :return: Data of the webhook
         :rtype: dict or None
         """
-        response = cls.get('/repos/{}/hooks/{}'.format(full_name, id))
+        response = self.get('/repos/{}/hooks/{}'.format(full_name, id))
         if response.status_code == 200:
             return response.json()
         return None
 
-    @classmethod
-    def webhooks_get(cls, full_name):
+    def webhooks_get(self, full_name):
         """GET all webhooks of the repository
 
         :param full_name: Full name of repository
@@ -162,7 +157,7 @@ class GitHubAPI:
         :return: List of returned webhooks
         :rtype: list
         """
-        response = cls.get('/repos/{}/hooks'.format(full_name))
+        response = self.get('/repos/{}/hooks'.format(full_name))
         if response.status_code == 200:
             return response.json()
         return []
@@ -193,7 +188,7 @@ class GitHubAPI:
                 'secret': self.webhooks_secret
             }
         }
-        response = requests.post(
+        response = self.session.post(
             self.API_URL + '/repos/{}/hooks'.format(full_name),
             data=json.dumps(data),
             headers=self._get_auth_header()
@@ -202,8 +197,7 @@ class GitHubAPI:
             return response.json()
         return None
 
-    @classmethod
-    def webhook_tests(cls, full_name, hook_id):
+    def webhook_tests(self, full_name, hook_id):
         """Perform test request for repo's webhook
 
         :param full_name: Full name of repository that contains the hook
@@ -213,16 +207,15 @@ class GitHubAPI:
         :return: If request was successful
         :rtype: bool
         """
-        response = requests.delete(
-            cls.API_URL + '/repos/{}/hooks/{}/tests'.format(
+        response = self.session.delete(
+            self.API_URL + '/repos/{}/hooks/{}/tests'.format(
                 full_name, hook_id
             ),
-            headers=cls._get_auth_header()
+            headers=self._get_auth_header()
         )
         return response.status_code == 204
 
-    @classmethod
-    def webhook_delete(cls, full_name, hook_id):
+    def webhook_delete(self, full_name, hook_id):
         """Perform DELETE request for repo's webhook
 
         :param full_name: Full name of repository that contains the hook
@@ -232,11 +225,11 @@ class GitHubAPI:
         :return: If request was successful
         :rtype: bool
         """
-        response = requests.delete(
-            cls.API_URL + '/repos/{}/hooks/{}'.format(
+        response = self.session.delete(
+            self.API_URL + '/repos/{}/hooks/{}'.format(
                 full_name, hook_id
             ),
-            headers=cls._get_auth_header()
+            headers=self._get_auth_header()
         )
         return response.status_code == 204
 
