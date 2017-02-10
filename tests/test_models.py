@@ -142,6 +142,11 @@ def test_repo_push(session, github_data_loader):
     assert 'Push' in repr(push)
     assert str(push.commits[0].id) in repr(push.commits[0])
     assert 'Commit' in repr(push.commits[0])
+    before = datetime.datetime.now()
+    repo.events_updated()
+    act = datetime.datetime.now()
+    delta = act - before
+    assert (datetime.datetime.now() - repo.last_event) < delta
 
 
 def test_role_mixin():
@@ -175,6 +180,7 @@ def test_anonymous():
     assert not anonym.sees_repo(repo)
     repo.visibility_type = Repository.VISIBILITY_PUBLIC
     assert anonym.sees_repo(repo)
+    assert not anonym.owns_repo(repo)
 
 
 def test_user_mixin():
