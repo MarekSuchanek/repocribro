@@ -106,17 +106,20 @@ class Anonymous(flask_login.AnonymousUserMixin):
         """
         return False
 
-    def sees_repo(self, repo):
+    def sees_repo(self, repo, has_secret=False):
         """Check if user is allowed to see the repo
 
         Anonymous can see only public repos
 
         :param repo: Repository which user want to see
         :type repo: ``repocribro.models.Repository``
+        :param has_secret: If current user knows the secret URL
+        :type has_secret: bool
         :return: If user can see repo
         :rtype: bool
         """
-        return repo.is_public
+        visible = repo.is_public or (has_secret and repo.is_hidden)
+        return visible
 
 
 class UserMixin(flask_login.UserMixin):
@@ -159,17 +162,20 @@ class UserMixin(flask_login.UserMixin):
         """
         return repo.owner.github_id == self.github_user.github_id
 
-    def sees_repo(self, repo):
+    def sees_repo(self, repo, has_secret=False):
         """Check if user is allowed to see the repo
 
         Must be admin or owner to see not public repo
 
         :param repo: Repository which user want to see
         :type repo: ``repocribro.models.Repository``
+        :param has_secret: If current user knows the secret URL
+        :type has_secret: bool
         :return: If user can see repo
         :rtype: bool
         """
-        return repo.is_public or self.has_role('admin') or self.owns_repo(repo)
+        visible = repo.is_public or (has_secret and repo.is_hidden)
+        return visible or self.has_role('admin') or self.owns_repo(repo)
 
 
 #: Many-to-many relationship between user accounts and roles

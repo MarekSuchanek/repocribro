@@ -47,14 +47,14 @@ def user_detail(login):
 
     user = db.session.query(User).filter_by(login=login).first()
     if user is None:
-        is_org = db.session.query(Organization).filter(
+        org = db.session.query(Organization).filter(
             Organization.login == login
-        ).exists()
-        if not is_org:
+        ).first()
+        if org is None:
             flask.abort(404)
         flask.flash('Oy! You wanted to access user, but it\'s an organization.'
                     'We redirected you but be careful next time!', 'notice')
-        return flask.redirect(flask.url_for('core.org', login=login))
+        return flask.redirect(flask.url_for('core.org_detail', login=login))
 
     tabs = {}
     ext_master.call('view_core_user_detail_tabs',
@@ -76,14 +76,14 @@ def org_detail(login):
     db = flask.current_app.container.get('db')
     ext_master = flask.current_app.container.get('ext_master')
 
-    org = db.session.query(User).filter_by(login=login).first()
+    org = db.session.query(Organization).filter_by(login=login).first()
     if org is None:
-        is_user = db.session.query(User).filter_by(login=login).exists()
-        if not is_user:
+        user = db.session.query(User).filter_by(login=login).first()
+        if user is None:
             flask.abort(404)
         flask.flash('Oy! You wanted to access organization, but it\'s  auser.'
                     'We redirected you but be careful next time!', 'notice')
-        return flask.redirect(flask.url_for('core.user', login=login))
+        return flask.redirect(flask.url_for('core.user_detail', login=login))
     tabs = {}
     ext_master.call('view_core_org_detail_tabs',
                     org=org, tabs_dict=tabs)
@@ -99,18 +99,17 @@ def org_detail(login):
 def repo_redir(login):
     flask.flash('Seriously?! You forget to specify repository name, didn\'t '
                 'you? We redirected you but be careful next time!', 'notice')
-    print('WTF')
     return flask.redirect(flask.url_for('core.user_detail', login=login))
 
 
-def repo_detail_common(db, ext_master, repo):
+def repo_detail_common(db, ext_master, repo, has_secret=False):
     """Repo detail (for GET handlers)
 
     :todo: implement 410 (repo deleted/archived/renamed)
     """
     if repo is None:
         flask.abort(404)
-    if not flask_login.current_user.sees_repo(repo):
+    if not flask_login.current_user.sees_repo(repo, has_secret):
         flask.abort(404)
 
     tabs = {}
@@ -143,4 +142,4 @@ def repo_detail_hidden(secret):
     ext_master = flask.current_app.container.get('ext_master')
 
     repo = db.session.query(Repository).filter_by(secret=secret).first()
-    return repo_detail_common(db, ext_master, repo)
+    return repo_detail_common(db, ext_master, repo, True)

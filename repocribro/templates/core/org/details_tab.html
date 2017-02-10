@@ -10,8 +10,12 @@
     <div class="col-xs-12 col-md-8">
         <table class="table table-responsive table-striped">
             <tr>
-                <th>Name</th>
+                <th>Login</th>
                 <td>{{ org|gh_user_link }}</td>
+            </tr>
+            <tr>
+                <th>Name</th>
+                <td>{{ org.name }}</td>
             </tr>
             <tr>
                 <th>Email</th>
