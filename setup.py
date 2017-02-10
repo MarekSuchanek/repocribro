@@ -43,7 +43,7 @@ setup(
         'flask-principal',
         'flask-restless',
         'flask-sqlalchemy',
-        'injector',
+        'iso8601',
         'jinja2',
         'requests',
         'sqlalchemy',

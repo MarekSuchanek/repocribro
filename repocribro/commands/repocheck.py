@@ -1,5 +1,7 @@
+import iso8601
 import flask
 import flask_script
+from werkzeug.exceptions import HTTPException
 
 
 class RepocheckCommand(flask_script.Command):
@@ -23,17 +25,26 @@ class RepocheckCommand(flask_script.Command):
         :raises SystemExit: If repository with given full_name does not exist
         """
         from ..models import Repository
-        db = flask.current_app.container.get('db')
+        self.db = flask.current_app.container.get('db')
+        ext_master = flask.current_app.container.get('ext_master')
+
+        hooks_list = ext_master.call('get_gh_event_processors', default={})
+        self.hooks = {}
+        for ext_hooks in hooks_list:
+            for hook_event in ext_hooks:
+                if hook_event not in self.hooks:
+                    self.hooks[hook_event] = []
+                self.hooks[hook_event].extend(ext_hooks[hook_event])
 
         repos = []
         if full_name is None:
             print('Performing repository check on all public repositories')
-            repos = db.session.query(Repository).filter_by(
+            repos = self.db.session.query(Repository).filter_by(
                 private=False
             ).all()
         else:
             print('Performing repository check on repository '+full_name)
-            repo = db.session.query(Repository).filter_by(
+            repo = self.db.session.query(Repository).filter_by(
                 full_name=full_name
             ).first()
             if repo is None:
@@ -65,6 +76,8 @@ class RepocheckCommand(flask_script.Command):
             new = self._process_event(repo, event)
             if not new:
                 break
+        repo.events_updated()
+        self.db.session.commit()
 
     def _process_event(self, repo, event):
         """Process potentially new event for repository
@@ -75,7 +88,16 @@ class RepocheckCommand(flask_script.Command):
         :type event: dict
         :return: If the event was new or already registered before
         :rtype: bool
-
-        :todo: Implement processing the event (check if new and add)
         """
-        return False
+        if iso8601.parse_date(event['created_at']) <= repo.last_event:
+            return False
+        for event_processor in self.hooks.get(event['type'], []):
+            try:
+                event_processor(db=self.db, repo=repo,
+                                data=event['payload'], delivery_id=None)
+                print('Processed {} from {} event for {}'.format(
+                    event['type'], event['created_at'], repo.full_name
+                ))
+            except HTTPException:
+                print('Error while processing #{}'.format(event['id']))
+        return True

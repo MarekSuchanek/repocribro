@@ -461,6 +461,9 @@ class Repository(db.Model, SearchableMixin):
     secret = sqlalchemy.Column(sqlalchemy.String(255), unique=True)
     # Webhook ID for sending events
     webhook_id = sqlalchemy.Column(sqlalchemy.Integer)
+    # Webhook ID for sending events
+    last_event = sqlalchemy.Column(sqlalchemy.DateTime,
+                                   default=datetime.datetime.now())
     # ID of the owner of repository
     owner_id = sqlalchemy.Column(
         sqlalchemy.Integer, sqlalchemy.ForeignKey('RepositoryOwner.id')
@@ -599,6 +602,13 @@ class Repository(db.Model, SearchableMixin):
     def is_hidden(self):
         """Check if repository is hidden within app"""
         return self.visibility_type == self.VISIBILITY_HIDDEN
+
+    def events_updated(self):
+        """Set that now was performed last events update of repo
+
+        :todo: How about some past events before adding to app?
+        """
+        self.last_event = datetime.datetime.now()
 
     def __repr__(self):
         """Standard string representation of DB object

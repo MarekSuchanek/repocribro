@@ -37,7 +37,8 @@ def gh_webhook():
     repo = db.session.query(Repository).get_or_404(data['repository']['id'])
 
     for event_processor in hooks.get(event, []):
-        event_processor(db=db, repo=repo, data=data, deliver_id=delivery_id)
+        event_processor(db=db, repo=repo, data=data, delivery_id=delivery_id)
 
+    repo.events_updated()
     db.session.commit()
     return ''
