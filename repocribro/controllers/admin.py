@@ -50,12 +50,12 @@ def account_ban(login):
     unban = flask.request.form.get('active') == '1'
     if user.user_account.active and ban:
         user.user_account.active = False
-        db.session.commmit()
+        db.session.commit()
         flask.flash('User account {} has been disabled.'.format(login),
                     'success')
     elif not user.user_account.active and unban:
         user.user_account.active = True
-        db.session.commmit()
+        db.session.commit()
         flask.flash('User account {} has been enabled.'.format(login),
                     'success')
     else:
@@ -184,6 +184,7 @@ def role_edit(name):
     except sqlalchemy.exc.IntegrityError as e:
         flask.flash('Couldn\'t make that role... {}'.format(str(e)),
                     'warning')
+        db.session.rollback()
         return flask.redirect(flask.url_for('admin.index', tab='roles'))
     flask.flash('Role {} has been edited'.format(name), 'success')
     return flask.redirect(flask.url_for('admin.role_detail', name=role.name))
@@ -223,13 +224,14 @@ def role_create():
     except sqlalchemy.exc.IntegrityError as e:
         flask.flash('Couldn\'t make that role... {}'.format(str(e)),
                     'warning')
+        db.session.rollback()
         return flask.redirect(flask.url_for('admin.index', tab='roles'))
     return flask.redirect(flask.url_for('admin.role_detail', name=role.name))
 
 
 @admin.route('/role/<name>/add', methods=['POST'])
 @permissions.admin_role.require(404)
-def role_assignment_add(db, name):
+def role_assignment_add(name):
     """Assign role to user (POST handler)"""
     db = flask.current_app.container.get('db')
 
