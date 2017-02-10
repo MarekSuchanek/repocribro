@@ -1,9 +1,6 @@
 import flask
 import flask_login
-import flask_sqlalchemy
-import injector
 
-from ..extending import ExtensionsMaster
 from ..models import User, Organization, Repository
 
 #: Core controller blueprint
@@ -19,12 +16,13 @@ def index():
 @core.route('/search/')
 @core.route('/search')
 @core.route('/search/<query>')
-@injector.inject(ext_master=ExtensionsMaster)
-def search(ext_master, query=''):
+def search(query=''):
     """Search page (GET handler)
 
     :todo: more attrs, limits & pages
     """
+    ext_master = flask.current_app.container.get('ext_master')
+
     tabs = {}
     active_tab = ''
     if query != '':
@@ -39,13 +37,14 @@ def search(ext_master, query=''):
 
 
 @core.route('/user/<login>')
-@injector.inject(db=flask_sqlalchemy.SQLAlchemy,
-                 ext_master=ExtensionsMaster)
-def user_detail(db, ext_master, login):
+def user_detail(login):
     """User detail (GET handler)
 
     :todo: implement 410 (user deleted/archived/renamed)
     """
+    db = flask.current_app.container.get('db')
+    ext_master = flask.current_app.container.get('ext_master')
+
     user = db.session.query(User).filter_by(login=login).first()
     if user is None:
         is_org = db.session.query(Organization).filter(
@@ -69,13 +68,14 @@ def user_detail(db, ext_master, login):
 
 
 @core.route('/org/<login>')
-@injector.inject(db=flask_sqlalchemy.SQLAlchemy,
-                 ext_master=ExtensionsMaster)
-def org_detail(db, ext_master, login):
+def org_detail(login):
     """Organization detail (GET handler)
 
     :todo: implement 410 (org deleted/archived/renamed)
     """
+    db = flask.current_app.container.get('db')
+    ext_master = flask.current_app.container.get('ext_master')
+
     org = db.session.query(User).filter_by(login=login).first()
     if org is None:
         is_user = db.session.query(User).filter_by(login=login).exists()
@@ -125,10 +125,11 @@ def repo_detail_common(db, ext_master, repo):
 
 
 @core.route('/repo/<login>/<reponame>')
-@injector.inject(db=flask_sqlalchemy.SQLAlchemy,
-                 ext_master=ExtensionsMaster)
-def repo_detail(db, ext_master, login, reponame):
+def repo_detail(login, reponame):
     """Repo detail (GET handler)"""
+    db = flask.current_app.container.get('db')
+    ext_master = flask.current_app.container.get('ext_master')
+
     repo = db.session.query(Repository).filter_by(
         full_name='{}/{}'.format(login, reponame),
     ).first()
@@ -136,9 +137,10 @@ def repo_detail(db, ext_master, login, reponame):
 
 
 @core.route('/hidden-repo/<secret>')
-@injector.inject(db=flask_sqlalchemy.SQLAlchemy,
-                 ext_master=ExtensionsMaster)
-def repo_detail_hidden(db, ext_master, secret):
+def repo_detail_hidden(secret):
     """Hidden repo detail (GET handler)"""
+    db = flask.current_app.container.get('db')
+    ext_master = flask.current_app.container.get('ext_master')
+
     repo = db.session.query(Repository).filter_by(secret=secret).first()
     return repo_detail_common(db, ext_master, repo)

@@ -1,8 +1,5 @@
 import flask
 import flask_ini
-import flask_injector
-import flask_sqlalchemy
-import injector
 import os
 
 from .extending import ExtensionsMaster
@@ -25,6 +22,66 @@ RELEASE = '0.1-alpha'
 VERSION = '0.1'
 
 
+class DI_Container:
+    """Simple container of services for web app
+
+    :ivar factories: Factories of services
+    :ivar singletons: Singletons (shared objects) of services
+    """
+
+    def __init__(self):
+        """Prepare dict for storing services and factories"""
+        self.factories = {}
+        self.singletons = {}
+
+    def get(self, what, *args, **kwargs):
+        """Retrieve service from the container
+
+        :param what: Name of the service to get
+        :type what: str
+        :param args: Positional arguments passed to factory
+        :param kwargs: Keyword arguments passed to factory
+        :return: The service or None
+        """
+        if what in self.singletons:
+            return self.singletons[what]
+        factory = self.factories.get(what, None)
+        return factory(args, kwargs) if callable(factory) else factory
+
+    def set_singleton(self, name, singleton):
+        """Set service as singleton (shared object)
+
+        :param name: Name of the service
+        :type name: str
+        :param singleton: The object to be shared as singleton
+        :type singleton: object
+        """
+        self.singletons[name] = singleton
+
+    def set_factory(self, name, factory):
+        """Set service factory (callable for creating instances)
+
+        :param name: Name of the service
+        :type name: str
+        :param factory: Function or callable object creating service instance
+        :type factory: callable
+        """
+        self.factories[name] = factory
+
+
+class Repocribro(flask.Flask):
+    """Repocribro is Flask web application
+
+    :ivar container: Service container for the app
+    :type container: ``repocribro.repocribro.DI_Container``
+    """
+
+    def __init__(self):
+        """Setup Flask app and prepare service container"""
+        super().__init__(PROG_NAME)
+        self.container = DI_Container()
+
+
 def make_githup_api(cfg):
     """Simple factory for making the GitHub API client
 
@@ -45,13 +102,13 @@ def create_app(cfg_files='DEFAULT'):
 
     :param cfg_files: Single or more config file(s)
     :return: Constructed web application
-    :rtype: ``flask.Flask``
+    :rtype: ``repocribro.repocribro.Repocribro``
     """
     if cfg_files == 'DEFAULT':
         cfg_files = os.environ.get('REPOCRIBRO_CONFIG_FILE',
                                    DEFAULT_CONFIG_FILES)
 
-    app = flask.Flask(__name__)
+    app = Repocribro()
     app.config['RELEASE'] = RELEASE
     with app.app_context():
         app.iniconfig = flask_ini.FlaskIni()
@@ -71,23 +128,10 @@ def create_app(cfg_files='DEFAULT'):
     ext_master.call('init_filters')
     ext_master.call('init_blueprints')
 
-    def configure(binder):
-        # TODO: let extensions make injector binds
-        binder.bind(ExtensionsMaster,
-                    to=ext_master,
-                    scope=injector.singleton)
-        binder.bind(flask_sqlalchemy.SQLAlchemy,
-                    to=db,
-                    scope=injector.singleton)
-        binder.bind(flask_ini.FlaskIni,
-                    to=app.iniconfig,
-                    scope=injector.singleton)
-        binder.bind(GitHubAPI,
-                    to=make_githup_api(app.iniconfig),
-                    scope=injector.singleton)
-
-    inj = injector.Injector([configure])
-    flask_injector.FlaskInjector(app=app, injector=inj)
+    app.container.set_singleton('db', db)
+    app.container.set_singleton('ext_master', ext_master,)
+    app.container.set_singleton('config', app.iniconfig)
+    app.container.set_singleton('gh_api', make_githup_api(app.iniconfig))
 
     ext_master.call('init_post_injector')
 

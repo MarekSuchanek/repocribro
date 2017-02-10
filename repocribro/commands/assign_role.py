@@ -1,3 +1,4 @@
+import flask
 import flask_script
 
 
@@ -20,8 +21,9 @@ class AssignRoleCommand(flask_script.Command):
         :type role_name: str
         :raises SystemExit: If user does not exists or already had the role
         """
-        from ..database import db
         from ..models import Role, User
+        db = flask.current_app.container.get('db')
+
         user = db.session.query(User).filter_by(login=login).first()
         if user is None:
             print('User {} not found'.format(login))

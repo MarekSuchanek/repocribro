@@ -22,8 +22,9 @@ class RepocheckCommand(flask_script.Command):
         :type full_name: str
         :raises SystemExit: If repository with given full_name does not exist
         """
-        from ..database import db
         from ..models import Repository
+        db = flask.current_app.container.get('db')
+
         repos = []
         if full_name is None:
             print('Performing repository check on all public repositories')

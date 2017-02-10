@@ -1,9 +1,6 @@
 import flask
-import flask_sqlalchemy
 import functools
-import injector
 
-from ..github import GitHubAPI
 from ..models import Repository, Push, Release
 
 webhooks = flask.Blueprint('webhooks', __name__, url_prefix='/webhook/github')
@@ -80,10 +77,11 @@ hooks = {
 
 
 @webhooks.route('', methods=['POST'])
-@injector.inject(db=flask_sqlalchemy.SQLAlchemy,
-                 gh_api=GitHubAPI)
-def gh_webhook(db, gh_api):
+def gh_webhook():
     """Point for GitHub webhook msgs (POST handler)"""
+    db = flask.current_app.container.get('db')
+    gh_api = flask.current_app.container.get('gh_api')
+
     headers = flask.request.headers
     agent = headers.get('User-Agent', '')
     signature = headers.get('X-Hub-Signature', '')

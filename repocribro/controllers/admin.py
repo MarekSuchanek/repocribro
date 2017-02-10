@@ -1,9 +1,6 @@
 import flask
-import flask_sqlalchemy
-import injector
 import sqlalchemy
 
-from ..extending import ExtensionsMaster
 from ..models import User, Role, Repository
 from ..security import permissions
 
@@ -13,9 +10,10 @@ admin = flask.Blueprint('admin', __name__, url_prefix='/admin')
 
 @admin.route('')
 @permissions.admin_role.require(404)
-@injector.inject(ext_master=ExtensionsMaster)
-def index(ext_master):
+def index():
     """Administration zone dashboard (GET handler)"""
+    ext_master = flask.current_app.container.get('ext_master')
+
     tabs = {}
     ext_master.call('view_admin_index_tabs',
                     tabs_dict=tabs)
@@ -29,9 +27,10 @@ def index(ext_master):
 
 @admin.route('/account/<login>')
 @permissions.admin_role.require(404)
-@injector.inject(db=flask_sqlalchemy.SQLAlchemy)
-def account_detail(db, login):
+def account_detail(login):
     """Account administration (GET handler)"""
+    db = flask.current_app.container.get('db')
+
     user = db.session.query(User).filter_by(login=login).first()
     if user is None:
         flask.abort(404)
@@ -40,9 +39,10 @@ def account_detail(db, login):
 
 @admin.route('/account/<login>/ban', methods=['POST'])
 @permissions.admin_role.require(404)
-@injector.inject(db=flask_sqlalchemy.SQLAlchemy)
-def account_ban(db, login):
+def account_ban(login):
     """Ban (make inactive) account (POST handler)"""
+    db = flask.current_app.container.get('db')
+
     user = db.session.query(User).filter_by(login=login).first()
     if user is None:
         flask.abort(404)
@@ -67,9 +67,10 @@ def account_ban(db, login):
 
 @admin.route('/account/<login>/delete', methods=['POST'])
 @permissions.admin_role.require(404)
-@injector.inject(db=flask_sqlalchemy.SQLAlchemy)
-def account_delete(db, login):
+def account_delete(login):
     """Delete account (POST handler)"""
+    db = flask.current_app.container.get('db')
+
     user = db.session.query(User).filter_by(login=login).first()
     if user is None:
         flask.abort(404)
@@ -84,9 +85,10 @@ def account_delete(db, login):
 
 @admin.route('/repository/<login>/<reponame>')
 @permissions.admin_role.require(404)
-@injector.inject(db=flask_sqlalchemy.SQLAlchemy)
-def repo_detail(db, login, reponame):
+def repo_detail(login, reponame):
     """Repository administration (GET handler)"""
+    db = flask.current_app.container.get('db')
+
     repo = db.session.query(Repository).filter_by(
         full_name=Repository.make_full_name(login, reponame)
     ).first()
@@ -100,9 +102,10 @@ def repo_detail(db, login, reponame):
 
 @admin.route('/repository/<login>/<reponame>/visibility', methods=['POST'])
 @permissions.admin_role.require(404)
-@injector.inject(db=flask_sqlalchemy.SQLAlchemy)
-def repo_visibility(db, login, reponame):
+def repo_visibility(login, reponame):
     """Change repository visibility (POST handler)"""
+    db = flask.current_app.container.get('db')
+
     repo = db.session.query(Repository).filter_by(
         full_name=Repository.make_full_name(login, reponame)
     ).first()
@@ -132,9 +135,10 @@ def repo_visibility(db, login, reponame):
 
 @admin.route('/repository/<login>/<reponame>/delete', methods=['POST'])
 @permissions.admin_role.require(404)
-@injector.inject(db=flask_sqlalchemy.SQLAlchemy)
-def repo_delete(db, login, reponame):
+def repo_delete(login, reponame):
     """Delete repository  (POST handler)"""
+    db = flask.current_app.container.get('db')
+
     repo = db.session.query(Repository).filter_by(
         full_name=Repository.make_full_name(login, reponame)
     ).first()
@@ -149,9 +153,10 @@ def repo_delete(db, login, reponame):
 
 @admin.route('/role/<name>')
 @permissions.admin_role.require(404)
-@injector.inject(db=flask_sqlalchemy.SQLAlchemy)
-def role_detail(db, name):
+def role_detail(name):
     """Role administration (GET handler)"""
+    db = flask.current_app.container.get('db')
+
     role = db.session.query(Role).filter_by(name=name).first()
     if role is None:
         flask.abort(404)
@@ -160,9 +165,10 @@ def role_detail(db, name):
 
 @admin.route('/role/<name>/edit', methods=['POST'])
 @permissions.admin_role.require(404)
-@injector.inject(db=flask_sqlalchemy.SQLAlchemy)
-def role_edit(db, name):
+def role_edit(name):
     """Edit role (POST handler)"""
+    db = flask.current_app.container.get('db')
+
     role = db.session.query(Role).filter_by(name=name).first()
     if role is None:
         flask.abort(404)
@@ -185,9 +191,10 @@ def role_edit(db, name):
 
 @admin.route('/role/<name>/delete', methods=['POST'])
 @permissions.admin_role.require(404)
-@injector.inject(db=flask_sqlalchemy.SQLAlchemy)
-def role_delete(db, name):
+def role_delete(name):
     """Delete role (POST handler)"""
+    db = flask.current_app.container.get('db')
+
     role = db.session.query(Role).filter_by(name=name).first()
     if role is None:
         flask.abort(404)
@@ -200,9 +207,10 @@ def role_delete(db, name):
 
 @admin.route('/roles/create', methods=['POST'])
 @permissions.admin_role.require(404)
-@injector.inject(db=flask_sqlalchemy.SQLAlchemy)
-def role_create(db):
+def role_create():
     """Create new role (POST handler)"""
+    db = flask.current_app.container.get('db')
+
     name = flask.request.form.get('name', '')
     desc = flask.request.form.get('description', None)
     if name == '':
@@ -221,9 +229,10 @@ def role_create(db):
 
 @admin.route('/role/<name>/add', methods=['POST'])
 @permissions.admin_role.require(404)
-@injector.inject(db=flask_sqlalchemy.SQLAlchemy)
 def role_assignment_add(db, name):
     """Assign role to user (POST handler)"""
+    db = flask.current_app.container.get('db')
+
     login = flask.request.form.get('login', '')
     user = db.session.query(User).filter_by(login=login).first()
     role = db.session.query(Role).filter_by(name=name).first()
@@ -243,9 +252,10 @@ def role_assignment_add(db, name):
 
 @admin.route('/role/<name>/remove', methods=['POST'])
 @permissions.admin_role.require(404)
-@injector.inject(db=flask_sqlalchemy.SQLAlchemy)
-def role_assignment_remove(db, name):
+def role_assignment_remove(name):
     """Remove assignment of role to user (POST handler)"""
+    db = flask.current_app.container.get('db')
+
     login = flask.request.form.get('login', '')
     user = db.session.query(User).filter_by(login=login).first()
     role = db.session.query(Role).filter_by(name=name).first()

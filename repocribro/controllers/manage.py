@@ -1,11 +1,7 @@
 import flask
 import flask_login
-import flask_sqlalchemy
-import injector
 import json
 
-from ..extending import ExtensionsMaster
-from ..github import GitHubAPI
 from ..models import Repository
 
 #: Manage controller blueprint
@@ -14,10 +10,11 @@ manage = flask.Blueprint('manage', __name__, url_prefix='/manage')
 
 @manage.route('')
 @flask_login.login_required
-@injector.inject(ext_master=ExtensionsMaster,
-                 gh_api=GitHubAPI)
-def dashboard(ext_master, gh_api):
+def dashboard():
     """Management zone dashboard (GET handler)"""
+    ext_master = flask.current_app.container.get('ext_master')
+    gh_api = flask.current_app.container.get('gh_api')
+
     tabs = {}
     ext_master.call('view_manage_dashboard_tabs', tabs_dict=tabs,
                     gh_api=gh_api)
@@ -31,13 +28,14 @@ def dashboard(ext_master, gh_api):
 
 @manage.route('/profile/update')
 @flask_login.login_required
-@injector.inject(db=flask_sqlalchemy.SQLAlchemy,
-                 gh_api=GitHubAPI)
-def update_profile(db, gh_api):
+def update_profile():
     """Update user info from GitHub (GET handler)
 
     :todo: protect from updating too often
     """
+    db = flask.current_app.container.get('db')
+    gh_api = flask.current_app.container.get('gh_api')
+
     user_data = gh_api.get_data('/user')
     gh_user = flask_login.current_user.github_user
     gh_user.update_from_dict(user_data)
@@ -47,9 +45,10 @@ def update_profile(db, gh_api):
 
 @manage.route('/repos')
 @flask_login.login_required
-@injector.inject(gh_api=GitHubAPI)
-def repositories(gh_api):
+def repositories():
     """List user repositories from GitHub (GET handler)"""
+    gh_api = flask.current_app.container.get('gh_api')
+
     repos_data = gh_api.get_data('/user/repos')
     user = flask_login.current_user.github_user
     active_ids = [repo.github_id for repo in user.repositories]
@@ -105,9 +104,10 @@ def update_webhook(gh_api, repo):
 
 @manage.route('/repo/<reponame>')
 @flask_login.login_required
-@injector.inject(db=flask_sqlalchemy.SQLAlchemy)
-def repo_detail(db, reponame):
+def repo_detail(reponame):
     """Repository detail (GET handler)"""
+    db = flask.current_app.container.get('db')
+
     user = flask_login.current_user.github_user
     full_name = Repository.make_full_name(user.login, reponame)
     repo = db.session.query(Repository).filter_by(full_name=full_name).first()
@@ -119,13 +119,14 @@ def repo_detail(db, reponame):
 
 @manage.route('/repo/<reponame>/update')
 @flask_login.login_required
-@injector.inject(db=flask_sqlalchemy.SQLAlchemy,
-                 gh_api=GitHubAPI)
-def repo_update(db, gh_api, reponame):
+def repo_update(reponame):
     """Update repo info from GitHub (GET handler)
 
     :todo: protect from updating too often
     """
+    db = flask.current_app.container.get('db')
+    gh_api = flask.current_app.container.get('gh_api')
+
     user = flask_login.current_user.github_user
     full_name = Repository.make_full_name(user.login, reponame)
     repo = db.session.query(Repository).filter_by(full_name=full_name).first()
@@ -141,13 +142,14 @@ def repo_update(db, gh_api, reponame):
 
 @manage.route('/repo/<reponame>/activate', methods=['POST'])
 @flask_login.login_required
-@injector.inject(db=flask_sqlalchemy.SQLAlchemy,
-                 gh_api=GitHubAPI)
-def repo_activate(db, gh_api, reponame):
+def repo_activate(reponame):
     """Activate repo in app from GitHub (POST handler)
 
     :todo: protect from activating too often
     """
+    db = flask.current_app.container.get('db')
+    gh_api = flask.current_app.container.get('gh_api')
+
     visibility_type = flask.request.form.get('enable', type=int)
     if visibility_type not in (
         Repository.VISIBILITY_HIDDEN,
@@ -189,10 +191,11 @@ def repo_activate(db, gh_api, reponame):
 
 @manage.route('/repo/<reponame>/deactivate', methods=['POST'])
 @flask_login.login_required
-@injector.inject(db=flask_sqlalchemy.SQLAlchemy,
-                 gh_api=GitHubAPI)
-def repo_deactivate(db, gh_api, reponame):
+def repo_deactivate(reponame):
     """Deactivate repo in app from GitHub (POST handler)"""
+    db = flask.current_app.container.get('db')
+    gh_api = flask.current_app.container.get('gh_api')
+
     user = flask_login.current_user.github_user
     full_name = Repository.make_full_name(user.login, reponame)
 
@@ -215,10 +218,11 @@ def repo_deactivate(db, gh_api, reponame):
 
 @manage.route('/repos/delete', methods=['POST'])
 @flask_login.login_required
-@injector.inject(db=flask_sqlalchemy.SQLAlchemy,
-                 gh_api=GitHubAPI)
-def repo_delete(db, gh_api):
+def repo_delete():
     """Delete repo (in app) from GitHub (POST handler)"""
+    db = flask.current_app.container.get('db')
+    gh_api = flask.current_app.container.get('gh_api')
+
     reponame = flask.request.form.get('reponame')
     user = flask_login.current_user.github_user
     full_name = Repository.make_full_name(user.login, reponame)
@@ -237,10 +241,11 @@ def repo_delete(db, gh_api):
 
 @manage.route('/orgs')
 @flask_login.login_required
-@injector.inject(gh_api=GitHubAPI)
-def organizations(gh_api):
+def organizations():
     """List user organizations from GitHub (GET handler)"""
     flask.abort(501)
+    gh_api = flask.current_app.container.get('gh_api')
+
     orgs_data = gh_api.get_data('/user/orgs')
     return flask.render_template(
         'manage/orgs.html',
