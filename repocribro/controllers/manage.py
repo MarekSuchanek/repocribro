@@ -53,8 +53,7 @@ def repositories():
     user = flask_login.current_user.github_user
     active_ids = [repo.github_id for repo in user.repositories]
     return flask.render_template(
-        'manage/repos.html',
-        repos=[Repository.create_from_dict(d, user) for d in repos_data],
+        'manage/repos.html', repos=repos_data,
         Repository=Repository, active_ids=active_ids
     )
 
@@ -73,9 +72,7 @@ def has_good_webhook(gh_api, repo):
     """
     if repo.webhook_id is None:
         return False
-    print(repo.webhook_id)
     webhook = gh_api.webhook_get(repo.full_name, repo.webhook_id)
-    print(webhook)
     return webhook is None
 
 
@@ -93,11 +90,9 @@ def update_webhook(gh_api, repo):
     """
     if not has_good_webhook(gh_api, repo):
         repo.webhook_id = None
-    print(repo.webhook_id)
     if repo.webhook_id is None:
         # Create new webhook
         webhook = gh_api.webhook_create(repo.full_name)
-        print(webhook)
         if webhook is None:
             return False
         repo.webhook_id = webhook['id']
@@ -134,7 +129,7 @@ def repo_update(reponame):
     repo = db.session.query(Repository).filter_by(full_name=full_name).first()
     if repo is None:
         flask.abort(404)
-    repo_data = gh_api.get('/repos/' + full_name)
+    repo_data = gh_api.get_data('/repos/' + full_name)
     repo.update_from_dict(repo_data)
     db.session.commit()
     return flask.redirect(
