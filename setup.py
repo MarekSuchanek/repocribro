@@ -52,6 +52,7 @@ setup(
         'pytest-runner',
     ],
     tests_require=[
+        'betamax',
         'pytest-pep8',
         'pytest-cov',
         'pytest'

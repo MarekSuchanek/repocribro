@@ -1,10 +1,13 @@
+import betamax
 import pytest
 import flask
 import os
 import json
+from betamax.cassette import cassette
 
 from repocribro import create_app
 from repocribro.database import db as _db
+from repocribro.github import GitHubAPI
 
 ABS_PATH = os.path.abspath(os.path.dirname(__file__))
 FLASK_CONFIG_FILE = ABS_PATH + '/fixtures/config.cfg'
@@ -12,13 +15,67 @@ TESTDB_PATH = '/tmp/repocribro_test.db'
 FIXTURES_PATH = ABS_PATH + '/fixtures'
 GITHUB_DATA = FIXTURES_PATH + '/github_data/{}.json'
 
-test_errors_bp = flask.Blueprint('test-error', __name__,
-                                 url_prefix='/test-error')
+
+def sanitize_requests(interaction, current_cassette):
+    headers = interaction.data['request']['headers']
+    auth = headers.get('Authorization')[0]
+    if auth is None:
+        return
+    current_cassette.placeholders.append(
+        cassette.Placeholder(
+            placeholder='<AUTH>',
+            replace=auth
+        )
+    )
 
 
-@test_errors_bp.route('/<int:err_code>')
+def sanitize_token(interaction, current_cassette):
+    sanitize_requests(interaction, current_cassette)
+
+
+with betamax.Betamax.configure() as config:
+    config.cassette_library_dir = 'tests/fixtures/cassettes'
+    if 'GH_CLIENT_ID' in os.environ and 'GH_CLIENT_SECRET' in os.environ:
+        config.default_cassette_options['record_mode'] = 'all'
+    else:
+        config.default_cassette_options['record_mode'] = 'none'
+    config.before_record(callback=sanitize_token)
+
+
+@pytest.fixture
+def github_api(betamax_session):
+    """TwitterConnection with betamax session"""
+    betamax_session.headers.update({'accept-encoding': 'identity'})
+    api_key = os.environ.get('GH_CLIENT_ID', 'fake_key')
+    api_secret = os.environ.get('GH_CLIENT_SECRET', 'fake_secret')
+    webhooks_secret = os.environ.get('WEBHOOKS_SECRET', 'webhooks_secret')
+    return GitHubAPI(api_key, api_secret, webhooks_secret,
+                     session=betamax_session)
+
+
+test = flask.Blueprint('test', __name__, url_prefix='/test')
+
+
+@test.route('/error/<int:err_code>')
 def error_invoker(err_code):
     flask.abort(err_code)
+
+
+@test.route('/login/<username>')
+def fake_login(username):
+    from repocribro.security import login
+    from repocribro.models import User
+    db = flask.current_app.container.get('db')
+    user = db.session.query(User).filter_by(login=username).first()
+    login(user.user_account)
+    return 'OK'
+
+
+@test.route('/logout')
+def fake_logout():
+    from repocribro.security import logout
+    logout()
+    return 'OK'
 
 
 # @see http://alexmic.net/flask-sqlalchemy-pytest/
@@ -27,7 +84,7 @@ def app(request):
     """Session-wide test `Flask` application."""
     os.environ['REPOCRIBRO_CONFIG_FILE'] = FLASK_CONFIG_FILE
     app = create_app(FLASK_CONFIG_FILE)
-    app.register_blueprint(test_errors_bp)
+    app.register_blueprint(test)
 
     # Establish an application context before running the tests.
     ctx = app.app_context()
