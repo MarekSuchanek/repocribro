@@ -34,6 +34,10 @@
             <th>URL @repocribro:</th>
             <td>{{ repo|repo_link(show_secret=True) }}</td>
         </tr>
+        <tr>
+            <th>Webhook ID:</th>
+            <td>{{ repo.webhook_id }}</td>
+        </tr>
     </table>
 
     <div class="row">

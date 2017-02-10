@@ -93,9 +93,11 @@ def update_webhook(gh_api, repo):
     """
     if not has_good_webhook(gh_api, repo):
         repo.webhook_id = None
+    print(repo.webhook_id)
     if repo.webhook_id is None:
         # Create new webhook
         webhook = gh_api.webhook_create(repo.full_name)
+        print(webhook)
         if webhook is None:
             return False
         repo.webhook_id = webhook['id']
@@ -163,7 +165,6 @@ def repo_activate(reponame):
     full_name = Repository.make_full_name(user.login, reponame)
 
     repo = db.session.query(Repository).filter_by(full_name=full_name).first()
-    # TODO: some bug causing that webhook_id is NONE even when is in DB
 
     response = gh_api.get('/repos/' + full_name)
     if response.status_code != 200:
@@ -205,10 +206,10 @@ def repo_deactivate(reponame):
     if repo.webhook_id is not None:
         if gh_api.webhook_delete(repo.full_name, repo.webhook_id):
             flask.flash('Webhook was deactivated', 'success')
-            repo.webhook_id = None
-            db.session.commit()
         else:
             flask.flash('GitHub couldn\'t delete the webhook', 'warning')
+        repo.webhook_id = None
+        db.session.commit()
     else:
         flask.flash('There is no registered the webhook', 'info')
     return flask.redirect(
