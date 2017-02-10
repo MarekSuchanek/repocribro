@@ -28,13 +28,15 @@ def gh_webhook():
     data = flask.request.get_json()
 
     if not agent.startswith('GitHub-Hookshot/'):
-        return flask.abort(404)
+        flask.abort(404)
     if data is None or 'repository' not in data:
-        return flask.abort(400)
+        flask.abort(404)
     if not gh_api.webhook_verify_signature(data, signature):
-        return flask.abort(404)
+        flask.abort(404)
 
-    repo = db.session.query(Repository).get_or_404(data['repository']['id'])
+    repo = db.session.query(Repository).get(data['repository']['id'])
+    if repo is None:
+        flask.abort(404)
 
     for event_processor in hooks.get(event, []):
         event_processor(db=db, repo=repo, data=data, delivery_id=delivery_id)
