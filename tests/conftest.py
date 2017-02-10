@@ -303,6 +303,8 @@ class FakeGitHubAPI:
         return flask.url_for('auth.github_callback')
 
     def login(self, session_code):
+        if session_code == 'bad_code':
+            return False
         flask.session['github_token'] = 'GH_TOKEN'
         flask.session['github_scope'] = 'GH_SCOPE'
         return True
