@@ -49,13 +49,16 @@ def github_callback():
 
     session_code = flask.request.args.get('code')
     if gh_api.login(session_code):
+        flask.session['github_token'] = gh_api.token
+        flask.session['github_scope'] = gh_api.scope
         user_account, is_new = github_callback_get_account(db, gh_api)
         security_login(user_account)
         if not user_account.active:
             flask.flash('Sorry, but your account is deactivated. '
                         'Please contact admin for details', 'error')
             security_logout()
-            gh_api.logout()
+            flask.session.pop('github_token')
+            flask.session.pop('github_scope')
             return flask.redirect(flask.url_for('core.index'))
         if is_new:
             flask.flash('You account has been created via GitHub. '
@@ -72,9 +75,8 @@ def github_callback():
 @auth.route('/logout')
 def logout():
     """Logout currently logged user (GET handler)"""
-
-    gh_api = flask.current_app.container.get('gh_api')
     security_logout()
-    gh_api.logout()
+    flask.session.pop('github_token')
+    flask.session.pop('github_scope')
     flask.flash('You are now logged out, see you soon!', 'info')
     return flask.redirect(flask.url_for('core.index'))

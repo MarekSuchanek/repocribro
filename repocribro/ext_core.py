@@ -112,19 +112,23 @@ def gh_event_repository(db, repo, payload, actor):
         repo.visibility_type = Repository.VISIBILITY_PRIVATE
 
 
-def make_githup_api(cfg):
-    """Simple factory for making the GitHub API client
+def make_githup_api_factory(cfg):
+    """Simple factory for making the GitHub API client factory
 
     :param cfg: Configuration of the application
     :type cfg: ``configparser.ConfigParser``
-    :return: GitHub API client
-    :rtype: ``repocribro.github.GitHubAPI``
+    :return: GitHub API client factory
+    :rtype: ``function``
     """
-    return GitHubAPI(
-        cfg.get('github', 'client_id'),
-        cfg.get('github', 'client_secret'),
-        cfg.get('github', 'webhooks_secret')
-    )
+    def github_api_factory(token=None, session=None):
+        return GitHubAPI(
+            cfg.get('github', 'client_id'),
+            cfg.get('github', 'client_secret'),
+            cfg.get('github', 'webhooks_secret'),
+            session=session,
+            token=token
+        )
+    return github_api_factory
 
 
 class CoreExtension(Extension):
@@ -185,9 +189,9 @@ class CoreExtension(Extension):
 
     def init_container(self):
         """Init service DI container of the app"""
-        self.app.container.set_singleton(
+        self.app.container.set_factory(
             'gh_api',
-            make_githup_api(self.app.container.get('config'))
+            make_githup_api_factory(self.app.container.get('config'))
         )
 
     def view_core_search_tabs(self, query, tabs_dict):
@@ -331,8 +335,6 @@ class CoreExtension(Extension):
         :param tabs_dict: Target dictionary for tabs
         :type tabs_dict: dict of str: ``repocribro.extending.helpers.ViewTab``
         """
-        gh_api = self.app.container.get('gh_api')
-
         repos = flask_login.current_user.github_user.repositories
 
         tabs_dict['repositories'] = ViewTab(
@@ -355,8 +357,8 @@ class CoreExtension(Extension):
             'session', 'Session', 2,
             flask.render_template(
                 'manage/dashboard/session_tab.html',
-                token=gh_api.get_token(),
-                scopes=gh_api.get_scope()
+                token=flask.session['github_token'],
+                scopes=flask.session['github_scope']
             ),
             octicon='mark-github'
         )

@@ -32,7 +32,9 @@ def update_profile():
     :todo: protect from updating too often
     """
     db = flask.current_app.container.get('db')
-    gh_api = flask.current_app.container.get('gh_api')
+    gh_api = flask.current_app.container.get(
+        'gh_api', token=flask.session['github_token']
+    )
 
     user_data = gh_api.get_data('/user')
     gh_user = flask_login.current_user.github_user
@@ -45,7 +47,9 @@ def update_profile():
 @flask_login.login_required
 def repositories():
     """List user repositories from GitHub (GET handler)"""
-    gh_api = flask.current_app.container.get('gh_api')
+    gh_api = flask.current_app.container.get(
+        'gh_api', token=flask.session['github_token']
+    )
 
     repos_data = gh_api.get_data('/user/repos')
     user = flask_login.current_user.github_user
@@ -90,7 +94,10 @@ def update_webhook(gh_api, repo):
         repo.webhook_id = None
     if repo.webhook_id is None:
         # Create new webhook
-        webhook = gh_api.webhook_create(repo.full_name)
+        webhook = gh_api.webhook_create(
+            repo.full_name,
+            flask.url_for(gh_api.WEBHOOK_CONTROLLER, _external=True)
+        )
         if webhook is None:
             return False
         repo.webhook_id = webhook['id']
@@ -120,7 +127,9 @@ def repo_update(reponame):
     :todo: protect from updating too often
     """
     db = flask.current_app.container.get('db')
-    gh_api = flask.current_app.container.get('gh_api')
+    gh_api = flask.current_app.container.get(
+        'gh_api', token=flask.session['github_token']
+    )
 
     user = flask_login.current_user.github_user
     full_name = Repository.make_full_name(user.login, reponame)
@@ -143,7 +152,9 @@ def repo_activate(reponame):
     :todo: protect from activating too often
     """
     db = flask.current_app.container.get('db')
-    gh_api = flask.current_app.container.get('gh_api')
+    gh_api = flask.current_app.container.get(
+        'gh_api', token=flask.session['github_token']
+    )
 
     visibility_type = flask.request.form.get('enable', type=int)
     if visibility_type not in (
@@ -188,7 +199,9 @@ def repo_activate(reponame):
 def repo_deactivate(reponame):
     """Deactivate repo in app from GitHub (POST handler)"""
     db = flask.current_app.container.get('db')
-    gh_api = flask.current_app.container.get('gh_api')
+    gh_api = flask.current_app.container.get(
+        'gh_api', token=flask.session['github_token']
+    )
 
     user = flask_login.current_user.github_user
     full_name = Repository.make_full_name(user.login, reponame)
@@ -215,7 +228,9 @@ def repo_deactivate(reponame):
 def repo_delete():
     """Delete repo (in app) from GitHub (POST handler)"""
     db = flask.current_app.container.get('db')
-    gh_api = flask.current_app.container.get('gh_api')
+    gh_api = flask.current_app.container.get(
+        'gh_api', token=flask.session['github_token']
+    )
 
     reponame = flask.request.form.get('reponame')
     user = flask_login.current_user.github_user
@@ -238,7 +253,9 @@ def repo_delete():
 def organizations():
     """List user organizations from GitHub (GET handler)"""
     flask.abort(501)
-    gh_api = flask.current_app.container.get('gh_api')
+    gh_api = flask.current_app.container.get(
+        'gh_api', token=flask.session['github_token']
+    )
 
     orgs_data = gh_api.get_data('/user/orgs')
     return flask.render_template(

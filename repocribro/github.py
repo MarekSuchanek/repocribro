@@ -1,6 +1,5 @@
 import hashlib
 import hmac
-import flask
 import json
 import requests
 
@@ -29,23 +28,24 @@ class GitHubAPI:
     WEBHOOK_CONTROLLER = 'webhooks.gh_webhook'
 
     def __init__(self, client_id, client_secret, webhooks_secret,
-                 session=None):
+                 session=None, token=None):
         self.client_id = client_id
         self.client_secret = client_secret
         self.webhooks_secret = webhooks_secret
         self.session = session or requests.Session()
+        self.token = token
+        self.scope = []
 
-    @staticmethod
-    def _get_auth_header():
+    def _get_auth_header(self):
         """Prepare auth header fields (empty if no token provided)
 
         :return: Headers for the request
         :rtype: dict
         """
-        if 'github_token' not in flask.session:
+        if self.token is None:
             return {}
         return {
-            'Authorization': 'token {}'.format(flask.session['github_token'])
+            'Authorization': 'token {}'.format(self.token)
         }
 
     def get_auth_url(self):
@@ -80,32 +80,9 @@ class GitHubAPI:
         if response.status_code != 200:
             return False
         data = response.json()
-        token = flask.escape(data['access_token'])
-        scope = [flask.escape(x) for x in data['scope'].split(',')]
-        flask.session['github_token'] = token
-        flask.session['github_scope'] = scope
+        self.token = data['access_token']
+        self.scope = [x for x in data['scope'].split(',')]
         return True
-
-    def get_token(self):
-        """Retrieve GitHub OAuth token for current user
-
-        :return: GitHub token for current user
-        :rtype: str
-        """
-        return flask.session['github_token']
-
-    def get_scope(self):
-        """Retrieve GitHub OAuth scope for current user
-
-        :return: GitHub scope for current user
-        :rtype: str
-        """
-        return flask.session['github_scope']
-
-    def logout(self):
-        """Logout the current user from GitHub session (destroy token)"""
-        for key in ('github_token', 'github_scope'):
-            flask.session.pop(key, None)
 
     def get(self, what):
         """Perform GET request on GitHub API
@@ -162,22 +139,20 @@ class GitHubAPI:
             return response.json()
         return []
 
-    def webhook_create(self, full_name, events=None, hook_url=None):
+    def webhook_create(self, full_name, hook_url, events=None):
         """Create new webhook for specified repository
 
         :param full_name: Full name of the repository
         :type full_name: str
-        :param events: List of requested events for that webhook
-        :type events: list of str
         :param hook_url: URL where the webhook data will be sent
         :type hook_url: str
+        :param events: List of requested events for that webhook
+        :type events: list of str
         :return: The created webhook data
         :rtype: dict or None
         """
         if events is None:
             events = self.WEBHOOKS
-        if hook_url is None:
-            hook_url = flask.url_for(self.WEBHOOK_CONTROLLER, _external=True)
         data = {
             'name': 'web',
             'active': True,

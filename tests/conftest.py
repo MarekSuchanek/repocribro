@@ -372,13 +372,27 @@ class FakeGitHubAPI:
             }
         ]
     }
+    #: URL to GitHub API
+    API_URL = 'https://api.github.com'
+    #: URL for OAuth request at GitHub
+    AUTH_URL = 'https://github.com/login/oauth/authorize?scope={}&client_id={}'
+    #: URL for OAuth token at GitHub
+    TOKEN_URL = 'https://github.com/login/oauth/access_token'
+    #: Scopes for OAuth request
+    SCOPES = ['user', 'repo', 'admin:repo_hook']
+    #: Required webhooks to be registered
+    WEBHOOKS = ['push', 'release', 'repository']
+    #: Controller for incoming webhook events
+    WEBHOOK_CONTROLLER = 'webhooks.gh_webhook'
 
     def __init__(self, client_id='', client_secret='', webhooks_secret='',
-                 session=None):
+                 session=None, token=None):
         self.client_id = client_id
         self.client_secret = client_secret
         self.webhooks_secret = webhooks_secret
         self.session = session
+        self.token = token
+        self.scope = []
 
     @staticmethod
     def _get_auth_header():
