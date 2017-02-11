@@ -61,5 +61,5 @@ class ExtensionsMaster:
         :param kwargs: Keywords args to be passed to the hook operation
         :return: Result of the operation on the requested hook
         """
-        return [ext.call(hook_name, default, args, **kwargs)
+        return [ext.call(hook_name, default, *args, **kwargs)
                 for ext in self.exts]

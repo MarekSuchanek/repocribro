@@ -137,7 +137,7 @@ class CoreExtension(Extension):
     #: GitHub URL of core extension
     GH_URL = 'https://github.com/MarekSuchanek/repocribro'
 
-    def __init__(self, master, app, db, *args, **kwargs):
+    def __init__(self, master, app, db):
         super().__init__(master, app, db)
         self.migrate = flask_migrate.Migrate(self.app, self.db)
 
@@ -157,8 +157,8 @@ class CoreExtension(Extension):
         return all_filters
 
     @staticmethod
-    def get_gh_webhook_processors(*args, **kwargs):
-        """"""
+    def get_gh_webhook_processors():
+        """Get all GitHub webhooks processory"""
         return {
             'push': [gh_webhook_push],
             'release': [gh_webhook_release],
@@ -166,20 +166,16 @@ class CoreExtension(Extension):
         }
 
     @staticmethod
-    def get_gh_event_processors(*args, **kwargs):
-        """"""
+    def get_gh_event_processors():
+        """Get all GitHub events processors"""
         return {
             'push': [gh_event_push],
             'release': [gh_event_release],
             'repository': [gh_event_repository],
         }
 
-    def init_business(self, *args, **kwargs):
-        """Init business layer (other extensions, what is needed)
-
-        :param args: not used
-        :param kwargs: not used
-        """
+    def init_business(self):
+        """Init business layer (other extensions, what is needed)"""
         from .security import init_login_manager
         login_manager, principals = init_login_manager(self.db)
         login_manager.init_app(self.app)
@@ -187,21 +183,21 @@ class CoreExtension(Extension):
         from .api import create_api
         api_manager = create_api(self.app, self.db)
 
-    def init_container(self, *args, **kwargs):
+    def init_container(self):
+        """Init service DI container of the app"""
         self.app.container.set_singleton(
             'gh_api',
             make_githup_api(self.app.container.get('config'))
         )
 
-    def view_core_search_tabs(self, *args, **kwargs):
+    def view_core_search_tabs(self, query, tabs_dict):
         """Prepare tabs for search view of core controller
 
-        :param args: not used
-        :param kwargs: Must contain ``query`` and ``tabs_dict``
+        :param query: Fulltext query for the search
+        :type query: str
+        :param tabs_dict: Target dictionary for tabs
+        :type tabs_dict: dict of str: ``repocribro.extending.helpers.ViewTab``
         """
-        query = kwargs.get('query', '')
-        tabs_dict = kwargs.get('tabs_dict')
-
         from .models import User, Organization, Repository
         users = User.fulltext_query(
             query, self.db.session.query(User)
@@ -229,15 +225,14 @@ class CoreExtension(Extension):
             octicon='organization', badge=Badge(len(orgs))
         )
 
-    def view_core_user_detail_tabs(self, *args, **kwargs):
+    def view_core_user_detail_tabs(self, user, tabs_dict):
         """Prepare tabs for user detail view of core controller
 
-        :param args: not used
-        :param kwargs: Must contain target ``tabs_dict`` and ``user``
+        :param user: User which details should be shown
+        :type user: ``repocribro.models.User``
+        :param tabs_dict: Target dictionary for tabs
+        :type tabs_dict: dict of str: ``repocribro.extending.helpers.ViewTab``
         """
-        user = kwargs.get('user')
-        tabs_dict = kwargs.get('tabs_dict')
-
         tabs_dict['details'] = ViewTab(
             'details', 'Details', 0,
             flask.render_template('core/user/details_tab.html', user=user),
@@ -251,15 +246,14 @@ class CoreExtension(Extension):
             octicon='repo', badge=Badge(len(user.repositories))
         )
 
-    def view_core_org_detail_tabs(self, *args, **kwargs):
+    def view_core_org_detail_tabs(self, org, tabs_dict):
         """Prepare tabs for org detail view of core controller
 
-        :param args: not used
-        :param kwargs: Must contain target ``tabs_dict`` and ``org``
+        :param org: Organization which details should be shown
+        :type org: ``repocribro.models.Organization``
+        :param tabs_dict: Target dictionary for tabs
+        :type tabs_dict: dict of str: ``repocribro.extending.helpers.ViewTab``
         """
-        org = kwargs.get('org')
-        tabs_dict = kwargs.get('tabs_dict')
-
         tabs_dict['details'] = ViewTab(
             'details', 'Details', 0,
             flask.render_template('core/org/details_tab.html', org=org),
@@ -273,15 +267,14 @@ class CoreExtension(Extension):
             octicon='repo', badge=Badge(len(org.repositories))
         )
 
-    def view_core_repo_detail_tabs(self, *args, **kwargs):
+    def view_core_repo_detail_tabs(self, repo, tabs_dict):
         """Prepare tabs for repo detail view of core controller
 
-        :param args: not used
-        :param kwargs: Must contain target ``tabs_dict`` and ``repo``
+        :param repo: Repository which details should be shown
+        :type repo: ``repocribro.models.Repository``
+        :param tabs_dict: Target dictionary for tabs
+        :type tabs_dict: dict of str: ``repocribro.extending.helpers.ViewTab``
         """
-        repo = kwargs.get('repo')
-        tabs_dict = kwargs.get('tabs_dict')
-
         tabs_dict['details'] = ViewTab(
             'details', 'Details', 0,
             flask.render_template('core/repo/details_tab.html', repo=repo),
@@ -298,14 +291,12 @@ class CoreExtension(Extension):
             octicon='git-commit', badge=Badge(len(repo.pushes))
         )
 
-    def view_admin_index_tabs(self, *args, **kwargs):
+    def view_admin_index_tabs(self, tabs_dict):
         """Prepare tabs for index view of admin controller
 
-        :param args: not used
-        :param kwargs: Must contain target ``tabs_dict``
+        :param tabs_dict: Target dictionary for tabs
+        :type tabs_dict: dict of str: ``repocribro.extending.helpers.ViewTab``
         """
-        tabs_dict = kwargs.get('tabs_dict')
-
         from .models import Repository, Role, UserAccount
         accounts = self.db.session.query(UserAccount).all()
         roles = self.db.session.query(Role).all()
@@ -334,14 +325,13 @@ class CoreExtension(Extension):
             octicon='code', badge=Badge(len(exts))
         )
 
-    def view_manage_dashboard_tabs(self, *args, **kwargs):
+    def view_manage_dashboard_tabs(self, tabs_dict):
         """Prepare tabs for dashboard view of manage controller
 
-        :param args: not used
-        :param kwargs: Must contain target ``tabs_dict`` and ``gh_api``
+        :param tabs_dict: Target dictionary for tabs
+        :type tabs_dict: dict of str: ``repocribro.extending.helpers.ViewTab``
         """
-        tabs_dict = kwargs.get('tabs_dict')
-        gh_api = kwargs.get('gh_api')
+        gh_api = self.app.container.get('gh_api')
 
         repos = flask_login.current_user.github_user.repositories
 

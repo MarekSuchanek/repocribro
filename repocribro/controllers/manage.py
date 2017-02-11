@@ -13,11 +13,9 @@ manage = flask.Blueprint('manage', __name__, url_prefix='/manage')
 def dashboard():
     """Management zone dashboard (GET handler)"""
     ext_master = flask.current_app.container.get('ext_master')
-    gh_api = flask.current_app.container.get('gh_api')
 
     tabs = {}
-    ext_master.call('view_manage_dashboard_tabs', tabs_dict=tabs,
-                    gh_api=gh_api)
+    ext_master.call('view_manage_dashboard_tabs', tabs_dict=tabs)
     tabs = sorted(tabs.values())
     active_tab = flask.request.args.get('tab', tabs[0].id)
 

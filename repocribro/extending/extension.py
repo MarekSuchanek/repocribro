@@ -24,7 +24,7 @@ class Extension:
     #: GitHub url of extension project
     GH_URL = None
 
-    def __init__(self, master, app, db, *args, **kwargs):
+    def __init__(self, master, app, db):
         """Inits the basic two parts of repocribro - flask app and DB
 
         :param master: Master for this extension
@@ -102,50 +102,37 @@ class Extension:
         """
         return {}
 
-    def init_models(self, *args, **kwargs):
+    def init_models(self):
         """Hook operation for initiating the models and registering them
         within db
-
-        :param args: not used
-        :param kwargs: not used
         """
         return self.provide_models()
 
-    def init_blueprints(self, *args, **kwargs):
+    def init_blueprints(self):
         """Hook operation for initiating the blueprints and registering them
         within repocribro Flask app
-
-        :param args: not used
-        :param kwargs: not used
         """
         self.register_blueprints_from_list(self.provide_blueprints())
 
-    def init_filters(self, *args, **kwargs):
+    def init_filters(self):
         """Hook operation for initiating the Jinja filters and registering them
         within Jinja env of repocribro Flask app
-
-        :param args: not used
-        :param kwargs: not used
         """
         self.register_filters_from_dict(self.provide_filters())
 
-    def introduce(self, *args, **kwargs):
+    def introduce(self):
         """Hook operation for getting short introduction of extension (mostly
         for debug/log purpose)
 
-        :param args: not used
-        :param kwargs: not used
         :return: Name of the extension
         :rtype: str
         """
         return getattr(self, 'NAME', 'unknown')
 
-    def view_admin_extensions(self, *args, **kwargs):
+    def view_admin_extensions(self):
         """Hook operation for getting view model of the extension in order
         to show it in the administration of app
 
-        :param args: not used
-        :param kwargs: not used
         :return: Extensions view for this extension
         :rtype: ``repocribro.extending.helpers.ExtensionView``
         """

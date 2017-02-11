@@ -45,7 +45,7 @@ class DI_Container:
         if what in self.singletons:
             return self.singletons[what]
         factory = self.factories.get(what, None)
-        return factory(args, kwargs) if callable(factory) else factory
+        return factory(*args, **kwargs) if callable(factory) else factory
 
     def set_singleton(self, name, singleton):
         """Set service as singleton (shared object)
