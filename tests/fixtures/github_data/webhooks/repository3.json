@@ -1,0 +1,15 @@
+{
+  "action": "privatized",
+  "repository": {
+    "id": 100,
+    "name": "regular/repo1",
+    "owner": {
+      "login": "regular",
+      "id": 65
+    }
+  },
+  "sender": {
+    "login": "regular",
+    "id": 65
+  }
+}

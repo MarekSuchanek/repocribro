@@ -1,0 +1,50 @@
+{
+  "push": {
+    "push_id": 77777,
+    "created": false,
+    "deleted": false,
+    "forced": false,
+    "base_ref": null,
+    "ref": "refs/heads/master",
+    "after": "a31bf2212be0f567ed863a28ed16f6f9adecb694",
+    "before": "f7ed038c532687aee14102c0e30c49e30204165c",
+    "commits": [
+      {
+        "id": "dea9a21cc8ebb1fdeff29f948eb485519acdc99e",
+        "tree_id": "c6938ecc032373a12dec26840fdff220c4543735",
+        "timestamp": "2017-02-11T15:50:43+01:00",
+        "author": {
+          "email": "regular@mail.com",
+          "name": "Mister Regular"
+        },
+        "message": "MSG COMMIT 2",
+        "distinct": false
+      },
+      {
+        "sha": "a31bf2212be0f567ed863a28ed16f6f9adecb694",
+        "author": {
+          "email": "regular@mail.com",
+          "name": "Mister Regular"
+        },
+        "message": "MSG COMMIT 1",
+        "distinct": true
+      }
+    ]
+  },
+  "repository": {
+    "id": 100,
+    "name": "regular/repo1",
+    "owner": {
+      "login": "regular",
+      "id": 65
+    }
+  },
+  "pusher": {
+    "name": "regular",
+    "email": "regular@users.noreply.github.com"
+  },
+  "sender": {
+    "login": "regular",
+    "id": 65
+  }
+}

@@ -1,0 +1,53 @@
+{
+  "action": "published",
+  "release": {
+    "url": "https://api.github.com/repos/regular/repo1/releases/5429026",
+    "assets_url": "https://api.github.com/repos/regular/repo1/releases/5429026/assets",
+    "upload_url": "https://uploads.github.com/repos/regular/repo1/releases/5429026/assets{?name,label}",
+    "html_url": "https://github.com/regular/repo1/releases/tag/v0.0b",
+    "id": 5429026,
+    "tag_name": "v0.0b",
+    "target_commitish": "master",
+    "name": "Testing 2",
+    "draft": false,
+    "author": {
+      "login": "regular",
+      "id": 65,
+      "avatar_url": "https://avatars.githubusercontent.com/u/9638527?v=3",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/regular",
+      "html_url": "https://github.com/regular",
+      "followers_url": "https://api.github.com/users/regular/followers",
+      "following_url": "https://api.github.com/users/regular/following{/other_user}",
+      "gists_url": "https://api.github.com/users/regular/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/regular/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/regular/subscriptions",
+      "organizations_url": "https://api.github.com/users/regular/orgs",
+      "repos_url": "https://api.github.com/users/regular/repos",
+      "events_url": "https://api.github.com/users/regular/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/regular/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "prerelease": false,
+    "created_at": "2017-02-11T14:50:43Z",
+    "published_at": "2017-02-11T15:02:39Z",
+    "assets": [
+    ],
+    "tarball_url": "https://api.github.com/repos/regular/repo1/tarball/v0.0b",
+    "zipball_url": "https://api.github.com/repos/regular/repo1/zipball/v0.0b",
+    "body": "teeeest"
+  },
+  "repository": {
+    "id": 100,
+    "name": "regular/repo1",
+    "owner": {
+      "login": "regular",
+      "id": 65
+    }
+  },
+  "sender": {
+    "login": "regular",
+    "id": 65
+  }
+}
