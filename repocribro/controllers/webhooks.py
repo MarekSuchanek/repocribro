@@ -12,7 +12,7 @@ def gh_webhook():
     ext_master = flask.current_app.container.get('ext_master')
     gh_api = flask.current_app.container.get('gh_api')
 
-    hooks_list = ext_master.call('get_gh_event_processors', default={})
+    hooks_list = ext_master.call('get_gh_webhook_processors', default={})
     hooks = {}
     for ext_hooks in hooks_list:
         for hook_event in ext_hooks:
@@ -34,7 +34,9 @@ def gh_webhook():
     if not gh_api.webhook_verify_signature(data, signature):
         flask.abort(404)
 
-    repo = db.session.query(Repository).get(data['repository']['id'])
+    repo = db.session.query(Repository).filter_by(
+        github_id=data['repository']['id']
+    ).first()
     if repo is None:
         flask.abort(404)
 

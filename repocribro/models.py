@@ -694,20 +694,32 @@ class Push(db.Model, SearchableMixin):
         :return: Created new push
         :rtype: ``repocribro.models.Push``
         """
+        after = push_dict.get('after', None)
+        if after is None:
+            after = push_dict.get('head', None)
+        size = push_dict.get('size', -1)
+        dist_size = push_dict.get('distinct_size', -1)
         push = Push(
             push_dict['push_id'],
             push_dict['ref'],
-            push_dict['head'],
+            after,
             push_dict['before'],
-            push_dict['size'],
-            push_dict['distinct_size'],
+            size,
+            dist_size,
             datetime.datetime.now() if timestamp is None else timestamp,
             sender_dict['login'],
             sender_dict['id'],
             repo
         )
+        dst = 0
         for commit_data in push_dict.get('commits', []):
-            Commit.create_from_dict(commit_data, push)
+            c = Commit.create_from_dict(commit_data, push)
+            if c.distinct:
+                dst += 1
+        if size == -1:
+            push.size = len(push.commits)
+        if dist_size == -1:
+            push.distinct_size = dst
         return push
 
     def __repr__(self):
@@ -769,8 +781,11 @@ class Commit(db.Model, SearchableMixin):
 
         :todo: verify, there are some conflict in GitHub docs
         """
+        sha = commit_dict.get('sha', None)
+        if sha is None:
+            sha = commit_dict.get('id', None)
         return Commit(
-            commit_dict['sha'],
+            sha,
             commit_dict['message'],
             commit_dict['author']['name'],
             commit_dict['author']['email'],
