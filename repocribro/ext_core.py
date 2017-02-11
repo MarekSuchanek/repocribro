@@ -5,6 +5,7 @@ import flask_migrate
 from .extending import Extension
 from .extending.helpers import ViewTab, Badge
 from .models import Push, Release, Repository
+from .github import GitHubAPI
 
 
 def gh_webhook_push(db, repo, data, delivery_id):
@@ -111,6 +112,21 @@ def gh_event_repository(db, repo, payload, actor):
         repo.visibility_type = Repository.VISIBILITY_PRIVATE
 
 
+def make_githup_api(cfg):
+    """Simple factory for making the GitHub API client
+
+    :param cfg: Configuration of the application
+    :type cfg: ``configparser.ConfigParser``
+    :return: GitHub API client
+    :rtype: ``repocribro.github.GitHubAPI``
+    """
+    return GitHubAPI(
+        cfg.get('github', 'client_id'),
+        cfg.get('github', 'client_secret'),
+        cfg.get('github', 'webhooks_secret')
+    )
+
+
 class CoreExtension(Extension):
     #: Name of core extension
     NAME = 'core'
@@ -168,17 +184,14 @@ class CoreExtension(Extension):
         login_manager, principals = init_login_manager(self.db)
         login_manager.init_app(self.app)
         principals.init_app(self.app)
-
-    def init_post_injector(self, *args, **kwargs):
-        """Init what needs to be done after setting up injector
-
-        :param args: not used
-        :param kwargs: not used
-
-        :todo: flask_restless is not compatible with flask_injector!
-        """
         from .api import create_api
         api_manager = create_api(self.app, self.db)
+
+    def init_container(self, *args, **kwargs):
+        self.app.container.set_singleton(
+            'gh_api',
+            make_githup_api(self.app.container.get('config'))
+        )
 
     def view_core_search_tabs(self, *args, **kwargs):
         """Prepare tabs for search view of core controller

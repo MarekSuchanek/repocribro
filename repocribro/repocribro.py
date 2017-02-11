@@ -3,7 +3,6 @@ import flask_ini
 import os
 
 from .extending import ExtensionsMaster
-from .github import GitHubAPI
 
 #: Paths to default configuration files
 DEFAULT_CONFIG_FILES = [
@@ -82,21 +81,6 @@ class Repocribro(flask.Flask):
         self.container = DI_Container()
 
 
-def make_githup_api(cfg):
-    """Simple factory for making the GitHub API client
-
-    :param cfg: Configuration of the application
-    :type cfg: ``configparser.ConfigParser``
-    :return: GitHub API client
-    :rtype: ``repocribro.github.GitHubAPI``
-    """
-    return GitHubAPI(
-        cfg.get('github', 'client_id'),
-        cfg.get('github', 'client_secret'),
-        cfg.get('github', 'webhooks_secret')
-    )
-
-
 def create_app(cfg_files='DEFAULT'):
     """Factory for making the web Flask application
 
@@ -114,25 +98,22 @@ def create_app(cfg_files='DEFAULT'):
         app.iniconfig = flask_ini.FlaskIni()
         app.iniconfig.read(cfg_files)
     app.secret_key = app.iniconfig.get('flask', 'secret_key')
+    app.container.set_singleton('config', app.iniconfig)
 
     from .database import db
     db.init_app(app)
+    app.container.set_singleton('db', db)
 
     ext_master = ExtensionsMaster(app=app, db=db)
     ext_names = ext_master.call('introduce', 'unknown')
     print('Loaded extensions: {}'.format(', '.join(ext_names)))
+    app.container.set_singleton('ext_master', ext_master)
 
     ext_master.call('init_first')
     ext_master.call('init_models')
     ext_master.call('init_business')
     ext_master.call('init_filters')
     ext_master.call('init_blueprints')
-
-    app.container.set_singleton('db', db)
-    app.container.set_singleton('ext_master', ext_master,)
-    app.container.set_singleton('config', app.iniconfig)
-    app.container.set_singleton('gh_api', make_githup_api(app.iniconfig))
-
-    ext_master.call('init_post_injector')
+    ext_master.call('init_container')
 
     return app
