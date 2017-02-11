@@ -1,0 +1,378 @@
+{
+  "http_interactions": [
+    {
+      "recorded_at": "2017-02-11T17:23:37",
+      "response": {
+        "url": "https://api.github.com/repos/MarekSuchanek/pyplayground/hooks/12054307",
+        "headers": {
+          "X-XSS-Protection": "1; mode=block",
+          "Access-Control-Allow-Origin": "*",
+          "Cache-Control": "private, max-age=60, s-maxage=60",
+          "ETag": "\"82ffbc574b62db1ec75efeb1421ab84a\"",
+          "Server": "GitHub.com",
+          "X-RateLimit-Remaining": "4947",
+          "Content-Length": "604",
+          "X-RateLimit-Reset": "1486836809",
+          "Access-Control-Expose-Headers": "ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval",
+          "X-Accepted-OAuth-Scopes": "admin:repo_hook, public_repo, read:repo_hook, repo, write:repo_hook",
+          "Content-Type": "application/json; charset=utf-8",
+          "Content-Security-Policy": "default-src 'none'",
+          "Status": "200 OK",
+          "X-OAuth-Scopes": "admin:repo_hook, repo",
+          "X-RateLimit-Limit": "5000",
+          "Strict-Transport-Security": "max-age=31536000; includeSubdomains; preload",
+          "Vary": "Accept, Authorization, Cookie, X-GitHub-OTP",
+          "X-Content-Type-Options": "nosniff",
+          "X-Frame-Options": "deny",
+          "X-Served-By": "474556b853193c38f1b14328ce2d1b7d",
+          "Last-Modified": "Sat, 11 Feb 2017 17:23:37 GMT",
+          "X-GitHub-Request-Id": "D248:6158:2F6D304:3A68903:589F4899",
+          "X-GitHub-Media-Type": "github.v3; format=json",
+          "Date": "Sat, 11 Feb 2017 17:23:37 GMT"
+        },
+        "body": {
+          "encoding": "utf-8",
+          "string": "{\"type\":\"Repository\",\"id\":12054307,\"name\":\"web\",\"active\":true,\"events\":[\"push\",\"release\",\"repository\"],\"config\":{\"content_type\":\"json\",\"secret\":\"********\",\"url\":\"http://localhost:5000/test\",\"insecure_ssl\":\"0\"},\"updated_at\":\"2017-02-11T17:23:37Z\",\"created_at\":\"2017-02-11T17:23:37Z\",\"url\":\"https://api.github.com/repos/MarekSuchanek/pyplayground/hooks/12054307\",\"test_url\":\"https://api.github.com/repos/MarekSuchanek/pyplayground/hooks/12054307/test\",\"ping_url\":\"https://api.github.com/repos/MarekSuchanek/pyplayground/hooks/12054307/pings\",\"last_response\":{\"code\":0,\"status\":\"unused\",\"message\":\"Unused\"}}"
+        },
+        "status": {
+          "code": 200,
+          "message": "OK"
+        }
+      },
+      "request": {
+        "body": {
+          "encoding": "utf-8",
+          "string": ""
+        },
+        "headers": {
+          "Authorization": "token <TOKEN>",
+          "Connection": "keep-alive",
+          "Accept": "*/*",
+          "accept-encoding": "identity",
+          "User-Agent": "python-requests/2.12.4"
+        },
+        "uri": "https://api.github.com/repos/MarekSuchanek/pyplayground/hooks/12054307",
+        "method": "GET"
+      }
+    },
+    {
+      "recorded_at": "2017-02-11T17:23:38",
+      "response": {
+        "url": "https://api.github.com/repos/MarekSuchanek/pyplayground/hooks/12054307/tests",
+        "headers": {
+          "X-OAuth-Scopes": "admin:repo_hook, repo",
+          "X-XSS-Protection": "1; mode=block",
+          "Access-Control-Allow-Origin": "*",
+          "X-GitHub-Media-Type": "github.v3; format=json",
+          "Server": "GitHub.com",
+          "X-RateLimit-Remaining": "4946",
+          "X-Content-Type-Options": "nosniff",
+          "X-RateLimit-Limit": "5000",
+          "X-RateLimit-Reset": "1486836809",
+          "Strict-Transport-Security": "max-age=31536000; includeSubdomains; preload",
+          "Content-Length": "77",
+          "X-Frame-Options": "deny",
+          "X-Accepted-OAuth-Scopes": "admin:repo_hook, public_repo, repo",
+          "Content-Type": "application/json; charset=utf-8",
+          "X-GitHub-Request-Id": "D248:6158:2F6D321:3A68926:589F4899",
+          "Date": "Sat, 11 Feb 2017 17:23:38 GMT",
+          "Status": "404 Not Found",
+          "Content-Security-Policy": "default-src 'none'",
+          "Access-Control-Expose-Headers": "ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval"
+        },
+        "body": {
+          "encoding": "utf-8",
+          "string": "{\"message\":\"Not Found\",\"documentation_url\":\"https://developer.github.com/v3\"}"
+        },
+        "status": {
+          "code": 404,
+          "message": "Not Found"
+        }
+      },
+      "request": {
+        "body": {
+          "encoding": "utf-8",
+          "string": ""
+        },
+        "headers": {
+          "Authorization": "token <TOKEN>",
+          "Accept": "*/*",
+          "accept-encoding": "identity",
+          "User-Agent": "python-requests/2.12.4",
+          "Content-Length": "0",
+          "Connection": "keep-alive"
+        },
+        "uri": "https://api.github.com/repos/MarekSuchanek/pyplayground/hooks/12054307/tests",
+        "method": "DELETE"
+      }
+    },
+    {
+      "recorded_at": "2017-02-11T17:24:57",
+      "response": {
+        "body": {
+          "encoding": "utf-8",
+          "string": "{\"type\":\"Repository\",\"id\":12054322,\"name\":\"web\",\"active\":true,\"events\":[\"push\",\"release\",\"repository\"],\"config\":{\"url\":\"http://localhost:5000/test\",\"content_type\":\"json\",\"secret\":\"********\",\"insecure_ssl\":\"0\"},\"updated_at\":\"2017-02-11T17:24:57Z\",\"created_at\":\"2017-02-11T17:24:57Z\",\"url\":\"https://api.github.com/repos/MarekSuchanek/pyplayground/hooks/12054322\",\"test_url\":\"https://api.github.com/repos/MarekSuchanek/pyplayground/hooks/12054322/test\",\"ping_url\":\"https://api.github.com/repos/MarekSuchanek/pyplayground/hooks/12054322/pings\",\"last_response\":{\"code\":null,\"status\":\"unused\",\"message\":null}}"
+        },
+        "headers": {
+          "X-XSS-Protection": "1; mode=block",
+          "Access-Control-Allow-Origin": "*",
+          "Cache-Control": "private, max-age=60, s-maxage=60",
+          "ETag": "\"8d4c632efb17ec8a21a684f47d650489\"",
+          "Server": "GitHub.com",
+          "X-RateLimit-Remaining": "4941",
+          "Date": "Sat, 11 Feb 2017 17:24:57 GMT",
+          "Content-Length": "603",
+          "X-RateLimit-Reset": "1486836809",
+          "X-Accepted-OAuth-Scopes": "admin:repo_hook, public_repo, repo, write:repo_hook",
+          "Content-Type": "application/json; charset=utf-8",
+          "Content-Security-Policy": "default-src 'none'",
+          "Status": "201 Created",
+          "X-OAuth-Scopes": "admin:repo_hook, repo",
+          "X-RateLimit-Limit": "5000",
+          "Strict-Transport-Security": "max-age=31536000; includeSubdomains; preload",
+          "Vary": "Accept, Authorization, Cookie, X-GitHub-OTP",
+          "X-Content-Type-Options": "nosniff",
+          "X-Frame-Options": "deny",
+          "X-Served-By": "2c18a09f3ac5e4dd1e004af7c5a94769",
+          "Location": "https://api.github.com/repos/MarekSuchanek/pyplayground/hooks/12054322",
+          "X-GitHub-Request-Id": "D27E:6161:3097B40:3BD96D1:589F48E9",
+          "X-GitHub-Media-Type": "github.v3; format=json",
+          "Access-Control-Expose-Headers": "ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval"
+        },
+        "url": "https://api.github.com/repos/MarekSuchanek/pyplayground/hooks",
+        "status": {
+          "code": 201,
+          "message": "Created"
+        }
+      },
+      "request": {
+        "body": {
+          "encoding": "utf-8",
+          "string": "{\"name\": \"web\", \"config\": {\"url\": \"http://localhost:5000/test\", \"content_type\": \"json\", \"secret\": \"webhooks_secret\"}, \"events\": [\"push\", \"release\", \"repository\"], \"active\": true}"
+        },
+        "headers": {
+          "Content-Length": "178",
+          "accept-encoding": "identity",
+          "Accept": "*/*",
+          "User-Agent": "python-requests/2.12.4",
+          "Authorization": "token <TOKEN>",
+          "Connection": "keep-alive"
+        },
+        "uri": "https://api.github.com/repos/MarekSuchanek/pyplayground/hooks",
+        "method": "POST"
+      }
+    },
+    {
+      "recorded_at": "2017-02-11T17:24:58",
+      "response": {
+        "body": {
+          "encoding": "utf-8",
+          "string": "[{\"type\":\"Repository\",\"id\":11877633,\"name\":\"travis\",\"active\":true,\"events\":[\"create\",\"delete\",\"issue_comment\",\"member\",\"membership\",\"public\",\"pull_request\",\"push\",\"repository\"],\"config\":{\"domain\":\"notify.travis-ci.org\",\"token\":\"********\",\"user\":\"MarekSuchanek\"},\"updated_at\":\"2017-02-02T13:58:18Z\",\"created_at\":\"2017-02-02T13:58:18Z\",\"url\":\"https://api.github.com/repos/MarekSuchanek/pyplayground/hooks/11877633\",\"test_url\":\"https://api.github.com/repos/MarekSuchanek/pyplayground/hooks/11877633/test\",\"ping_url\":\"https://api.github.com/repos/MarekSuchanek/pyplayground/hooks/11877633/pings\",\"last_response\":{\"code\":200,\"status\":\"active\",\"message\":\"OK\"}},{\"type\":\"Repository\",\"id\":12050018,\"name\":\"web\",\"active\":true,\"events\":[\"push\",\"release\",\"repository\"],\"config\":{\"content_type\":\"json\",\"secret\":\"********\",\"url\":\"http://localhost:5000/webhook/github\",\"insecure_ssl\":\"0\"},\"updated_at\":\"2017-02-11T07:38:32Z\",\"created_at\":\"2017-02-11T07:38:32Z\",\"url\":\"https://api.github.com/repos/MarekSuchanek/pyplayground/hooks/12050018\",\"test_url\":\"https://api.github.com/repos/MarekSuchanek/pyplayground/hooks/12050018/test\",\"ping_url\":\"https://api.github.com/repos/MarekSuchanek/pyplayground/hooks/12050018/pings\",\"last_response\":{\"code\":502,\"status\":\"connection_error\",\"message\":\"Couldn't connect to server\"}},{\"type\":\"Repository\",\"id\":12054322,\"name\":\"web\",\"active\":true,\"events\":[\"push\",\"release\",\"repository\"],\"config\":{\"content_type\":\"json\",\"secret\":\"********\",\"url\":\"http://localhost:5000/test\",\"insecure_ssl\":\"0\"},\"updated_at\":\"2017-02-11T17:24:57Z\",\"created_at\":\"2017-02-11T17:24:57Z\",\"url\":\"https://api.github.com/repos/MarekSuchanek/pyplayground/hooks/12054322\",\"test_url\":\"https://api.github.com/repos/MarekSuchanek/pyplayground/hooks/12054322/test\",\"ping_url\":\"https://api.github.com/repos/MarekSuchanek/pyplayground/hooks/12054322/pings\",\"last_response\":{\"code\":0,\"status\":\"unused\",\"message\":\"Unused\"}}]"
+        },
+        "headers": {
+          "X-XSS-Protection": "1; mode=block",
+          "Access-Control-Allow-Origin": "*",
+          "Cache-Control": "private, max-age=60, s-maxage=60",
+          "ETag": "\"a4cb40106ec216ae30128e3c7b309e16\"",
+          "Server": "GitHub.com",
+          "X-RateLimit-Remaining": "4940",
+          "Date": "Sat, 11 Feb 2017 17:24:58 GMT",
+          "Content-Length": "1907",
+          "X-RateLimit-Reset": "1486836809",
+          "X-Accepted-OAuth-Scopes": "admin:repo_hook, public_repo, read:repo_hook, repo, write:repo_hook",
+          "Content-Type": "application/json; charset=utf-8",
+          "Content-Security-Policy": "default-src 'none'",
+          "Status": "200 OK",
+          "X-OAuth-Scopes": "admin:repo_hook, repo",
+          "X-RateLimit-Limit": "5000",
+          "Strict-Transport-Security": "max-age=31536000; includeSubdomains; preload",
+          "Vary": "Accept, Authorization, Cookie, X-GitHub-OTP",
+          "X-Content-Type-Options": "nosniff",
+          "X-Frame-Options": "deny",
+          "X-Served-By": "a51acaae89a7607fd7ee967627be18e4",
+          "X-GitHub-Request-Id": "D27E:6161:3097B4D:3BD96E5:589F48E9",
+          "X-GitHub-Media-Type": "github.v3; format=json",
+          "Access-Control-Expose-Headers": "ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval"
+        },
+        "url": "https://api.github.com/repos/MarekSuchanek/pyplayground/hooks",
+        "status": {
+          "code": 200,
+          "message": "OK"
+        }
+      },
+      "request": {
+        "body": {
+          "encoding": "utf-8",
+          "string": ""
+        },
+        "headers": {
+          "Authorization": "token <TOKEN>",
+          "Connection": "keep-alive",
+          "Accept": "*/*",
+          "accept-encoding": "identity",
+          "User-Agent": "python-requests/2.12.4"
+        },
+        "uri": "https://api.github.com/repos/MarekSuchanek/pyplayground/hooks",
+        "method": "GET"
+      }
+    },
+    {
+      "recorded_at": "2017-02-11T17:24:58",
+      "response": {
+        "body": {
+          "encoding": "utf-8",
+          "string": "{\"type\":\"Repository\",\"id\":12054322,\"name\":\"web\",\"active\":true,\"events\":[\"push\",\"release\",\"repository\"],\"config\":{\"content_type\":\"json\",\"secret\":\"********\",\"url\":\"http://localhost:5000/test\",\"insecure_ssl\":\"0\"},\"updated_at\":\"2017-02-11T17:24:57Z\",\"created_at\":\"2017-02-11T17:24:57Z\",\"url\":\"https://api.github.com/repos/MarekSuchanek/pyplayground/hooks/12054322\",\"test_url\":\"https://api.github.com/repos/MarekSuchanek/pyplayground/hooks/12054322/test\",\"ping_url\":\"https://api.github.com/repos/MarekSuchanek/pyplayground/hooks/12054322/pings\",\"last_response\":{\"code\":0,\"status\":\"unused\",\"message\":\"Unused\"}}"
+        },
+        "headers": {
+          "X-XSS-Protection": "1; mode=block",
+          "Access-Control-Allow-Origin": "*",
+          "Cache-Control": "private, max-age=60, s-maxage=60",
+          "ETag": "\"3e08d03bab84bb80282ad1e4f51ff9d8\"",
+          "Server": "GitHub.com",
+          "X-RateLimit-Remaining": "4939",
+          "Date": "Sat, 11 Feb 2017 17:24:58 GMT",
+          "Content-Length": "604",
+          "X-RateLimit-Reset": "1486836809",
+          "X-Accepted-OAuth-Scopes": "admin:repo_hook, public_repo, read:repo_hook, repo, write:repo_hook",
+          "Content-Type": "application/json; charset=utf-8",
+          "Content-Security-Policy": "default-src 'none'",
+          "Status": "200 OK",
+          "X-OAuth-Scopes": "admin:repo_hook, repo",
+          "X-RateLimit-Limit": "5000",
+          "Strict-Transport-Security": "max-age=31536000; includeSubdomains; preload",
+          "Vary": "Accept, Authorization, Cookie, X-GitHub-OTP",
+          "X-Content-Type-Options": "nosniff",
+          "X-Frame-Options": "deny",
+          "X-Served-By": "a474937f3b2fa272558fa6dc951018ad",
+          "Last-Modified": "Sat, 11 Feb 2017 17:24:57 GMT",
+          "X-GitHub-Request-Id": "D27E:6161:3097B63:3BD9707:589F48EA",
+          "X-GitHub-Media-Type": "github.v3; format=json",
+          "Access-Control-Expose-Headers": "ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval"
+        },
+        "url": "https://api.github.com/repos/MarekSuchanek/pyplayground/hooks/12054322",
+        "status": {
+          "code": 200,
+          "message": "OK"
+        }
+      },
+      "request": {
+        "body": {
+          "encoding": "utf-8",
+          "string": ""
+        },
+        "headers": {
+          "Authorization": "token <TOKEN>",
+          "Connection": "keep-alive",
+          "Accept": "*/*",
+          "accept-encoding": "identity",
+          "User-Agent": "python-requests/2.12.4"
+        },
+        "uri": "https://api.github.com/repos/MarekSuchanek/pyplayground/hooks/12054322",
+        "method": "GET"
+      }
+    },
+    {
+      "recorded_at": "2017-02-11T17:24:58",
+      "response": {
+        "body": {
+          "encoding": "utf-8",
+          "string": "{\"message\":\"Not Found\",\"documentation_url\":\"https://developer.github.com/v3\"}"
+        },
+        "headers": {
+          "X-OAuth-Scopes": "admin:repo_hook, repo",
+          "X-XSS-Protection": "1; mode=block",
+          "Access-Control-Allow-Origin": "*",
+          "Server": "GitHub.com",
+          "X-RateLimit-Remaining": "4938",
+          "Content-Length": "77",
+          "X-RateLimit-Limit": "5000",
+          "X-RateLimit-Reset": "1486836809",
+          "Access-Control-Expose-Headers": "ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval",
+          "Strict-Transport-Security": "max-age=31536000; includeSubdomains; preload",
+          "X-Content-Type-Options": "nosniff",
+          "X-Frame-Options": "deny",
+          "X-Accepted-OAuth-Scopes": "admin:repo_hook, public_repo, repo",
+          "Content-Type": "application/json; charset=utf-8",
+          "X-GitHub-Request-Id": "D27E:6161:3097B84:3BD9727:589F48EA",
+          "X-GitHub-Media-Type": "github.v3; format=json",
+          "Status": "404 Not Found",
+          "Content-Security-Policy": "default-src 'none'",
+          "Date": "Sat, 11 Feb 2017 17:24:58 GMT"
+        },
+        "url": "https://api.github.com/repos/MarekSuchanek/pyplayground/hooks/12054322/tests",
+        "status": {
+          "code": 404,
+          "message": "Not Found"
+        }
+      },
+      "request": {
+        "body": {
+          "encoding": "utf-8",
+          "string": ""
+        },
+        "headers": {
+          "Content-Length": "0",
+          "accept-encoding": "identity",
+          "Accept": "*/*",
+          "User-Agent": "python-requests/2.12.4",
+          "Authorization": "token <TOKEN>",
+          "Connection": "keep-alive"
+        },
+        "uri": "https://api.github.com/repos/MarekSuchanek/pyplayground/hooks/12054322/tests",
+        "method": "DELETE"
+      }
+    },
+    {
+      "recorded_at": "2017-02-11T17:24:58",
+      "response": {
+        "body": {
+          "encoding": null,
+          "string": ""
+        },
+        "headers": {
+          "X-OAuth-Scopes": "admin:repo_hook, repo",
+          "X-XSS-Protection": "1; mode=block",
+          "Access-Control-Allow-Origin": "*",
+          "Server": "GitHub.com",
+          "X-RateLimit-Remaining": "4937",
+          "X-Content-Type-Options": "nosniff",
+          "X-RateLimit-Limit": "5000",
+          "X-RateLimit-Reset": "1486836809",
+          "Access-Control-Expose-Headers": "ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval",
+          "Strict-Transport-Security": "max-age=31536000; includeSubdomains; preload",
+          "Vary": "Accept-Encoding",
+          "X-Frame-Options": "deny",
+          "X-Served-By": "3e3b9690823fb031da84658eb58aa83b",
+          "X-Accepted-OAuth-Scopes": "admin:repo_hook, public_repo, repo",
+          "X-GitHub-Request-Id": "D27E:6161:3097B9C:3BD9749:589F48EA",
+          "X-GitHub-Media-Type": "github.v3; format=json",
+          "Status": "204 No Content",
+          "Content-Security-Policy": "default-src 'none'",
+          "Date": "Sat, 11 Feb 2017 17:24:58 GMT"
+        },
+        "url": "https://api.github.com/repos/MarekSuchanek/pyplayground/hooks/12054322",
+        "status": {
+          "code": 204,
+          "message": "No Content"
+        }
+      },
+      "request": {
+        "body": {
+          "encoding": "utf-8",
+          "string": ""
+        },
+        "headers": {
+          "Content-Length": "0",
+          "accept-encoding": "identity",
+          "Accept": "*/*",
+          "User-Agent": "python-requests/2.12.4",
+          "Authorization": "token <TOKEN>",
+          "Connection": "keep-alive"
+        },
+        "uri": "https://api.github.com/repos/MarekSuchanek/pyplayground/hooks/12054322",
+        "method": "DELETE"
+      }
+    }
+  ],
+  "recorded_with": "betamax/0.8.0"
+}

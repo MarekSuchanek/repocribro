@@ -1,5 +1,8 @@
 import pytest
 
+REPOSITORY = 'MarekSuchanek/pyplayground'
+NOT_REPOSITORY = 'MarekSuchanek/pyplaygroundzzzz7'
+
 
 def test_login_bad(github_api):
     assert not github_api.login('random_code')
@@ -12,15 +15,55 @@ def test_get_user_self(github_api):
     assert 'login' in user_data
 
 
-def test_get_webhooks(github_api):
-    res = github_api.webhooks_get('MarekSuchanek/pyplayground')
-    assert isinstance(res, list)
+def test_get_webhooks_bad(github_api):
+    res = github_api.webhooks_get(NOT_REPOSITORY)
+    assert res == []
 
 
-def test_get_webhook_create(github_api):
-    res = github_api.webhooks_get('MarekSuchanek/pyplayground'
-                                  'http://localhost:5000/test')
+def test_get_webhook_bad(github_api):
+    res = github_api.webhook_get(REPOSITORY, 666)
+    assert res is None
+
+
+def test_get_webhook_create_check(github_api):
+    res = github_api.webhook_create(
+        REPOSITORY, 'http://localhost:5000/test'
+    )
     assert res is not None
+    webhook_id = res['id']
+
+    res = github_api.webhooks_get(REPOSITORY)
+    assert len(res) >= 1
+    found = False
+    for webhook in res:
+        if webhook['id'] == webhook_id:
+            found = True
+            break
+    assert found
+
+    res = github_api.webhook_get(REPOSITORY, webhook_id)
+    assert res is not None
+    assert res['id'] == webhook_id
+
+    # Delivery on localhost must fail
+    assert not github_api.webhook_tests(REPOSITORY, webhook_id)
+
+    res = github_api.webhook_delete(REPOSITORY, webhook_id)
+    assert res
+
+
+def test_get_webhook_delete_check(github_api):
+    res = github_api.webhook_create(
+        REPOSITORY, 'http://localhost:5000/test'
+    )
+    assert res is not None
+    webhook_id = res['id']
+
+    res = github_api.webhook_delete(REPOSITORY, webhook_id)
+    assert res
+
+    res = github_api.webhook_get(REPOSITORY, webhook_id)
+    assert res is None
 
 
 def compute_signature(payload, secret):

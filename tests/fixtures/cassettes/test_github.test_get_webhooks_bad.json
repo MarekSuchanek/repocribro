@@ -1,0 +1,55 @@
+{
+  "http_interactions": [
+    {
+      "recorded_at": "2017-02-11T17:24:56",
+      "response": {
+        "body": {
+          "encoding": "utf-8",
+          "string": "{\"message\":\"Not Found\",\"documentation_url\":\"https://developer.github.com/v3\"}"
+        },
+        "headers": {
+          "X-OAuth-Scopes": "admin:repo_hook, repo",
+          "X-XSS-Protection": "1; mode=block",
+          "Access-Control-Allow-Origin": "*",
+          "Server": "GitHub.com",
+          "X-RateLimit-Remaining": "4943",
+          "Content-Length": "77",
+          "X-RateLimit-Limit": "5000",
+          "X-RateLimit-Reset": "1486836809",
+          "Access-Control-Expose-Headers": "ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval",
+          "Strict-Transport-Security": "max-age=31536000; includeSubdomains; preload",
+          "X-Content-Type-Options": "nosniff",
+          "X-Frame-Options": "deny",
+          "X-Accepted-OAuth-Scopes": "repo",
+          "Content-Type": "application/json; charset=utf-8",
+          "X-GitHub-Request-Id": "D27A:6158:2F6F8B8:3A6B7C4:589F48E7",
+          "X-GitHub-Media-Type": "github.v3; format=json",
+          "Status": "404 Not Found",
+          "Content-Security-Policy": "default-src 'none'",
+          "Date": "Sat, 11 Feb 2017 17:24:56 GMT"
+        },
+        "url": "https://api.github.com/repos/MarekSuchanek/pyplaygroundzzzz7/hooks",
+        "status": {
+          "code": 404,
+          "message": "Not Found"
+        }
+      },
+      "request": {
+        "body": {
+          "encoding": "utf-8",
+          "string": ""
+        },
+        "headers": {
+          "Authorization": "token <TOKEN>",
+          "Connection": "keep-alive",
+          "Accept": "*/*",
+          "accept-encoding": "identity",
+          "User-Agent": "python-requests/2.12.4"
+        },
+        "uri": "https://api.github.com/repos/MarekSuchanek/pyplaygroundzzzz7/hooks",
+        "method": "GET"
+      }
+    }
+  ],
+  "recorded_with": "betamax/0.8.0"
+}
