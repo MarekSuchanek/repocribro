@@ -1,3 +1,5 @@
+include LICENSE
+include CHANGELOG.md
 include setup.cfg
 include pytest.ini
 include config/*.example.cfg

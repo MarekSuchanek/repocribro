@@ -16,7 +16,7 @@ AUTHOR = 'Marek Suchánek'
 #: Name of the application
 PROG_NAME = 'repocribro'
 #: Actual release tag
-RELEASE = '0.1-alpha'
+RELEASE = '0.1'
 #: Actual version
 VERSION = '0.1'
 
