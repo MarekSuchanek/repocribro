@@ -18,13 +18,13 @@
     {% for release in repo.releases %}
         <tr>
             <td>{{ release.name }}</td>
-            <td>{{ release.languages }}</td>
-            <td>{{ release.visibility_type }}</td>{# TODO: filter #}
+            <td>{{ release.tag_name }}</td>
+            <td>{{ release.published_at }}</td>
             <td>{{ release.author_login }}</td>
             <td>{{ release.sender_login }}</td>
-            <td>{{ release.prerelease }}</td>{# TODO: filter #}
+            <td>{{ release.prerelease|yes_no }}</td>
             <td>
-                <a href="{{ release.url }}">{{ octicon('mark-github') }}</a>
+                <a href="{{ release.url }}" target="_blank" class="btn btn-default">{{ octicon('mark-github') }}</a>
             </td>
         </tr>
     {% endfor %}
