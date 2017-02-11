@@ -1,0 +1,60 @@
+{
+  "http_interactions": [
+    {
+      "recorded_at": "2017-02-11T16:52:58",
+      "request": {
+        "body": {
+          "string": "",
+          "encoding": "utf-8"
+        },
+        "method": "GET",
+        "headers": {
+          "accept-encoding": "identity",
+          "Authorization": "token <TOKEN>",
+          "Accept": "*/*",
+          "User-Agent": "python-requests/2.12.4",
+          "Connection": "keep-alive"
+        },
+        "uri": "https://api.github.com/user"
+      },
+      "response": {
+        "body": {
+          "string": "{\"login\":\"MarekSuchanek\",\"id\":9638527,\"avatar_url\":\"https://avatars.githubusercontent.com/u/9638527?v=3\",\"gravatar_id\":\"\",\"url\":\"https://api.github.com/users/MarekSuchanek\",\"html_url\":\"https://github.com/MarekSuchanek\",\"followers_url\":\"https://api.github.com/users/MarekSuchanek/followers\",\"following_url\":\"https://api.github.com/users/MarekSuchanek/following{/other_user}\",\"gists_url\":\"https://api.github.com/users/MarekSuchanek/gists{/gist_id}\",\"starred_url\":\"https://api.github.com/users/MarekSuchanek/starred{/owner}{/repo}\",\"subscriptions_url\":\"https://api.github.com/users/MarekSuchanek/subscriptions\",\"organizations_url\":\"https://api.github.com/users/MarekSuchanek/orgs\",\"repos_url\":\"https://api.github.com/users/MarekSuchanek/repos\",\"events_url\":\"https://api.github.com/users/MarekSuchanek/events{/privacy}\",\"received_events_url\":\"https://api.github.com/users/MarekSuchanek/received_events\",\"type\":\"User\",\"site_admin\":false,\"name\":\"Marek Such\u00e1nek\",\"company\":\"@CCMi-FIT\",\"blog\":\"http://webdev.fit.cvut.cz/~suchama4/\",\"location\":\"Prague, Czech Republic\",\"email\":null,\"hireable\":null,\"bio\":\"Student @ CTU in Prague\",\"public_repos\":6,\"public_gists\":0,\"followers\":1,\"following\":4,\"created_at\":\"2014-11-09T10:59:51Z\",\"updated_at\":\"2017-02-11T08:58:18Z\"}",
+          "encoding": "utf-8"
+        },
+        "url": "https://api.github.com/user",
+        "headers": {
+          "X-Served-By": "a51acaae89a7607fd7ee967627be18e4",
+          "Status": "200 OK",
+          "Server": "GitHub.com",
+          "X-GitHub-Media-Type": "github.v3; format=json",
+          "X-RateLimit-Reset": "1486832931",
+          "ETag": "\"5770e2ef81b3afc8b5c23823d7516261\"",
+          "X-RateLimit-Remaining": "4977",
+          "Strict-Transport-Security": "max-age=31536000; includeSubdomains; preload",
+          "X-Accepted-OAuth-Scopes": "",
+          "Content-Length": "1256",
+          "X-RateLimit-Limit": "5000",
+          "Date": "Sat, 11 Feb 2017 16:52:58 GMT",
+          "Content-Security-Policy": "default-src 'none'",
+          "X-XSS-Protection": "1; mode=block",
+          "X-Frame-Options": "deny",
+          "Last-Modified": "Sat, 11 Feb 2017 08:58:18 GMT",
+          "Access-Control-Expose-Headers": "ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval",
+          "Access-Control-Allow-Origin": "*",
+          "X-Content-Type-Options": "nosniff",
+          "X-OAuth-Scopes": "",
+          "Content-Type": "application/json; charset=utf-8",
+          "Vary": "Accept, Authorization, Cookie, X-GitHub-OTP",
+          "Cache-Control": "private, max-age=60, s-maxage=60",
+          "X-GitHub-Request-Id": "BB00:6158:2F2DE26:3A1B00B:589F416A"
+        },
+        "status": {
+          "code": 200,
+          "message": "OK"
+        }
+      }
+    }
+  ],
+  "recorded_with": "betamax/0.8.0"
+}
