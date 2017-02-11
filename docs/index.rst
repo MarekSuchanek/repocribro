@@ -8,14 +8,20 @@ desired topic from the list of contents. You can also visit the repository
 Contents
 --------
 .. toctree::
+   :caption: Basic Information
    :maxdepth: 2
 
    intro
    install/index
    usage/index
-   extensions/index
-   testing
    credits
+
+.. toctree::
+   :caption: Development
+   :maxdepth: 2
+
+   testing
+   extensions/index
    api/index
 
 
