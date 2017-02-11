@@ -35,9 +35,7 @@ setup(
     },
     install_requires=[
         'Flask>=0.12',
-        'flask-bower',
         'flask-ini',
-        'flask-injector',
         'flask-login',
         'flask-migrate',
         'flask-principal',

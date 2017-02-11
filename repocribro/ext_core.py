@@ -1,5 +1,4 @@
 import flask
-import flask_bower
 import flask_login
 import flask_migrate
 
@@ -124,7 +123,6 @@ class CoreExtension(Extension):
 
     def __init__(self, master, app, db, *args, **kwargs):
         super().__init__(master, app, db)
-        self.bower = flask_bower.Bower(self.app)
         self.migrate = flask_migrate.Migrate(self.app, self.db)
 
     @staticmethod
