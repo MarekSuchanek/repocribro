@@ -1,4 +1,5 @@
 import betamax
+import datetime
 import pytest
 import flask
 import os
@@ -159,6 +160,7 @@ def github_data_loader():
     def get_github_data(name):
         with open(GITHUB_DATA.format(name)) as f:
             return json.load(f)
+
     return get_github_data
 
 
@@ -279,6 +281,96 @@ class FakeGitHubAPI:
             'language': 'C++', 'html_url': '', 'description': '',
             'private': False
         },
+        '/repos/regular/repo1/events': [
+            {
+                'id': 118818, 'type': 'PushEvent',
+                'created_at': '2017-03-04T21:08:12Z',
+                'public': True,
+                'actor': {'id': 65, 'login': 'regular'},
+                'repo': {'id': 100, 'name': 'regular/repo1'},
+                'payload': {
+                    'push_id': 77777, 'size': 2, 'distinct_size': 1,
+                    'ref': 'refs/heads/master',
+                    'head': 'a31bf2212be0f567ed863a28ed16f6f9adecb694',
+                    'before': 'f7ed038c532687aee14102c0e30c49e30204165c',
+                    'commits': [
+                        {
+                            'sha': 'dea9a21cc8ebb1fdeff29f948eb485519acdc99e',
+                            'author': {
+                                'email': 'regular@mail.com',
+                                'name': 'Mister Regular'
+                            },
+                            'message': 'MSG COMMIT 2',
+                            'distinct': False,
+                        },
+                        {
+                            'sha': 'a31bf2212be0f567ed863a28ed16f6f9adecb694',
+                            'author': {
+                                'email': 'regular@mail.com',
+                                'name': 'Mister Regular'
+                            },
+                            'message': 'MSG COMMIT 1',
+                            'distinct': True,
+                        }
+                    ]
+                }
+            },
+            {
+                'id': 7777541, 'type': 'ReleaseEvent',
+                'created_at': '2017-02-04T21:08:12Z',
+                'public': True,
+                'actor': {'id': 65, 'login': 'regular'},
+                'repo': {'id': 100, 'name': 'regular/repo1'},
+                'payload': {
+                    'action': 'published',
+                    'release': {
+                        'id': 8461516,
+                        'tag_name': '0.0.7',
+                        'name': 'Yolo Release',
+                        'body': 'Some long text body',
+                        'draft': False,
+                        'prerelease': True,
+                        'html_url': 'URL',
+                        'created_at': '2017-02-04T21:08:12Z',
+                        'published_at': '2017-02-04T21:08:12Z',
+                        'author': {'id': 65, 'login': 'regular'},
+                    }
+                }
+            },
+            {
+                'id': 7454542, 'type': 'RepositoryEvent',
+                'created_at': '2017-01-04T21:08:12Z',
+                'public': True,
+                'actor': {'id': 65, 'login': 'regular'},
+                'repo': {'id': 100, 'name': 'regular/repo1'},
+                'payload': {
+                    'action': 'publicized',
+                    'repository': {}
+                }
+            },
+            {
+                'id': 7454542, 'type': 'RepositoryEvent',
+                'created_at': '2017-01-04T21:08:12Z',
+                'public': True,
+                'actor': {'id': 65, 'login': 'regular'},
+                'repo': {'id': 100, 'name': 'regular/repo1'},
+                'payload': {
+                    'action': 'privatized',
+                    'repository': {}
+                }
+            },
+            {
+                'id': 7454542, 'type': 'RepositoryEvent',
+                'created_at': '2017-01-04T21:08:12Z',
+                'public': True,
+                'actor': {'id': 65, 'login': 'regular'},
+                'repo': {'id': 100, 'name': 'regular/repo1'},
+                'payload': {
+                    'action': 'deleted',
+                    'repository': {}
+                }
+            }
+        ]
     }
 
     def __init__(self, client_id='', client_secret='', webhooks_secret='',
@@ -319,7 +411,7 @@ class FakeGitHubAPI:
     def get(self, what):
         if what in self.DATA:
             return FakeResponse(200, self.DATA[what])
-        return FakeResponse(204, None)
+        return FakeResponse(404, {'message': 'Not Found'})
 
     def get_data(self, what):
         return self.get(what).json()
@@ -344,7 +436,6 @@ class FakeGitHubAPI:
 
 
 class FakeResponse:
-
     def __init__(self, status_code, data):
         self.status_code = status_code
         self.data = data
