@@ -31,7 +31,7 @@ def gh_webhook():
         flask.abort(404)
     if data is None or 'repository' not in data:
         flask.abort(404)
-    if not gh_api.webhook_verify_signature(data, signature):
+    if not gh_api.webhook_verify_signature(flask.request.data, signature):
         flask.abort(404)
 
     repo = db.session.query(Repository).filter_by(

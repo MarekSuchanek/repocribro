@@ -208,19 +208,18 @@ class GitHubAPI:
         )
         return response.status_code == 204
 
-    def webhook_verify_signature(self, payload, signature):
+    def webhook_verify_signature(self, data, signature):
         """Verify the content with signature
 
-        :param payload: Data of webhook message
-        :type payload: dict
+        :param data: Request data to be verified
         :param signature: The signature of data
         :type signature: str
         :return: If the content is verified
         :rtype: bool
         """
         h = hmac.new(
-            self.webhooks_secret,
-            payload,
+            self.webhooks_secret.encode('utf-8'),
+            data,
             hashlib.sha1
         )
         return hmac.compare_digest(h.hexdigest(), signature)
