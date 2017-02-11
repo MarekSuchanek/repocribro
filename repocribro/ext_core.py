@@ -46,30 +46,70 @@ def gh_webhook_repository(db, repo, data, delivery_id):
 
 
 # AWESOME EVENTS ARE DIFFERENT THAN WEBHOOK MSGS!!
-def gh_event_push(db, repo, payload):
-    """Process push event msg
+def gh_event_push(db, repo, payload, actor):
+    """Process GitHub PushEvent (with commits)
 
-    :todo: implement
+    https://developer.github.com/v3/activity/events/types/#pushevent
+
+    :param db: Database to store push data
+    :type db: ``flask_sqlalchemy.SQLAlchemy``
+    :param repo: Repository where push belongs to
+    :type repo: ``repocribro.models.Repository``
+    :param payload: Data about push and commits
+    :type payload: dict
+    :param actor: Actor doing the event
+    :type actor: dict
     """
-    pass
+    push = Push.create_from_dict(payload, actor, repo)
+    db.session.add(push)
+    for commit in push.commits:
+        db.session.add(commit)
 
 
-def gh_event_release(db, repo, payload):
-    """Process release event msg
+def gh_event_release(db, repo, payload, actor):
+    """Process GitHub ReleaseEvent (with commits)
 
-    :todo: implement
+    https://developer.github.com/v3/activity/events/types/#releaseevent
+
+    :param db: Database to store push data
+    :type db: ``flask_sqlalchemy.SQLAlchemy``
+    :param repo: Repository where release belongs to
+    :type repo: ``repocribro.models.Repository``
+    :param payload: Data about release and action
+    :type payload: dict
+    :param actor: Actor doing the event
+    :type actor: dict
     """
-    pass
+    action = payload['action']
+    release = Release.create_from_dict(payload['release'], actor, repo)
+    db.session.add(release)
 
 
-def gh_event_repository(db, repo, payload):
-    """Process repository event msg
+def gh_event_repository(db, repo, payload, actor):
+    """Process GitHub RepositoryEvent (with commits)
 
-    This can be one of "created", "deleted", "publicized", or "privatized".
+    https://developer.github.com/v3/activity/events/types/#repositoryevent
 
-    :todo: implement
+    :param db: Database to store repository data
+    :type db: ``flask_sqlalchemy.SQLAlchemy``
+    :param repo: Repository related to event
+    :type repo: ``repocribro.models.Repository``
+    :param payload: Data about repository and action
+    :type payload: dict
+    :param actor: Actor doing the event
+    :type actor: dict
     """
-    pass
+    action = payload['action']
+    if action == 'privatized':
+        repo.private = True
+        repo.visibility_type = Repository.VISIBILITY_PRIVATE
+    elif action == 'publicized':
+        repo.private = False
+        repo.visibility_type = Repository.VISIBILITY_PUBLIC
+    elif action == 'deleted':
+        # TODO: consider some signalization of not being @GitHub anymore
+        repo.webhook_id = None
+        repo.visibility_type = Repository.VISIBILITY_PRIVATE
 
 
 class CoreExtension(Extension):

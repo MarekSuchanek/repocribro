@@ -32,6 +32,8 @@ class RepocheckCommand(flask_script.Command):
         """
         from ..models import Repository
         self.db = flask.current_app.container.get('db')
+        self.gh_api = flask.current_app.container.get('gh_api')
+
         ext_master = flask.current_app.container.get('ext_master')
 
         hooks_list = ext_master.call('get_gh_event_processors', default={})
@@ -69,15 +71,18 @@ class RepocheckCommand(flask_script.Command):
 
         :raises SystemExit: if GitHub API request fails
         """
-        from repocribro.repocribro import make_githup_api
-        github = make_githup_api(flask.current_app.iniconfig)
-        gh_repo = github.get('/repos/{}'.format(repo.full_name))
+        gh_repo = self.gh_api.get('/repos/{}'.format(repo.full_name))
         if gh_repo.status_code != 200:
             print('GitHub doesn\'t know about that repo: {}'.format(
                 gh_repo.json()['message']
             ))
             exit(3)
-        gh_events = github.get('/repos/{}/events'.format(repo.full_name))
+        gh_events = self.gh_api.get('/repos/{}/events'.format(repo.full_name))
+        if gh_events.status_code != 200:
+            print('GitHub doesn\'t returned events for: {}'.format(
+                repo.full_name
+            ))
+            return
         for event in gh_events.json():
             new = self._process_event(repo, event)
             if not new:
@@ -102,7 +107,8 @@ class RepocheckCommand(flask_script.Command):
         for event_processor in self.hooks.get(hook_type, []):
             try:
                 event_processor(db=self.db, repo=repo,
-                                payload=event['payload'])
+                                payload=event['payload'],
+                                actor=event['actor'])
                 print('Processed {} from {} event for {}'.format(
                     event['type'], event['created_at'], repo.full_name
                 ))

@@ -695,7 +695,7 @@ class Push(db.Model, SearchableMixin):
         :rtype: ``repocribro.models.Push``
         """
         push = Push(
-            push_dict['id'],
+            push_dict['push_id'],
             push_dict['ref'],
             push_dict['head'],
             push_dict['before'],
