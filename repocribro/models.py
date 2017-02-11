@@ -630,25 +630,24 @@ class Repository(db.Model, SearchableMixin):
 class Push(db.Model, SearchableMixin):
     """Push from GitHub"""
     __tablename__ = 'Push'
-    __searchable__ = ['after', 'before', 'sender_login', 'pusher_name',
-                      'pusher_email']
+    __searchable__ = ['ref', 'after', 'before', 'sender_login']
 
     #: Unique identifier of the push
     id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
-    #: SHA after push
-    after = sqlalchemy.Column(sqlalchemy.Integer)
-    #: SHA before push
-    before = sqlalchemy.Column(sqlalchemy.Integer)
-    #: Ref of push (branch)
+    #: GitHub Push ID
+    github_id = sqlalchemy.Column(sqlalchemy.Integer)
+    #: The full Git ref that was pushed.
     ref = sqlalchemy.Column(sqlalchemy.String(255))
+    #: The SHA of the most recent commit on ref after the push. (HEAD)
+    after = sqlalchemy.Column(sqlalchemy.String(255))
+    #: The SHA of the most recent commit on ref before the push.
+    before = sqlalchemy.Column(sqlalchemy.String(255))
+    #: The number of commits in the push.
+    size = sqlalchemy.Column(sqlalchemy.Integer)
+    #: The number of distinct commits in the push.
+    distinct_size = sqlalchemy.Column(sqlalchemy.Integer)
     #: Timestamp of push (when it was registered)
     timestamp = sqlalchemy.Column(sqlalchemy.DateTime())
-    #: URL to page with commits comparison
-    compare_url = sqlalchemy.Column(sqlalchemy.UnicodeText())
-    #: Name of the pusher
-    pusher_name = sqlalchemy.Column(sqlalchemy.UnicodeText())
-    #: Email of the pusher
-    pusher_email = sqlalchemy.Column(sqlalchemy.String(255))
     #: Login of the sender
     sender_login = sqlalchemy.Column(sqlalchemy.String(40))
     #: ID of the sender
@@ -667,21 +666,21 @@ class Push(db.Model, SearchableMixin):
         cascade='all, delete-orphan'
     )
 
-    def __init__(self, after, before, ref, timestamp, compare_url, pusher_name,
-                 pusher_email, sender_login, sender_id, repository):
+    def __init__(self, github_id, ref, after, before, size, distinct_size,
+                 timestamp, sender_login, sender_id, repository):
+        self.github_id = github_id
+        self.ref = ref
         self.after = after
         self.before = before
-        self.ref = ref
+        self.size = size
+        self.distinct_size = distinct_size
         self.timestamp = timestamp
-        self.compare_url = compare_url
-        self.pusher_name = pusher_name
-        self.pusher_email = pusher_email
         self.sender_login = sender_login
         self.sender_id = sender_id
         self.repository = repository
 
     @staticmethod
-    def create_from_dict(push_dict, sender_dict, repo):
+    def create_from_dict(push_dict, sender_dict, repo, timestamp=None):
         """Create new push from GitHub and additional data
 
         This also creates commits of this push
@@ -696,13 +695,13 @@ class Push(db.Model, SearchableMixin):
         :rtype: ``repocribro.models.Push``
         """
         push = Push(
-            push_dict['after'],
-            push_dict['before'],
+            push_dict['id'],
             push_dict['ref'],
-            datetime.datetime.now(),
-            push_dict['compare'],
-            push_dict['pusher']['name'],
-            push_dict['pusher']['email'],
+            push_dict['head'],
+            push_dict['before'],
+            push_dict['size'],
+            push_dict['distinct_size'],
+            datetime.datetime.now() if timestamp is None else timestamp,
             sender_dict['login'],
             sender_dict['id'],
             repo
@@ -731,28 +730,16 @@ class Commit(db.Model, SearchableMixin):
 
     #: Unique identifier of the commit
     id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
-    #: SHA identifier of the commit
+    #: The SHA of the commit.
     sha = sqlalchemy.Column(sqlalchemy.String(40))
-    #: Tree SHA identifier
-    tree_sha = sqlalchemy.Column(sqlalchemy.String(40))
-    #: Commit messate
+    #: The commit message.
     message = sqlalchemy.Column(sqlalchemy.UnicodeText())
-    #: Commit timestamp
-    timestamp = sqlalchemy.Column(sqlalchemy.String(60))
-    #: URL to the commit page
-    url = sqlalchemy.Column(sqlalchemy.UnicodeText())
-    #: Name of author
+    #: The git author's name.
     author_name = sqlalchemy.Column(sqlalchemy.UnicodeText())
-    #: Email of author
+    #: The git author's email address.
     author_email = sqlalchemy.Column(sqlalchemy.String(255))
-    #: Login of author
-    author_login = sqlalchemy.Column(sqlalchemy.String(40))
-    #: Name of committer
-    committer_name = sqlalchemy.Column(sqlalchemy.UnicodeText())
-    #: Email of committer
-    committer_email = sqlalchemy.Column(sqlalchemy.String(255))
-    #: Login of committer
-    committer_login = sqlalchemy.Column(sqlalchemy.String(40))
+    #: Whether this commit is distinct from any that have been pushed before.
+    distinct = sqlalchemy.Column(sqlalchemy.Boolean)
     #: ID of push where the commit belongs to
     push_id = sqlalchemy.Column(
         sqlalchemy.Integer, sqlalchemy.ForeignKey('Push.id')
@@ -760,20 +747,13 @@ class Commit(db.Model, SearchableMixin):
     #: Push where the commit belongs to
     push = sqlalchemy.orm.relationship('Push', back_populates='commits')
 
-    def __init__(self, sha, tree_sha, message, timestamp, url,
-                 author_name, author_email, author_login,
-                 committer_name, committer_email, committer_login, push):
+    def __init__(self, sha, message, author_name, author_email, distinct,
+                 push):
         self.sha = sha
-        self.tree_sha = tree_sha
         self.message = message
-        self.timestamp = timestamp
-        self.url = url
         self.author_name = author_name
         self.author_email = author_email
-        self.author_login = author_login
-        self.committer_name = committer_name
-        self.committer_email = committer_email
-        self.committer_login = committer_login
+        self.distinct = distinct
         self.push = push
 
     @staticmethod
@@ -791,16 +771,10 @@ class Commit(db.Model, SearchableMixin):
         """
         return Commit(
             commit_dict['sha'],
-            commit_dict['tree_sha'],
             commit_dict['message'],
-            commit_dict['timestamp'],
-            commit_dict['html_url'],
             commit_dict['author']['name'],
             commit_dict['author']['email'],
-            commit_dict['author']['login'],
-            commit_dict['committer']['name'],
-            commit_dict['committer']['email'],
-            commit_dict['committer']['login'],
+            commit_dict['distinct'],
             push
         )
 

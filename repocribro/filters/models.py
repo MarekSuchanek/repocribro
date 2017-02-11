@@ -57,6 +57,21 @@ def gh_user_link(user):
     )
 
 
+def gh_push_url(push):
+    """Convert push to compare GitHub URL
+
+    :param push: Push to be converted
+    :type push: ``repocribro.models.Push``
+    :return: URL to GitHub compare page
+    :rtype: str
+    """
+    before = push.before[:10]
+    after = push.after[:10]
+    return 'https://github.com/{0}/compare/{1}...{2}'.format(
+        push.repository.full_name, before, after
+    )
+
+
 def gh_repo_link(repo):
     """Convert repo to its GitHub URL
 
@@ -89,5 +104,6 @@ model_filters = {
     'repo_link': repo_link,
     'gh_user_link': gh_user_link,
     'gh_repo_link': gh_repo_link,
+    'gh_push_url': gh_push_url,
     'gh_repo_visibility': gh_repo_visibility
 }

@@ -8,7 +8,6 @@
             <th>Timestamp</th>
             <th>Ref</th>
             <th>Before - After</th>
-            <th>Pusher</th>
             <th>Sender</th>
             <th>Commits</th>
             <th></th>
@@ -21,11 +20,10 @@
             <td>{{ push.timestamp }}</td>
             <td>{{ push.ref }}</td>
             <td>{{ push.before[:7] }} - {{ push.after[:7] }}</td>
-            <td>{{ push.pusher_login }}</td>
             <td>{{ push.sender_login }}</td>
-            <td>{{ push.commits|length }}</td>{# TODO: filter #}
+            <td>{{ push.size }}</td>
             <td>
-                <a href="{{ push.compare_url }}">{{ octicon('mark-github') }}</a>
+                <a href="{{ push|gh_push_url }}" target="_blank">{{ octicon('mark-github') }}</a>
             </td>
         </tr>
     {% endfor %}

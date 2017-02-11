@@ -223,14 +223,11 @@ def filled_db_session(empty_db_session):
                       'Some description', 'author_id', 'author_login',
                       'sender_login', 'sender_id', repo1)
     session.add(release)
-    push = Push('abc', 'def', 'refs/heads/changes', datetime.datetime.now(),
-                '', 'pusher_name', 'pusher_email', 'sender_login', 'sender_id',
-                repo1)
+    push = Push(484, 'refs/heads/changes', 'abc', 'def', 1, 1,
+                datetime.datetime.now(), 'sender_login', 'sender_id', repo1)
     session.add(push)
-    commit = Commit('def', 'tsha', 'Dummy commit', '',
-                    '', 'author_name', 'author_email', 'author_login',
-                    'committer_name', 'committer_email', 'committer_login',
-                    push)
+    commit = Commit('def', 'Dummy commit', 'author_name', 'author_email',
+                    True, push)
     session.add(commit)
     session.commit()
     return session

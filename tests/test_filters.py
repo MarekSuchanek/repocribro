@@ -1,9 +1,10 @@
+import datetime
 import jinja2
 import pytest
 
 from repocribro.filters.common import *
 from repocribro.filters.models import *
-from repocribro.models import Repository, User, Organization
+from repocribro.models import Repository, User, Organization, Push
 
 
 def test_yes_no():
@@ -100,6 +101,17 @@ def test_gh_repo_link():
     assert repo.full_name in result
     assert 'https://github.com' in result
     assert isinstance(result, jinja2.Markup)
+
+
+def test_gh_push_url():
+    repo = Repository(777, None, 'some/repo', 'repo', 'C++', '', '',
+                      False, None, None, Repository.VISIBILITY_PRIVATE)
+    push = Push(484, 'refs/heads/changes', 'abc', 'def', 1, 1,
+                datetime.datetime.now(), 'sender_login', 'sender_id', repo)
+    result = gh_push_url(push)
+    assert push.repository.full_name in result
+    assert 'https://github.com' in result
+    assert 'compare' in result
 
 
 def test_gh_repo_visibility():
