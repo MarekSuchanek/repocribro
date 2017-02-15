@@ -223,16 +223,15 @@ def repo_deactivate(reponame):
     )
 
 
-@manage.route('/repos/delete', methods=['POST'])
+@manage.route('/repo/<reponame>/delete', methods=['POST'])
 @flask_login.login_required
-def repo_delete():
+def repo_delete(reponame):
     """Delete repo (in app) from GitHub (POST handler)"""
     db = flask.current_app.container.get('db')
     gh_api = flask.current_app.container.get(
         'gh_api', token=flask.session['github_token']
     )
 
-    reponame = flask.request.form.get('reponame')
     user = flask_login.current_user.github_user
     full_name = Repository.make_full_name(user.login, reponame)
 

@@ -19,7 +19,7 @@ def test_unauthorized_get(app_client, route):
     'route', [
         '/manage/repo/dummyRepo/activate',
         '/manage/repo/dummyRepo/deactivate',
-        '/manage/repos/delete'
+        '/manage/repo/dummyRepo/delete'
     ]
 )
 def test_unauthorized_post(app_client, route):
@@ -67,7 +67,7 @@ def test_authorized_repo_unexisting(filled_db_session, app_client):
     res = app_client.post('/manage/repo/yolo/deactivate')
     assert res.status == '404 NOT FOUND'
 
-    res = app_client.post('/manage/repos/delete', data={'reponame': 'none'})
+    res = app_client.post('/manage/repo/yolo/delete')
     assert res.status == '404 NOT FOUND'
 
 
@@ -234,9 +234,7 @@ def test_authorized_repo_delete(filled_db_session, app_client):
     filled_db_session.commit()
     assert repo2 is not None
 
-    res = app_client.post('/manage/repos/delete', data={
-        'reponame': 'repo2'
-    })
+    res = app_client.post('/manage/repo/repo2/delete')
     assert res.status == '302 FOUND'
     repo2 = filled_db_session.query(Repository).filter_by(
         full_name='regular/repo2'
