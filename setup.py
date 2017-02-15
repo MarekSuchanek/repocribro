@@ -5,7 +5,7 @@ with open('README.rst') as f:
 
 setup(
     name='repocribro',
-    version='0.1',
+    version='0.1.001',
     keywords='github repositories sieve projects community',
     description='Extensible sifting tool for information from GitHub repositories',
     long_description=long_description,
@@ -22,7 +22,18 @@ setup(
             'static/fonts/*.*',
             'static/pics/*.png',
             'templates/*.html',
-            'templates/core/*.html'
+            'templates/admin/*.html',
+            'templates/admin/tabs/*.html',
+            'templates/core/*.html',
+            'templates/core/org/*.html',
+            'templates/core/repo/*.html',
+            'templates/core/repo_owner/*.html',
+            'templates/core/search/*.html',
+            'templates/core/user/*.html',
+            'templates/error/*.html',
+            'templates/macros/*.html',
+            'templates/manage/*.html',
+            'templates/manage/dashboard/*.html',
         ]
     },
     entry_points={
@@ -57,7 +68,7 @@ setup(
         'pytest'
     ],
     classifiers=[
-        'Development Status :: 1 - Planning',
+        'Development Status :: 4 - Beta',
         'Environment :: Web Environment',
         'Framework :: Flask',
         'Intended Audience :: Developers',
