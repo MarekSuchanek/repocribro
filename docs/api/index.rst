@@ -8,6 +8,7 @@ API
 
    repocribro/api.rst
    repocribro/commands.rst
+   repocribro/config.rst
    repocribro/controllers.rst
    repocribro/ext_core.rst
    repocribro/extending.rst

@@ -5,7 +5,7 @@ with open('README.rst') as f:
 
 setup(
     name='repocribro',
-    version='0.1.002',
+    version='0.1.003',
     keywords='github repositories sieve projects community',
     description='Extensible sifting tool for information from GitHub repositories',
     long_description=long_description,
@@ -45,8 +45,8 @@ setup(
         ]
     },
     install_requires=[
+        'configparser',
         'Flask>=0.12',
-        'flask-ini',
         'flask-login',
         'flask-migrate',
         'flask-principal',

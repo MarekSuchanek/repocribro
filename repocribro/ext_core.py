@@ -178,6 +178,13 @@ class CoreExtension(Extension):
             'repository': [gh_event_repository],
         }
 
+    def setup_config(self):
+        """Setup necessary configuration attributes"""
+        config = self.app.container.get('config')
+        config.mark_mandatory('github', 'client_id')
+        config.mark_mandatory('github', 'client_secret')
+        config.mark_mandatory('github', 'webhooks_secret')
+
     def init_business(self):
         """Init business layer (other extensions, what is needed)"""
         from .security import init_login_manager

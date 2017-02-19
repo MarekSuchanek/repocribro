@@ -1,8 +1,8 @@
 import flask
-import flask_ini
 import os
 
 from .extending import ExtensionsMaster
+from .config import create_config, check_config
 
 #: Paths to default configuration files
 DEFAULT_CONFIG_FILES = [
@@ -88,26 +88,29 @@ def create_app(cfg_files='DEFAULT'):
     :return: Constructed web application
     :rtype: ``repocribro.repocribro.Repocribro``
     """
+    app = Repocribro()
+    from .database import db
+    ext_master = ExtensionsMaster(app=app, db=db)
+    app.container.set_singleton('ext_master', ext_master)
+
     if cfg_files == 'DEFAULT':
         cfg_files = os.environ.get('REPOCRIBRO_CONFIG_FILE',
                                    DEFAULT_CONFIG_FILES)
 
-    app = Repocribro()
-    app.config['RELEASE'] = RELEASE
-    with app.app_context():
-        app.iniconfig = flask_ini.FlaskIni()
-        app.iniconfig.read(cfg_files)
-    app.secret_key = app.iniconfig.get('flask', 'secret_key')
-    app.container.set_singleton('config', app.iniconfig)
+    config = create_config(cfg_files)
+    config.set('flask', 'release', RELEASE)
+    app.container.set_singleton('config', config)
+    ext_master.call('setup_config')
+    config.update_flask_cfg(app)
+    check_config(config)
 
-    from .database import db
+    app.secret_key = config.get('flask', 'secret_key')
+
     db.init_app(app)
     app.container.set_singleton('db', db)
 
-    ext_master = ExtensionsMaster(app=app, db=db)
     ext_names = ext_master.call('introduce', 'unknown')
     print('Loaded extensions: {}'.format(', '.join(ext_names)))
-    app.container.set_singleton('ext_master', ext_master)
 
     ext_master.call('init_first')
     ext_master.call('init_models')
@@ -115,5 +118,4 @@ def create_app(cfg_files='DEFAULT'):
     ext_master.call('init_filters')
     ext_master.call('init_blueprints')
     ext_master.call('init_container')
-
     return app
