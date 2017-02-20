@@ -12,87 +12,47 @@ which are developed by different users and organizations.
 *Cribro* means sieve in `Italian language`_ (origins in Latin word *cribrum*). This project 
 provides tool for intelligent sifting repositories, information about them and its contents.
 
-
-Typical use cases
------------------
+Typical use cases of Repocribro:
 
 - **Community** - repositories hub of examples / projects related to the community (methodology, 
   standards, ...)
 - **Courses** - gathering and evaluating homeworks
 
+Installation and usage
+----------------------
 
-Specification
--------------
+Installation is done via standard way by ``setup.py`` file, alternatively you can install
+by ``pip`` but there are just major releases and bugfixed versions. You need to have Python
+3.5+ (tested with 3.5 and 3.6), all dependencies will be installed automatically.
 
-- Python-powered web application (`Flask`_ + `SQLAlchemy`_)
-- Distributed as python package (will be on `PyPi`_) and via GitHub
-- Ability to extend via python packages (from `PyPi`_)
+::
 
-  - Extend web interface, functionality and/or CLI commands
+    $ python setup.py install
+    $ repocribro --version
+    $ repocribro --help
 
-- Functionality
+You can also setup virtual Python environment before installation:
 
-  - User login via GitHub account (will create an account in app paired with GitHub account)
-  - Each user has own page with details and list of (public) repositories in app
-  - User can allow/forbid own GitHub repository within app
-  - Each registered repository has own page with details and history, details are gathered via 
-    `GitHub API`_ and some are stored in DB
-  - User can define if the repository page should be public, hidden (secret URL) or private 
-    (logged owner and admins)
-  - User has privileges (user/admin)
+::
 
-    - User = managing own repositories
-    - Admin = managing everything
-    - More roles can be created and privileges assigned to roles
+    $ python -venv env
+    $ . env/bin/activate
+    (env) $ python3 setup.py install
 
-  - Search repositories (by name, author, description, language, ...)
-  - Administration zone
+For running the application you will need to set up the configuration with GitHub client ID and
+secret, security keys, database and so on.
 
-    - User management
-    - Repositories management
-    - Other settings including extension settings
+For details please visit `repocribro.readthedocs.io`_.
 
-  - Listening (`webhooks`_) for changes in repository:
+Bugs, ideas, extensions and experience
+--------------------------------------
 
-    - ``push``
-    - ``release``
-    - ``repository``
+If you find any bug, get any idea or have any experience with **Repocribro** - let us know via
+`issues@GitHub`_. **Repocribro** is extensible, if you are developing any extension or have an
+idea for some new extension, let us know via `issues@GitHub`_ too. Please use a corresponding
+label.
 
-  - REST API for search, repository detail and user detail (public content)
-  - All/one repository check can be run as procedure (added to cron or runned at start of 
-    the application)
-- Documentation will be provided (`Sphinx`_, `readthedocs`_)
-- Everything what can be will be tested (`pytest`_, `Travis CI`_, coverage)
-
-
-Ideas for extensions
---------------------
-
-- ``repocribro-file``
-
-  - Read file info and store it in database for repository
-
-- ``repocribro-test``
-
-  - Run test/other script on repository contents and show evaluation on repository page
-  - ``repocribro-test-docker``
-
-    - Allow to run tests inside `Docker`_ (or other container) with restrictions so hosting 
-      system cannot be harmed
-
-- ``repocribro-badge``
-
-  - Add functionality to generate badge for repository (like `shields.io`_)
-
-- ``repocribro-<event>``
-
-  - Adding some actions for more webhooks (issues, milestones, statuses, …)
-
-- ``repocribro-gitlab``, ``repocribro-bitbucket``, ...
-- ``repocribro-<org>``
-
-  - Domain/organization-specific functionality
-
+For details please visit `repocribro.readthedocs.io`_ and `wiki@GitHub`_.
 
 License
 -------
@@ -100,17 +60,9 @@ License
 This project is licensed under the MIT License - see the `LICENSE`_ file for more details.
 
 .. _Italian language: https://en.wiktionary.org/wiki/cribro
-.. _Flask: http://flask.pocoo.org
-.. _SQLAlchemy: http://www.sqlalchemy.org
-.. _PyPi: https://pypi.python.org/pypi
-.. _GitHub API: https://developer.github.com/v3/
-.. _webhooks: https://developer.github.com/webhooks/
-.. _Sphinx: http://www.sphinx-doc.org/
-.. _readthedocs: https://readthedocs.org
-.. _pytest: http://doc.pytest.org
-.. _Travis CI: https://travis-ci.org
-.. _Docker: https://www.docker.com
-.. _shields.io: http://shields.io
+.. _repocribro.readthedocs.io: http://repocribro.readthedocs.io/en/latest/
+.. _wiki@GitHub: https://github.com/MarekSuchanek/repocribro/wiki
+.. _issues@GitHub: https://github.com/MarekSuchanek/repocribro/issues
 .. _LICENSE: LICENSE
 
 .. |license| image:: https://img.shields.io/badge/license-MIT-blue.svg
