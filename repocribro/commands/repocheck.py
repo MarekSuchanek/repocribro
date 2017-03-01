@@ -72,18 +72,18 @@ class RepocheckCommand(flask_script.Command):
         :raises SystemExit: if GitHub API request fails
         """
         gh_repo = self.gh_api.get('/repos/{}'.format(repo.full_name))
-        if gh_repo.status_code != 200:
+        if not gh_repo.is_ok:
             print('GitHub doesn\'t know about that repo: {}'.format(
-                gh_repo.json()['message']
+                gh_repo.data['message']
             ))
             exit(3)
         gh_events = self.gh_api.get('/repos/{}/events'.format(repo.full_name))
-        if gh_events.status_code != 200:
+        if not gh_events.is_ok:
             print('GitHub doesn\'t returned events for: {}'.format(
                 repo.full_name
             ))
             return
-        for event in gh_events.json():
+        for event in gh_events.data:
             new = self._process_event(repo, event)
             if not new:
                 break

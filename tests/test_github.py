@@ -10,19 +10,18 @@ def test_login_bad(github_api):
 
 def test_get_user_self(github_api):
     user = github_api.get('/user')
-    assert user.status_code == 200
-    user_data = user.json()
-    assert 'login' in user_data
+    assert user.is_ok
+    assert 'login' in user.data
 
 
 def test_get_webhooks_bad(github_api):
     res = github_api.webhooks_get(NOT_REPOSITORY)
-    assert res == []
+    assert not res.is_ok
 
 
 def test_get_webhook_bad(github_api):
     res = github_api.webhook_get(REPOSITORY, 666)
-    assert res is None
+    assert not res.is_ok
 
 
 def test_get_webhook_create_check(github_api):
@@ -33,17 +32,17 @@ def test_get_webhook_create_check(github_api):
     webhook_id = res['id']
 
     res = github_api.webhooks_get(REPOSITORY)
-    assert len(res) >= 1
+    assert len(res.data) >= 1
     found = False
-    for webhook in res:
+    for webhook in res.data:
         if webhook['id'] == webhook_id:
             found = True
             break
     assert found
 
     res = github_api.webhook_get(REPOSITORY, webhook_id)
-    assert res is not None
-    assert res['id'] == webhook_id
+    assert res.is_ok
+    assert res.data['id'] == webhook_id
 
     # Delivery on localhost must fail
     assert not github_api.webhook_tests(REPOSITORY, webhook_id)
@@ -63,7 +62,7 @@ def test_get_webhook_delete_check(github_api):
     assert res
 
     res = github_api.webhook_get(REPOSITORY, webhook_id)
-    assert res is None
+    assert not res.is_ok
 
 
 def compute_signature(payload, secret):

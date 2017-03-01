@@ -4,6 +4,111 @@ import json
 import requests
 
 
+class GitHubResponse:
+    """Wrapper for GET request response from GitHub"""
+
+    def __init__(self, response):
+        self.response = response
+
+    @property
+    def is_ok(self):
+        """Check if request has been successful
+
+        :return: if it was OK
+        :rtype: bool
+        """
+        return self.response.status_code < 300
+
+    @property
+    def data(self):
+        """Response data as dict/list
+
+        :return: data of response
+        :rtype: dict|list
+        """
+        return self.response.json()
+
+    @property
+    def url(self):
+        """URL of the request leading to this response
+
+        :return: URL origin
+        :rtype: str
+        """
+        return self.response.url
+
+    @property
+    def links(self):
+        """Response header links
+
+        :return: URL origin
+        :rtype: dict
+        """
+        return self.response.links
+
+    @property
+    def is_first_page(self):
+        """Check if this is the first page of data
+
+        :return:  if it is the first page of data
+        :rtype: bool
+        """
+        return 'first' not in self.links
+
+    @property
+    def is_last_page(self):
+        """Check if this is the last page of data
+
+        :return:  if it is the last page of data
+        :rtype: bool
+        """
+        return 'last' not in self.links
+
+    @property
+    def is_only_page(self):
+        """Check if this is the only page of data
+
+        :return: if it is the only page page of data
+        :rtype: bool
+        """
+        return self.is_first_page and self.is_last_page
+
+    @property
+    def total_pages(self):
+        """Number of pages
+
+        :return: number of pages
+        :rtype: int
+        """
+        if 'last' not in self.links:
+            return self.actual_page
+        return self.parse_page_number(self.links['last']['url'])
+
+    @property
+    def actual_page(self):
+        """Actual page number
+
+        :return: actual page number
+        :rtype: int
+        """
+        return self.parse_page_number(self.url)
+
+    @staticmethod
+    def parse_page_number(url):
+        """Parse page number from GitHub GET URL
+
+        :param url: URL used for GET request
+        :type url: str
+        :return: page number
+        :rtype: int
+        """
+        params = url.split("?")[1].split('=')
+        params = {k: v for k, v in zip(params[0::2], params[1::2])}
+        if 'page' not in params:
+            return 1
+        return int(params['page'])
+
+
 class GitHubAPI:
     """Simple GitHub API communication wrapper
 
@@ -11,7 +116,7 @@ class GitHubAPI:
     resources and special methods for working with webhooks.
 
     :todo: handle if GitHub is out of service, custom errors,
-           pagination, better abstraction, work with extensions
+           better abstraction, work with extensions
     """
 
     #: URL to GitHub API
@@ -84,32 +189,25 @@ class GitHubAPI:
         self.scope = [x for x in data['scope'].split(',')]
         return True
 
-    def get(self, what):
+    def get(self, what, page=0):
         """Perform GET request on GitHub API
 
         :param what: URI of requested resource
         :type what: str
-        :return: Response to the GET request
-        :rtype: ``requests.Response``
+        :param page: Number of requested page
+        :type page: int
+        :return: Response from the GitHub
+        :rtype: ``repocribro.github.GitHubResponse``
 
         :todo: pagination of content
         """
-        return self.session.get(
-            self.API_URL + what,
+        uri = self.API_URL + what
+        if page > 0:
+            uri += '?page={}'.format(page)
+        return GitHubResponse(self.session.get(
+            uri,
             headers=self._get_auth_header()
-        )
-
-    def get_data(self, what):
-        """Perform GET request on GitHub API
-
-        :param what: URI of requested resource
-        :type what: str
-        :return: Data of the response
-        :rtype: dict or None
-
-        :todo: pagination of content
-        """
-        return self.get(what).json()
+        ))
 
     def webhook_get(self, full_name, id):
         """Perform GET request for repo's webhook
@@ -121,10 +219,7 @@ class GitHubAPI:
         :return: Data of the webhook
         :rtype: dict or None
         """
-        response = self.get('/repos/{}/hooks/{}'.format(full_name, id))
-        if response.status_code == 200:
-            return response.json()
-        return None
+        return self.get('/repos/{}/hooks/{}'.format(full_name, id))
 
     def webhooks_get(self, full_name):
         """GET all webhooks of the repository
@@ -134,10 +229,7 @@ class GitHubAPI:
         :return: List of returned webhooks
         :rtype: list
         """
-        response = self.get('/repos/{}/hooks'.format(full_name))
-        if response.status_code == 200:
-            return response.json()
-        return []
+        return self.get('/repos/{}/hooks'.format(full_name))
 
     def webhook_create(self, full_name, hook_url, events=None):
         """Create new webhook for specified repository

@@ -12,6 +12,7 @@ API
    repocribro/controllers.rst
    repocribro/ext_core.rst
    repocribro/extending.rst
+   repocribro/github.rst
    repocribro/manage.rst
    repocribro/models.rst
    repocribro/repocribro.rst

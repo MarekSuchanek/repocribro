@@ -1,14 +1,12 @@
 import betamax
-import datetime
 import pytest
 import flask
 import os
 import json
-from betamax.cassette import cassette
 
 from repocribro import create_app
 from repocribro.database import db as _db
-from repocribro.github import GitHubAPI
+from repocribro.github import GitHubAPI, GitHubResponse
 
 ABS_PATH = os.path.abspath(os.path.dirname(__file__))
 FLASK_CONFIG_FILE = ABS_PATH + '/fixtures/config.cfg'
@@ -409,8 +407,12 @@ class FakeGitHubAPI:
 
     def get(self, what):
         if what in self.DATA:
-            return FakeResponse(200, self.DATA[what])
-        return FakeResponse(404, {'message': 'Not Found'})
+            return GitHubResponse(
+                FakeResponse(200, self.DATA[what])
+            )
+        return GitHubResponse(
+            FakeResponse(404, {'message': 'Not Found'})
+        )
 
     def get_data(self, what):
         return self.get(what).json()

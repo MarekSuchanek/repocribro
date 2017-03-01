@@ -36,7 +36,7 @@ def update_profile():
         'gh_api', token=flask.session['github_token']
     )
 
-    user_data = gh_api.get_data('/user')
+    user_data = gh_api.get('/user').data
     gh_user = flask_login.current_user.github_user
     gh_user.update_from_dict(user_data)
     db.session.commit()
@@ -51,11 +51,11 @@ def repositories():
         'gh_api', token=flask.session['github_token']
     )
 
-    repos_data = gh_api.get_data('/user/repos')
+    gh_repos = gh_api.get('/user/repos')
     user = flask_login.current_user.github_user
     active_ids = [repo.github_id for repo in user.repositories]
     return flask.render_template(
-        'manage/repos.html', repos=repos_data,
+        'manage/repos.html', repos=gh_repos.data,
         Repository=Repository, active_ids=active_ids
     )
 
@@ -136,7 +136,7 @@ def repo_update(reponame):
     repo = db.session.query(Repository).filter_by(full_name=full_name).first()
     if repo is None:
         flask.abort(404)
-    repo_data = gh_api.get_data('/repos/' + full_name)
+    repo_data = gh_api.get('/repos/' + full_name).data
     repo.update_from_dict(repo_data)
     db.session.commit()
     return flask.redirect(
@@ -171,11 +171,11 @@ def repo_activate(reponame):
     repo = db.session.query(Repository).filter_by(full_name=full_name).first()
 
     response = gh_api.get('/repos/' + full_name)
-    if response.status_code != 200:
+    if not response.is_ok:
         flask.flash('GitHub didn\'t give us data about that repository',
                     'error')
         return flask.redirect(flask.url_for('manage.repositories'))
-    gh_repo = response.json()
+    gh_repo = response.data
 
     if repo is None:
         repo = Repository.create_from_dict(gh_repo, user)
@@ -256,7 +256,7 @@ def organizations():
         'gh_api', token=flask.session['github_token']
     )
 
-    orgs_data = gh_api.get_data('/user/orgs')
+    orgs_data = gh_api.get('/user/orgs').data
     return flask.render_template(
         'manage/orgs.html',
         orgs_json=json.dumps(

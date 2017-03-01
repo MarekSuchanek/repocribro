@@ -26,7 +26,7 @@ def github_callback_get_account(db, gh_api):
     :return: User account and flag if it's new one
     :rtype: tuple of ``repocribro.models.UserAccount``, bool
     """
-    user_data = gh_api.get_data('/user')
+    user_data = gh_api.get('/user').data
     gh_user = db.session.query(User).filter(
         User.github_id == user_data['id']
     ).first()
