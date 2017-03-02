@@ -50,6 +50,7 @@ class ExtensionsMaster:
                 ))
             else:
                 self.exts.append(e)
+        self.exts.sort(key=lambda e: e.PRIORITY)
 
     def call(self, hook_name, default=None, *args, **kwargs):
         """Call the hook on all extensions registered

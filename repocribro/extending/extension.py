@@ -9,6 +9,9 @@ class Extension:
     can override those attributes and methods to make so behavior
     and extend repocribro. It also provides some useful methods to
     those subclasses.
+
+    :todo: Consider loading/asking order not by priority but by
+           dependencies
     """
 
     #: Name of extension
@@ -23,6 +26,8 @@ class Extension:
     HOME_URL = None
     #: GitHub url of extension project
     GH_URL = None
+    #: Priority (lower will be loaded/asked sooner)
+    PRIORITY = 1000
 
     def __init__(self, master, app, db):
         """Inits the basic two parts of repocribro - flask app and DB

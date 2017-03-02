@@ -140,6 +140,8 @@ class CoreExtension(Extension):
     AUTHOR = 'Marek Suchánek'
     #: GitHub URL of core extension
     GH_URL = 'https://github.com/MarekSuchanek/repocribro'
+    #: Priority of core extension
+    PRIORITY = 0
 
     def __init__(self, master, app, db):
         super().__init__(master, app, db)
