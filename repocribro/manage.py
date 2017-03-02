@@ -9,8 +9,8 @@ from .repocribro import create_app, PROG_NAME, VERSION
 def run():
     """Run the CLI manager for the web application
 
-    :todo: allow extension add options & commands,
-           separate create and run part of function
+    .. todo:: allow extension add options & commands,
+              separate create and run part of function
     """
     manager = flask_script.Manager(create_app)
     manager.add_option('-c', '--config', dest='cfg_files',

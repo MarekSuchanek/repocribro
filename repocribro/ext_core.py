@@ -11,7 +11,7 @@ from .github import GitHubAPI
 def gh_webhook_push(db, repo, data, delivery_id):
     """Process push webhook msg
 
-    :todo: deal with limit of commits in webhook msg (20)
+    .. todo:: deal with limit of commits in webhook msg (20)
     """
     push = Push.create_from_dict(data['push'], data['sender'], repo)
     db.session.add(push)
@@ -30,7 +30,7 @@ def gh_webhook_repository(db, repo, data, delivery_id):
 
     This can be one of "created", "deleted", "publicized", or "privatized".
 
-    :todo: find out where is "updated" action
+    .. todo:: find out where is "updated" action
     """
     action = data['action']
     if action == 'privatized':

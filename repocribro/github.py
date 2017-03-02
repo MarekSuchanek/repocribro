@@ -115,8 +115,8 @@ class GitHubAPI:
     It provides simple way for getting the basic GitHub API
     resources and special methods for working with webhooks.
 
-    :todo: handle if GitHub is out of service, custom errors,
-           better abstraction, work with extensions
+    .. todo:: handle if GitHub is out of service, custom errors,
+             better abstraction, work with extensions
     """
 
     #: URL to GitHub API
@@ -169,7 +169,7 @@ class GitHubAPI:
         :return: If the auth procedure was successful
         :rtype: bool
 
-        :todo: check granted scope vs GH_SCOPES
+        .. todo:: check granted scope vs GH_SCOPES
         """
         response = self.session.post(
             self.TOKEN_URL,
@@ -198,8 +198,6 @@ class GitHubAPI:
         :type page: int
         :return: Response from the GitHub
         :rtype: ``repocribro.github.GitHubResponse``
-
-        :todo: pagination of content
         """
         uri = self.API_URL + what
         if page > 0:

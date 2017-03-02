@@ -21,6 +21,7 @@ Contents
    :maxdepth: 2
 
    testing
+   todo
    extensions/index
    api/index
 

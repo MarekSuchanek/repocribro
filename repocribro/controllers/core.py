@@ -19,7 +19,7 @@ def index():
 def search(query=''):
     """Search page (GET handler)
 
-    :todo: more attrs, limits & pages
+    .. todo:: more attrs, limits & pages
     """
     ext_master = flask.current_app.container.get('ext_master')
 
@@ -40,7 +40,7 @@ def search(query=''):
 def user_detail(login):
     """User detail (GET handler)
 
-    :todo: implement 410 (user deleted/archived/renamed)
+    .. todo:: implement 410 (user deleted/archived/renamed)
     """
     db = flask.current_app.container.get('db')
     ext_master = flask.current_app.container.get('ext_master')
@@ -71,7 +71,7 @@ def user_detail(login):
 def org_detail(login):
     """Organization detail (GET handler)
 
-    :todo: implement 410 (org deleted/archived/renamed)
+    .. todo:: implement 410 (org deleted/archived/renamed)
     """
     db = flask.current_app.container.get('db')
     ext_master = flask.current_app.container.get('ext_master')
@@ -105,7 +105,7 @@ def repo_redir(login):
 def repo_detail_common(db, ext_master, repo, has_secret=False):
     """Repo detail (for GET handlers)
 
-    :todo: implement 410 (repo deleted/archived/renamed)
+    .. todo:: implement 410 (repo deleted/archived/renamed)
     """
     if repo is None:
         flask.abort(404)

@@ -29,7 +29,7 @@ def dashboard():
 def update_profile():
     """Update user info from GitHub (GET handler)
 
-    :todo: protect from updating too often
+    .. todo:: protect from updating too often
     """
     db = flask.current_app.container.get('db')
     gh_api = flask.current_app.container.get(
@@ -70,7 +70,7 @@ def has_good_webhook(gh_api, repo):
     :return: If webhook is already in good shape
     :rtype: bool
 
-    :todo: move somewhere else, check registered events
+    .. todo:: move somewhere else, check registered events
     """
     if repo.webhook_id is None:
         return False
@@ -88,7 +88,7 @@ def update_webhook(gh_api, repo):
     :return: If webhook is now in good shape
     :rtype: bool
 
-    :todo: move somewhere else
+    .. todo:: move somewhere else
     """
     if not has_good_webhook(gh_api, repo):
         repo.webhook_id = None
@@ -124,7 +124,7 @@ def repo_detail(reponame):
 def repo_update(reponame):
     """Update repo info from GitHub (GET handler)
 
-    :todo: protect from updating too often
+    .. todo:: protect from updating too often
     """
     db = flask.current_app.container.get('db')
     gh_api = flask.current_app.container.get(
@@ -149,7 +149,7 @@ def repo_update(reponame):
 def repo_activate(reponame):
     """Activate repo in app from GitHub (POST handler)
 
-    :todo: protect from activating too often
+    .. todo:: protect from activating too often
     """
     db = flask.current_app.container.get('db')
     gh_api = flask.current_app.container.get(

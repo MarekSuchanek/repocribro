@@ -31,7 +31,7 @@ def init_login_manager(db):
 class Permissions:
     """ Class for prividing various permissions
 
-    :todo: allow extensions provide permissions to others
+    .. todo:: allow extensions provide permissions to others
     """
 
     #: Administrator role permission

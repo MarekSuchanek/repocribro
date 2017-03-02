@@ -37,7 +37,7 @@ class ExtensionsMaster:
         :param args: positional args to be passed to extensions
         :param kwargs: keywords args to be passed to extensions
 
-        :todo: there might be some problem with ordering of extensions
+        .. todo:: There might be some problem with ordering of extensions
         """
         entry_points = self._collect_extensions()
         self.exts = []

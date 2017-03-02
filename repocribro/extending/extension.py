@@ -10,8 +10,9 @@ class Extension:
     and extend repocribro. It also provides some useful methods to
     those subclasses.
 
-    :todo: Consider loading/asking order not by priority but by
-           dependencies
+
+    .. todo:: Consider loading/asking order not by priority but by
+              dependencies
     """
 
     #: Name of extension

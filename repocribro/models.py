@@ -530,7 +530,7 @@ class Repository(db.Model, SearchableMixin):
         :return: Created new repository
         :rtype: ``repocribro.models.Repository``
 
-        :todo: work with fork_of somehow
+        .. todo:: work with fork_of somehow
         """
         fork_of = None
         if 'parent' in repo_dict:
@@ -612,7 +612,7 @@ class Repository(db.Model, SearchableMixin):
     def events_updated(self):
         """Set that now was performed last events update of repo
 
-        :todo: How about some past events before adding to app?
+        .. todo:: How about some past events before adding to app?
         """
         self.last_event = datetime.datetime.now()
 
@@ -779,7 +779,7 @@ class Commit(db.Model, SearchableMixin):
         :return: Created new commit
         :rtype: ``repocribro.models.Commit``
 
-        :todo: verify, there are some conflict in GitHub docs
+        .. todo:: verify, there are some conflict in GitHub docs
         """
         sha = commit_dict.get('sha', None)
         if sha is None:

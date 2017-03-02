@@ -67,9 +67,10 @@ class RepocheckCommand(flask_script.Command):
 
         :param repo: Repository to be checked
         :type repo: ``repocribro.models.Repository``
-        :todo: Handle pagination of GitHub events
 
         :raises SystemExit: if GitHub API request fails
+
+        .. todo:: handle pagination of GitHub events
         """
         gh_repo = self.gh_api.get('/repos/{}'.format(repo.full_name))
         if not gh_repo.is_ok:

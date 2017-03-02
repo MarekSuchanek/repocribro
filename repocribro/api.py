@@ -13,7 +13,7 @@ def create_api(app, db):
     :return: API manager extension
     :rtype: ``flask_restless.APIManager``
 
-    :todo: Implement own or go into bigger detail (privacy, usernames, etc.)
+    .. todo:: Implement own or go into bigger detail (privacy, usernames, etc.)
     """
     api_manager = flask_restless.APIManager(app, flask_sqlalchemy_db=db)
     api_manager.create_api(
