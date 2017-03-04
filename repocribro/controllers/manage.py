@@ -47,15 +47,17 @@ def update_profile():
 @flask_login.login_required
 def repositories():
     """List user repositories from GitHub (GET handler)"""
+    page = int(flask.request.args.get('page', 0))
     gh_api = flask.current_app.container.get(
         'gh_api', token=flask.session['github_token']
     )
 
-    gh_repos = gh_api.get('/user/repos')
+    gh_repos = gh_api.get('/user/repos', page=page)
     user = flask_login.current_user.github_user
     active_ids = [repo.github_id for repo in user.repositories]
     return flask.render_template(
         'manage/repos.html', repos=gh_repos.data,
+        actual_page=gh_repos.actual_page, total_pages=gh_repos.total_pages,
         Repository=Repository, active_ids=active_ids
     )
 

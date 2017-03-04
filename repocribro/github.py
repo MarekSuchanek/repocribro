@@ -102,7 +102,9 @@ class GitHubResponse:
         :return: page number
         :rtype: int
         """
-        params = url.split("?")[1].split('=')
+        if '?' not in url:
+            return 1
+        params = url.split('?')[1].split('=')
         params = {k: v for k, v in zip(params[0::2], params[1::2])}
         if 'page' not in params:
             return 1

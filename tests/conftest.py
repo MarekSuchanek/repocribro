@@ -405,7 +405,7 @@ class FakeGitHubAPI:
         for key in ('github_token', 'github_scope'):
             flask.session.pop(key, None)
 
-    def get(self, what):
+    def get(self, what, page=0):
         if what in self.DATA:
             return GitHubResponse(
                 FakeResponse(200, self.DATA[what])
@@ -413,9 +413,6 @@ class FakeGitHubAPI:
         return GitHubResponse(
             FakeResponse(404, {'message': 'Not Found'})
         )
-
-    def get_data(self, what):
-        return self.get(what).json()
 
     def webhook_get(self, full_name, id):
         return None
@@ -440,6 +437,8 @@ class FakeResponse:
     def __init__(self, status_code, data):
         self.status_code = status_code
         self.data = data
+        self.url = ''
+        self.links = {}
 
     def json(self):
         return self.data
