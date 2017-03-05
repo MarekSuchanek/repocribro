@@ -193,8 +193,6 @@ class CoreExtension(Extension):
         login_manager, principals = init_login_manager(self.db)
         login_manager.init_app(self.app)
         principals.init_app(self.app)
-        from .api import create_api
-        api_manager = create_api(self.app, self.db)
 
     def init_container(self):
         """Init service DI container of the app"""

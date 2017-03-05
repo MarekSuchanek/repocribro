@@ -8,6 +8,21 @@ from .database import db
 Base = flask_sqlalchemy.declarative_base()
 
 
+class SerializableMixin:
+    """Mixin for models that can be serialized via dict"""
+
+    #: List of names of attributes to be serialized
+    __serializable__ = []
+
+    def to_dict(self):
+        """Creates dict with object properties
+
+        :return: Serialized object to dict
+        :rtype: dict
+        """
+        return {k: getattr(self, k) for k in self.__serializable__}
+
+
 class SearchableMixin:
     """Mixin for models that support fulltext query"""
 
@@ -123,7 +138,6 @@ class Anonymous(flask_login.AnonymousUserMixin):
 
 
 class UserMixin(flask_login.UserMixin):
-
     @property
     def is_active(self):
         """Check whether is user active
@@ -299,10 +313,13 @@ class RepositoryOwner(db.Model):
     }
 
 
-class User(RepositoryOwner, SearchableMixin):
+class User(RepositoryOwner, SearchableMixin, SerializableMixin):
     """User from GitHub"""
     __searchable__ = ['login', 'email', 'name', 'company',
                       'description', 'location']
+    __serializable__ = ['id', 'github_id', 'login', 'email', 'name', 'company',
+                        'description', 'location', 'hireable', 'avatar_url',
+                        'blog_url']
 
     #: Flag whether is user hireable
     hireable = sqlalchemy.Column(sqlalchemy.Boolean)
@@ -385,10 +402,12 @@ class User(RepositoryOwner, SearchableMixin):
         )
 
 
-class Organization(RepositoryOwner, SearchableMixin):
+class Organization(RepositoryOwner, SearchableMixin, SerializableMixin):
     """Organization from GitHub"""
     __searchable__ = ['login', 'email', 'name', 'company',
                       'description', 'location']
+    __serializable__ = ['id', 'github_id', 'login', 'email', 'name', 'company',
+                        'description', 'location', 'avatar_url', 'blog_url']
 
     def __init__(self, github_id, login, email, name, company, location,
                  description, blog_url, avatar_url):
@@ -438,10 +457,13 @@ class Organization(RepositoryOwner, SearchableMixin):
     }
 
 
-class Repository(db.Model, SearchableMixin):
+class Repository(db.Model, SearchableMixin, SerializableMixin):
     """Repository from GitHub"""
     __tablename__ = 'Repository'
     __searchable__ = ['full_name', 'languages', 'description']
+    __serializable__ = ['id', 'github_id', 'fork_of', 'full_name', 'name',
+                        'languages', 'url', 'description', 'private',
+                        'visibility_type', 'last_event', 'owner_id']
 
     #: Unique identifier of the repository
     id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
@@ -627,10 +649,13 @@ class Repository(db.Model, SearchableMixin):
         )
 
 
-class Push(db.Model, SearchableMixin):
+class Push(db.Model, SearchableMixin, SerializableMixin):
     """Push from GitHub"""
     __tablename__ = 'Push'
     __searchable__ = ['ref', 'after', 'before', 'sender_login']
+    __serializable__ = ['id', 'github_id', 'ref', 'after', 'before', 'size',
+                        'distinct_size', 'timestamp', 'sender_login',
+                        'sender_id', 'repository_id']
 
     #: Unique identifier of the push
     id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
@@ -733,12 +758,14 @@ class Push(db.Model, SearchableMixin):
         )
 
 
-class Commit(db.Model, SearchableMixin):
+class Commit(db.Model, SearchableMixin, SerializableMixin):
     """Commit from GitHub"""
     __tablename__ = 'Commit'
     __searchable__ = ['sha', 'message', 'tree_sha',
                       'author_name', 'author_name', 'author_login',
                       'committer_name', 'committer_email', 'committer_login']
+    __serializable__ = ['id', 'sha', 'message', 'author_name', 'author_email',
+                        'distinct', 'push_id']
 
     #: Unique identifier of the commit
     id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
@@ -804,11 +831,14 @@ class Commit(db.Model, SearchableMixin):
         )
 
 
-class Release(db.Model, SearchableMixin):
+class Release(db.Model, SearchableMixin, SerializableMixin):
     """Release from GitHub"""
     __tablename__ = 'Release'
     __searchable__ = ['tag_name', 'name', 'body',
                       'author_login', 'sender_login']
+    __serializable__ = ['id', 'github_id', 'tag_name', 'url', 'created_at',
+                        'published_at', 'prerelease', 'draft', 'name',
+                        'author_login', 'sender_login', 'repository_id']
 
     #: Unique identifier of the release
     id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
