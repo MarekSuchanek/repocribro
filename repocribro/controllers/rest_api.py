@@ -1,3 +1,7 @@
+"""REST API controller
+
+.. todo:: pagination of resources
+"""
 import flask
 
 from ..models import User, Repository, Release, \
@@ -13,7 +17,10 @@ PAGE_SIZE = 20
 
 @rest_api.route('/search/<query>')
 def search(query):
-    """Search searchable objects by query"""
+    """Search searchable objects by query
+
+    .. todo:: implement search within all searchable models
+    """
     flask.abort(501)
     return flask.jsonify({})
 
@@ -53,7 +60,7 @@ def get_repo_by_name(login, reponame):
     """GET Repository (public) by owner login and repo name"""
     db = flask.current_app.container.get('db')
     repo = db.session.query(Repository).filter_by(
-        fullname=Repository.make_full_name(login, reponame)
+        full_name=Repository.make_full_name(login, reponame)
     ).first()
     if repo is None or not repo.is_public:
         flask.abort(404)
