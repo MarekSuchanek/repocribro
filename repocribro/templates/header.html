@@ -10,8 +10,8 @@
                 <span class="icon-bar"></span>
             </button>
             <a class="navbar-logo" href="{{ url_for('core.index') }}">
-                <img src="{{ url_for('static', filename='pics/repocribro-icon-inv.png') }}" alt="logo" id="logo">
-                <span class="navbar-brand" href="{{ url_for('core.index') }}">repocribro</span>
+                <img src="{{ repocribro_core_logo }}" alt="logo" id="logo">
+                <span class="navbar-brand" href="{{ url_for('core.index') }}">{{ repocribro_core_name }}</span>
             </a>
         </div>
         <div id="navbar" class="navbar-collapse collapse">

@@ -196,10 +196,23 @@ class CoreExtension(Extension):
 
     def init_container(self):
         """Init service DI container of the app"""
+        config = self.app.container.get('config')
         self.app.container.set_factory(
-            'gh_api',
-            make_githup_api_factory(self.app.container.get('config'))
+            'gh_api', make_githup_api_factory(config)
         )
+        with self.app.test_request_context():
+            self.app.jinja_env.globals.update(
+                repocribro_core_name=config.get(
+                    'repocribro-core', 'name',
+                    fallback='repocribro'
+                ),
+                repocribro_core_logo=config.get(
+                    'repocribro-core', 'logo',
+                    fallback=flask.url_for(
+                        'static', filename='pics/repocribro-icon.png'
+                    )
+                )
+            )
 
     def view_core_search_tabs(self, query, tabs_dict):
         """Prepare tabs for search view of core controller

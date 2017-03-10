@@ -99,3 +99,21 @@ For example:
 .. _ConfigParser: https://docs.python.org/3/library/configparser.html
 .. _session signing: http://flask.pocoo.org/docs/0.12/quickstart/#sessions
 
+
+Core customization
+------------------
+
+You can specify name and logo for your deployment of repocribro within
+``repocribro-core`` section. More options will be added later.
+
+
+For example:
+
+.. code-block:: ini
+
+    [repocribro-core]
+    # custom name
+    NAME = myRepocribro
+    # custom logo URL
+    LOGO = https://upload.wikimedia.org/wikipedia/commons/thumb/2/2f/Logo_TV_2015.svg/2000px-Logo_TV_2015.svg.png
+
