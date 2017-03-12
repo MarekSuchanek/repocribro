@@ -1,6 +1,5 @@
 import flask
 import flask_login
-import json
 
 from ..models import Repository
 
@@ -26,7 +25,7 @@ def dashboard():
 
 @manage.route('/profile/update')
 @flask_login.login_required
-def update_profile():
+def profile_update():
     """Update user info from GitHub (GET handler)
 
     .. todo:: protect from updating too often
@@ -43,7 +42,7 @@ def update_profile():
     return flask.redirect(flask.url_for('manage.dashboard', tab='profile'))
 
 
-@manage.route('/repos')
+@manage.route('/repositories')
 @flask_login.login_required
 def repositories():
     """List user repositories from GitHub (GET handler)"""
@@ -60,6 +59,17 @@ def repositories():
         actual_page=gh_repos.actual_page, total_pages=gh_repos.total_pages,
         Repository=Repository, active_ids=active_ids
     )
+
+
+@manage.route('/repository/<path:full_name>')
+@flask_login.login_required
+def repository_detail(full_name):
+    """Repository detail (GET handler)"""
+    db = flask.current_app.container.get('db')
+
+    # TODO: check if repo in DB and has permissions
+
+    return flask.abort(501)
 
 
 def has_good_webhook(gh_api, repo):
@@ -106,49 +116,9 @@ def update_webhook(gh_api, repo):
     return True
 
 
-@manage.route('/repo/<reponame>')
+@manage.route('/repository/activate', methods=['POST'])
 @flask_login.login_required
-def repo_detail(reponame):
-    """Repository detail (GET handler)"""
-    db = flask.current_app.container.get('db')
-
-    user = flask_login.current_user.github_user
-    full_name = Repository.make_full_name(user.login, reponame)
-    repo = db.session.query(Repository).filter_by(full_name=full_name).first()
-    if repo is None:
-        flask.abort(404)
-    return flask.render_template('manage/repo.html',
-                                 repo=repo, user=user, Repository=Repository)
-
-
-@manage.route('/repo/<reponame>/update')
-@flask_login.login_required
-def repo_update(reponame):
-    """Update repo info from GitHub (GET handler)
-
-    .. todo:: protect from updating too often
-    """
-    db = flask.current_app.container.get('db')
-    gh_api = flask.current_app.container.get(
-        'gh_api', token=flask.session['github_token']
-    )
-
-    user = flask_login.current_user.github_user
-    full_name = Repository.make_full_name(user.login, reponame)
-    repo = db.session.query(Repository).filter_by(full_name=full_name).first()
-    if repo is None:
-        flask.abort(404)
-    repo_data = gh_api.get('/repos/' + full_name).data
-    repo.update_from_dict(repo_data)
-    db.session.commit()
-    return flask.redirect(
-        flask.url_for('manage.repo_detail', reponame=reponame)
-    )
-
-
-@manage.route('/repo/<reponame>/activate', methods=['POST'])
-@flask_login.login_required
-def repo_activate(reponame):
+def repository_activate():
     """Activate repo in app from GitHub (POST handler)
 
     .. todo:: protect from activating too often
@@ -158,6 +128,7 @@ def repo_activate(reponame):
         'gh_api', token=flask.session['github_token']
     )
 
+    full_name = flask.request.form.get('full_name')
     visibility_type = flask.request.form.get('enable', type=int)
     if visibility_type not in (
         Repository.VISIBILITY_HIDDEN,
@@ -167,104 +138,124 @@ def repo_activate(reponame):
         flask.flash('You\'ve requested something weird...', 'error')
         return flask.redirect(flask.url_for('manage.repositories'))
 
-    user = flask_login.current_user.github_user
-    full_name = Repository.make_full_name(user.login, reponame)
-
-    repo = db.session.query(Repository).filter_by(full_name=full_name).first()
-
-    response = gh_api.get('/repos/' + full_name)
-    if not response.is_ok:
-        flask.flash('GitHub didn\'t give us data about that repository',
-                    'error')
+    gh_repo = gh_api.get('/repos/'+full_name)
+    if not gh_repo.is_ok:
+        flask.flash('Repository not found at GitHub', 'error')
         return flask.redirect(flask.url_for('manage.repositories'))
-    gh_repo = response.data
+    if not gh_repo['permissions']['admin']:
+        flask.flash('You are not admin of that repository', 'error')
+        return flask.redirect(flask.url_for('manage.repositories'))
 
-    if repo is None:
-        repo = Repository.create_from_dict(gh_repo, user)
-        db.session.add(repo)
-    else:
-        repo.update_from_dict(gh_repo)
-    if not update_webhook(gh_api, repo):
-        flask.flash('We were unable to create webhook for that repository',
-                    'warning')
-    repo.visibility_type = visibility_type
-    if repo.is_hidden:
-        repo.generate_secret()
-    db.session.commit()
-    return flask.redirect(
-        flask.url_for('manage.repo_detail', reponame=reponame)
-    )
+    # TODO: check if repo in DB, (if orgrepo add member)
+    # TODO: add webhook (register or lookup for existing)
+    # TODO: add repo to DB
+
+    return flask.jsonify(gh_repo.data)
 
 
-@manage.route('/repo/<reponame>/deactivate', methods=['POST'])
+@manage.route('/repository/deactivate', methods=['POST'])
 @flask_login.login_required
-def repo_deactivate(reponame):
+def repository_deactivate():
     """Deactivate repo in app from GitHub (POST handler)"""
     db = flask.current_app.container.get('db')
     gh_api = flask.current_app.container.get(
         'gh_api', token=flask.session['github_token']
     )
 
-    user = flask_login.current_user.github_user
-    full_name = Repository.make_full_name(user.login, reponame)
+    full_name = flask.request.form.get('full_name')
+    # TODO: check if repo in DB and user has permissions
+    # TODO: remove webhook
 
-    repo = db.session.query(Repository).filter_by(full_name=full_name).first()
-    if repo is None:
-        flask.abort(404)
-    if repo.webhook_id is not None:
-        if gh_api.webhook_delete(repo.full_name, repo.webhook_id):
-            flask.flash('Webhook was deactivated', 'success')
-        else:
-            flask.flash('GitHub couldn\'t delete the webhook', 'warning')
-        repo.webhook_id = None
-        db.session.commit()
-    else:
-        flask.flash('There is no registered the webhook', 'info')
-    return flask.redirect(
-        flask.url_for('manage.repo_detail', reponame=reponame)
-    )
+    return flask.abort(501)
 
 
-@manage.route('/repo/<reponame>/delete', methods=['POST'])
+@manage.route('/repository/delete', methods=['POST'])
 @flask_login.login_required
-def repo_delete(reponame):
+def repository_delete():
     """Delete repo (in app) from GitHub (POST handler)"""
     db = flask.current_app.container.get('db')
     gh_api = flask.current_app.container.get(
         'gh_api', token=flask.session['github_token']
     )
 
-    user = flask_login.current_user.github_user
-    full_name = Repository.make_full_name(user.login, reponame)
+    full_name = flask.request.form.get('full_name')
+    # TODO: check if repo in DB and user has permissions
+    # TODO: remove webhook
+    # TODO: remove repo from DB
 
-    repo = db.session.query(Repository).filter_by(full_name=full_name).first()
-    if repo is None:
-        flask.abort(404)
-    if repo.webhook_id is not None:
-        gh_api.webhook_delete(repo.full_name, repo.webhook_id)
-    db.session.delete(repo)
-    db.session.commit()
-    flask.flash('Repository {} has been deleted within app.'.format(full_name),
-                'success')
-    return flask.redirect(flask.url_for('manage.repositories'))
+    return flask.abort(501)
 
 
-@manage.route('/orgs')
+@manage.route('/repository/update')
 @flask_login.login_required
-def organizations():
-    """List user organizations from GitHub (GET handler)"""
-    flask.abort(501)
+def repository_update():
+    """Update repo info from GitHub (GET handler)
+
+    .. todo:: protect from updating too often
+    """
+    db = flask.current_app.container.get('db')
     gh_api = flask.current_app.container.get(
         'gh_api', token=flask.session['github_token']
     )
 
-    orgs_data = gh_api.get('/user/orgs').data
-    return flask.render_template(
-        'manage/orgs.html',
-        orgs_json=json.dumps(
-            orgs_data,
-            sort_keys=True,
-            indent=4,
-            separators=(',', ': ')
-        )
+    full_name = flask.request.form.get('full_name')
+    # TODO: check if repo in DB and user has permissions
+    # TODO: update repo from GH
+    # TODO: check if webhook is valid and fix if needed
+
+    return flask.abort(501)
+
+
+@manage.route('/organizations')
+@flask_login.login_required
+def organizations():
+    """List user organizations from GitHub (GET handler)"""
+    page = int(flask.request.args.get('page', 0))
+    gh_api = flask.current_app.container.get(
+        'gh_api', token=flask.session['github_token']
     )
+
+    gh_orgs = gh_api.get('/user/orgs', page=page)
+    orgs_link = gh_api.app_connections_link
+
+    return flask.render_template(
+        'manage/orgs.html', orgs=gh_orgs.data,
+        actual_page=gh_orgs.actual_page, total_pages=gh_orgs.total_pages,
+        orgs_link=orgs_link,
+
+    )
+
+
+@manage.route('/organization/<login>')
+@flask_login.login_required
+def organization(login):
+    """List organization repositories for activation
+
+    .. :todo: register organization in repocribro
+    .. :todo: own profile page of organization
+    """
+    ORG_REPOS_URL = '/orgs/{}/repos?type=member'
+    page = int(flask.request.args.get('page', 0))
+    gh_api = flask.current_app.container.get(
+        'gh_api', token=flask.session['github_token']
+    )
+
+    gh_repos = gh_api.get(ORG_REPOS_URL.format(login), page=page)
+    user = flask_login.current_user.github_user
+    active_ids = [repo.github_id for repo in user.repositories]
+    return flask.render_template(
+        'manage/repos.html', repos=gh_repos.data,
+        actual_page=gh_repos.actual_page, total_pages=gh_repos.total_pages,
+        Repository=Repository, active_ids=active_ids,
+        repos_type=login+' (organization)'
+    )
+
+
+@manage.route('/organization/<login>/update')
+@flask_login.login_required
+def organization_update(login):
+    """List organization repositories for activation
+
+    .. :todo: update org profile
+    """
+    return flask.abort(501)

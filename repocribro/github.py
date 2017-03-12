@@ -133,6 +133,8 @@ class GitHubAPI:
     WEBHOOKS = ['push', 'release', 'repository']
     #: Controller for incoming webhook events
     WEBHOOK_CONTROLLER = 'webhooks.gh_webhook'
+    #: URL for checking connections within GitHub
+    CONNECTIONS_URL = 'https://github.com/settings/connections/applications/{}'
 
     def __init__(self, client_id, client_secret, webhooks_secret,
                  session=None, token=None):
@@ -315,3 +317,7 @@ class GitHubAPI:
             hashlib.sha1
         )
         return hmac.compare_digest(h.hexdigest(), signature)
+
+    @property
+    def app_connections_link(self):
+        return self.CONNECTIONS_URL.format(self.client_id)

@@ -102,3 +102,9 @@ div#landing-info p {
 div#landing-info img.logo{
     max-height: 10em;
 }
+td.avatar{
+    text-align: center;
+}
+img.avatar-small{
+    max-height: 2em;
+}

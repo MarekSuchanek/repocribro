@@ -2,9 +2,9 @@
 <h2>Repositories</h2>
 
 <p>
-    Here is list of your connected repositories to <em>repocribro</em> you can
+    Here is list of your connected repositories to <em>repocribro</em>, you can
     <a href="{{ url_for('manage.repositories') }}" class="btn btn-success">{{ octicon('link') }}  connect more</a>
-    of your personal repos or browse
+    of your repos or browse
     <a href="{{ url_for('manage.organizations') }}" class="btn btn-primary">{{ octicon('organization') }} your organizations</a>.
 </p>
 
@@ -22,14 +22,14 @@
     <tbody>
     {% for repo in repos %}
         <tr>
-            <td><a href="{{ url_for('manage.repo_detail', reponame=repo.name) }}">{{ repo.name }}</a></td>
+            <td><a href="{{ url_for('manage.repository_detail', full_name=repo.full_name) }}">{{ repo.name }}</a></td>
             <td>{{ repo.languages }}</td>
             <td>{{ repo|repo_visibility }}</td>
             <td>{{ repo.pushes|length }}</td>
             <td>{{ repo.releases|length }}</td>
             <td class="btn-group">
                 <a href="{{ repo.url }}" class="btn btn-default">{{ octicon('mark-github') }}</a>
-                <a href="{{ url_for('manage.repo_detail', reponame=repo.name) }}" class="btn btn-primary">{{ octicon('repo') }}</a>
+                <a href="{{ url_for('manage.repository_detail', full_name=repo.full_name) }}" class="btn btn-primary">{{ octicon('repo') }}</a>
             </td>
         </tr>
     {% endfor %}

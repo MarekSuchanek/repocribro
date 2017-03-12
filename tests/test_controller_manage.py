@@ -44,7 +44,7 @@ def test_authorized_basic(filled_db_session, app_client):
     assert res.status == '200 OK'
 
     res = app_client.get('/manage/orgs')
-    assert res.status == '501 NOT IMPLEMENTED'
+    assert res.status == '200 OK'
 
 
 def test_authorized_repo_unexisting(filled_db_session, app_client):

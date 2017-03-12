@@ -1,14 +1,36 @@
 {% extends "layout.html" %}
+{% from 'macros/pagination.html' import pagination without context %}
+{% from "macros/basic.html" import octicon without context %}
 {% block body %}
 
     <h1>Organizations</h1>
 
-    <p>{{ retval }}</p>
-    <pre>
-    {{ orgs_json }}
-    </pre>
+    <table class="table table-striped" id="orgs-table">
+        <thead>
+        <tr>
+            <th></th>
+            <th>Name</th>
+            <th>Description</th>
+            <th></th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for org in orgs %}
+            <tr>
+                <td class="avatar"><img src="{{ org['avatar_url'] }}" class="avatar-small"></td>
+                <td>{{ org['login'] }}</td>
+                <td>{% if org['description'] %}{{ org['description'] }}{% endif %}</td>
+                <td class="btn-group">
+                    <a href="https://github.com/{{ org['login'] }}" class="btn btn-default">{{ octicon('mark-github') }}</a>
+                    <a href="{{ url_for('manage.organization', login=org['login']) }}" class="btn btn-primary">{{ octicon('repo') }}{{ octicon('tools') }}</a>
+                </td>
+            </tr>
+            </tbody>
+        {% endfor %}
+    </table>
+
+    {{ pagination('manage.organizations', actual_page, total_pages, 'orgs-table') }}
 
     <p>Do not see your organization? You need to allow access!</p>
-    <p>Review and add your authorized organizations.</p>
-    {# TODO: provide link with GitHub app client_id #}
+    <p><a href="{{ orgs_link }}" target="_blank">Review and add your authorized organizations</a>.</p>
 {% endblock %}

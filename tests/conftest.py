@@ -367,6 +367,7 @@ class FakeGitHubAPI:
     WEBHOOKS = ['push', 'release', 'repository']
     #: Controller for incoming webhook events
     WEBHOOK_CONTROLLER = 'webhooks.gh_webhook'
+    app_connections_link = 'https://github.com'
 
     def __init__(self, client_id='', client_secret='', webhooks_secret='',
                  session=None, token=None):
