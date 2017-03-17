@@ -5,10 +5,11 @@ import pytest
     'route', [
         '/manage',
         '/manage/profile/update',
-        '/manage/repos',
-        '/manage/repo/dummyRepo',
-        '/manage/repo/dummyRepo/update',
-        '/manage/orgs'
+        '/manage/repositories',
+        '/manage/repository/dummyRepo',
+        '/manage/organizations',
+        '/manage/organization/org',
+        '/manage/organization/org/update'
     ]
 )
 def test_unauthorized_get(app_client, route):
@@ -16,14 +17,15 @@ def test_unauthorized_get(app_client, route):
 
 
 @pytest.mark.parametrize(
-    'route', [
-        '/manage/repo/dummyRepo/activate',
-        '/manage/repo/dummyRepo/deactivate',
-        '/manage/repo/dummyRepo/delete'
+    ('route', 'data'), [
+        ('/manage/repository/activate', {'full_name': 'dummy/dummyRepo'}),
+        ('/manage/repository/deactivate', {'full_name': 'dummy/dummyRepo'}),
+        ('/manage/repository/delete', {'full_name': 'dummy/dummyRepo'}),
+        ('/manage/repository/update', {'full_name': 'dummy/dummyRepo'})
     ]
 )
-def test_unauthorized_post(app_client, route):
-    assert app_client.post(route).status == '403 FORBIDDEN'
+def test_unauthorized_post(app_client, route, data):
+    assert app_client.post(route, data=data).status == '403 FORBIDDEN'
 
 
 def test_authorized_basic(filled_db_session, app_client):
@@ -40,10 +42,10 @@ def test_authorized_basic(filled_db_session, app_client):
     assert res.status == '302 FOUND'
     assert user.name == 'new_n'
 
-    res = app_client.get('/manage/repos')
+    res = app_client.get('/manage/repositories')
     assert res.status == '200 OK'
 
-    res = app_client.get('/manage/orgs')
+    res = app_client.get('/manage/organizations')
     assert res.status == '200 OK'
 
 
@@ -52,22 +54,25 @@ def test_authorized_repo_unexisting(filled_db_session, app_client):
     app_client.get('/auth/github')
     app_client.get('/auth/github/callback?code=aaa')
 
-    res = app_client.get('/manage/repo/yolo')
+    res = app_client.get('/manage/repository/guy/yolo')
     assert res.status == '404 NOT FOUND'
 
-    res = app_client.get('/manage/repo/yolo/update')
+    data = {'full_name': '/guy/yolo'}
+    res = app_client.post('/manage/repository/update', data=data)
     assert res.status == '404 NOT FOUND'
 
-    res = app_client.post('/manage/repo/yolo/activate', data={'enable': '0'})
+    data['enable'] = 0
+    res = app_client.post('/manage/repository/activate', data=data)
     assert res.status == '302 FOUND'
 
-    res = app_client.post('/manage/repo/yolo/activate', data={'enable': '7'})
+    data['enable'] = 7
+    res = app_client.post('/manage/repository/activate', data=data)
     assert res.status == '302 FOUND'
 
-    res = app_client.post('/manage/repo/yolo/deactivate')
+    res = app_client.post('/manage/repository/deactivate', data=data)
     assert res.status == '404 NOT FOUND'
 
-    res = app_client.post('/manage/repo/yolo/delete')
+    res = app_client.post('/manage/repository/delete', data=data)
     assert res.status == '404 NOT FOUND'
 
 
@@ -77,26 +82,28 @@ def test_authorized_repos(filled_db_session, app_client):
     app_client.get('/auth/github')
     app_client.get('/auth/github/callback?code=aaa')
 
-    res = app_client.get('/manage/repo/repo1')
+    res = app_client.get('/manage/repository/regular/repo1')
     assert res.status == '200 OK'
     assert 'Python' in res.data.decode('utf-8')
 
     repo2 = filled_db_session.query(Repository).filter_by(
         full_name='regular/repo2'
     ).first()
+    data = {'full_name': 'regular/repo2'}
     assert repo2.languages == 'Python'
-    res = app_client.get('/manage/repo/repo2/update')
+    res = app_client.post('/manage/repository/update', data=data)
     assert res.status == '302 FOUND'
     assert repo2.languages == 'Javascript'
 
     repo2.webhook_id = 666
-    res = app_client.post('/manage/repo/repo2/deactivate')
+    res = app_client.post('/manage/repository/deactivate', data=data)
     assert res.status == '302 FOUND'
     assert repo2.webhook_id is None
-    res = app_client.post('/manage/repo/repo2/deactivate')
+    res = app_client.post('/manage/repository/deactivate', data=data)
     assert res.status == '302 FOUND'
 
-    res = app_client.post('/manage/repo/repo2/activate', data={'enable': '0'})
+    data['enable'] = 0
+    res = app_client.post('/manage/repository/activate', data=data)
     assert res.status == '302 FOUND'
     assert repo2.webhook_id is not None
     repo2 = filled_db_session.query(Repository).filter_by(
@@ -114,12 +121,13 @@ def test_authorized_repo_deactivate(filled_db_session, app_client):
     repo2 = filled_db_session.query(Repository).filter_by(
         full_name='regular/repo2'
     ).first()
+    data = {'full_name': 'regular/repo2'}
 
     repo2.webhook_id = 666
-    res = app_client.post('/manage/repo/repo2/deactivate')
+    res = app_client.post('/manage/repository/deactivate', data=data)
     assert res.status == '302 FOUND'
     assert repo2.webhook_id is None
-    res = app_client.post('/manage/repo/repo2/deactivate')
+    res = app_client.post('/manage/repository/deactivate', data=data)
     assert res.status == '302 FOUND'
 
 
@@ -132,11 +140,11 @@ def test_authorized_repo_activate_public(filled_db_session, app_client):
     repo2 = filled_db_session.query(Repository).filter_by(
         full_name='regular/repo2'
     ).first()
+    data = {'full_name': 'regular/repo2'}
     assert repo2.is_hidden
 
-    res = app_client.post('/manage/repo/repo2/activate', data={
-        'enable': Repository.VISIBILITY_PUBLIC
-    })
+    data['enable'] = Repository.VISIBILITY_PUBLIC
+    res = app_client.post('/manage/repository/activate', data=data)
     assert res.status == '302 FOUND'
     assert repo2.webhook_id is not None
     repo2 = filled_db_session.query(Repository).filter_by(
@@ -154,11 +162,11 @@ def test_authorized_repo_activate_private(filled_db_session, app_client):
     repo1 = filled_db_session.query(Repository).filter_by(
         full_name='regular/repo1'
     ).first()
+    data = {'full_name': 'regular/repo1'}
     assert repo1.is_public
 
-    res = app_client.post('/manage/repo/repo1/activate', data={
-        'enable': Repository.VISIBILITY_PRIVATE
-    })
+    data['enable'] = Repository.VISIBILITY_PRIVATE
+    res = app_client.post('/manage/repository/activate', data=data)
     assert res.status == '302 FOUND'
     repo1 = filled_db_session.query(Repository).filter_by(
         full_name='regular/repo1'
@@ -175,11 +183,11 @@ def test_authorized_repo_activate_new(filled_db_session, app_client):
     repo_new = filled_db_session.query(Repository).filter_by(
         full_name='regular/newOne'
     ).first()
+    data = {'full_name': 'regular/newOne'}
     assert repo_new is None
 
-    res = app_client.post('/manage/repo/newOne/activate', data={
-        'enable': Repository.VISIBILITY_PRIVATE
-    })
+    data['enable'] = Repository.VISIBILITY_PRIVATE
+    res = app_client.post('/manage/repository/activate', data=data)
     assert res.status == '302 FOUND'
     repo_new = filled_db_session.query(Repository).filter_by(
         full_name='regular/newOne'
@@ -196,11 +204,11 @@ def test_authorized_repo_activate_hidden(filled_db_session, app_client):
     repo1 = filled_db_session.query(Repository).filter_by(
         full_name='regular/repo1'
     ).first()
+    data = {'full_name': 'regular/repo1'}
     assert repo1.is_public
 
-    res = app_client.post('/manage/repo/repo1/activate', data={
-        'enable': Repository.VISIBILITY_HIDDEN
-    })
+    data['enable'] = Repository.VISIBILITY_HIDDEN
+    res = app_client.post('/manage/repository/activate', data=data)
     assert res.status == '302 FOUND'
     repo1 = filled_db_session.query(Repository).filter_by(
         full_name='regular/repo1'
@@ -209,9 +217,7 @@ def test_authorized_repo_activate_hidden(filled_db_session, app_client):
     assert repo1.secret is not None
     old_secret = repo1.secret
 
-    res = app_client.post('/manage/repo/repo1/activate', data={
-        'enable': Repository.VISIBILITY_HIDDEN
-    })
+    res = app_client.post('/manage/repository/activate', data=data)
     assert res.status == '302 FOUND'
     repo1 = filled_db_session.query(Repository).filter_by(
         full_name='regular/repo1'
@@ -230,11 +236,12 @@ def test_authorized_repo_delete(filled_db_session, app_client):
     repo2 = filled_db_session.query(Repository).filter_by(
         full_name='regular/repo2'
     ).first()
+    data = {'full_name': 'regular/repo2'}
     repo2.webhook_id = 777
     filled_db_session.commit()
     assert repo2 is not None
 
-    res = app_client.post('/manage/repo/repo2/delete')
+    res = app_client.post('/manage/repository/delete', data=data)
     assert res.status == '302 FOUND'
     repo2 = filled_db_session.query(Repository).filter_by(
         full_name='regular/repo2'
