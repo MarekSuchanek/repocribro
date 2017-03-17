@@ -112,7 +112,7 @@ def has_good_webhook(gh_api, repo):
     if repo.webhook_id is None:
         return False
     webhook = gh_api.webhook_get(repo.full_name, repo.webhook_id)
-    return webhook is None
+    return webhook.is_ok
 
 
 def update_webhook(gh_api, repo):
@@ -280,10 +280,10 @@ def repository_delete():
     return flask.redirect(flask.url_for('manage.repositories'))
 
 
-@manage.route('/repository/update')
+@manage.route('/repository/update', methods=['POST'])
 @flask_login.login_required
 def repository_update():
-    """Update repo info from GitHub (GET handler)
+    """Update repo info from GitHub (POST handler)
 
     .. todo:: protect from updating too often
     """

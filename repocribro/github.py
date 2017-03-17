@@ -219,7 +219,7 @@ class GitHubAPI:
         :param hook_id: GitHub ID of hook to be get
         :type hook_id: int
         :return: Data of the webhook
-        :rtype: dict or None
+        :rtype: ``repocribro.github.GitHubResponse``
         """
         return self.get('/repos/{}/hooks/{}'.format(full_name, id))
 
@@ -229,7 +229,7 @@ class GitHubAPI:
         :param full_name: Full name of repository
         :type full_name: str
         :return: List of returned webhooks
-        :rtype: list
+        :rtype: ``repocribro.github.GitHubResponse``
         """
         return self.get('/repos/{}/hooks'.format(full_name))
 
