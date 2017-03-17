@@ -1,7 +1,7 @@
 import flask
 import flask_login
 
-from ..models import Repository
+from ..models import Repository, Organization
 
 #: Manage controller blueprint
 manage = flask.Blueprint('manage', __name__, url_prefix='/manage')
@@ -61,15 +61,40 @@ def repositories():
     )
 
 
+def get_repo_if_admin(db, full_name):
+    """Retrieve repository from db and return if
+     current user is admin (owner or member)
+
+    :param db: database connection where are repos stored
+    :type db: ``flask_sqlalchemy.SQLAlchemy``
+    :param full_name: full name of desired repository
+    :type full_name: str
+    :return: repository if found, None otherwise
+    :rtype: ``repocribro.models.Repository`` or None
+    """
+    user = flask_login.current_user.github_user
+    repo = db.session.query(Repository).filter_by(
+        full_name=full_name
+    ).first()
+    if repo is None:
+        return None
+    if repo.owner == user or user in repo.members:
+        return repo
+    return None
+
+
 @manage.route('/repository/<path:full_name>')
 @flask_login.login_required
 def repository_detail(full_name):
     """Repository detail (GET handler)"""
     db = flask.current_app.container.get('db')
+    repo = get_repo_if_admin(db, full_name)
+    if repo is None:
+        flask.abort(404)
 
-    # TODO: check if repo in DB and has permissions
-
-    return flask.abort(501)
+    return flask.render_template(
+        'manage/repo.html', repo=repo, Repository=Repository
+    )
 
 
 def has_good_webhook(gh_api, repo):
@@ -142,15 +167,49 @@ def repository_activate():
     if not gh_repo.is_ok:
         flask.flash('Repository not found at GitHub', 'error')
         return flask.redirect(flask.url_for('manage.repositories'))
-    if not gh_repo['permissions']['admin']:
+    if not gh_repo.data['permissions']['admin']:
         flask.flash('You are not admin of that repository', 'error')
         return flask.redirect(flask.url_for('manage.repositories'))
 
-    # TODO: check if repo in DB, (if orgrepo add member)
-    # TODO: add webhook (register or lookup for existing)
-    # TODO: add repo to DB
+    user = flask_login.current_user.github_user
+    repo = db.session.query(Repository).filter_by(
+        full_name=full_name
+    ).first()
+    is_personal_repo = gh_repo.data['owner']['id'] == user.github_id
 
-    return flask.jsonify(gh_repo.data)
+    if repo is None:
+        if is_personal_repo:
+            repo = Repository.create_from_dict(gh_repo.data, user)
+        else:
+            org_login = gh_repo.data['owner']['login']
+            org = db.session.query(Organization).filter_by(
+                login=org_login
+            ).first()
+            if org is None:
+                gh_org = gh_api.get('/orgs/'+org_login)
+                org = Organization.create_from_dict(gh_org.data)
+            repo = Repository.create_from_dict(gh_repo.data, org)
+            repo.members.append(user)
+            db.session.add(org)
+        db.session.add(repo)
+    else:
+        if not is_personal_repo and user not in repo.members:
+            repo.members.append(user)
+        repo.update_from_dict(gh_repo.data)
+
+    if not update_webhook(gh_api, repo):
+        flask.flash('We were unable to create webhook for that repository. '
+                    'There is maybe some old one, please remove it and try '
+                    'this procedure again.',
+                    'warning')
+    repo.visibility_type = visibility_type
+    if repo.is_hidden:
+        repo.generate_secret()
+    db.session.commit()
+
+    return flask.redirect(
+        flask.url_for('manage.repository_detail', full_name=repo.full_name)
+    )
 
 
 @manage.route('/repository/deactivate', methods=['POST'])
@@ -163,27 +222,62 @@ def repository_deactivate():
     )
 
     full_name = flask.request.form.get('full_name')
-    # TODO: check if repo in DB and user has permissions
-    # TODO: remove webhook
+    repo = get_repo_if_admin(db, full_name)
+    if repo is None:
+        flask.abort(404)
 
-    return flask.abort(501)
+    if repo.webhook_id is not None:
+        if gh_api.webhook_delete(repo.full_name, repo.webhook_id):
+            flask.flash('Webhook has been deactivated',
+                        'success')
+        else:
+            flask.flash('GitHub couldn\'t delete the webhook. Please do it '
+                        'manually within GitHub web application.',
+                        'warning')
+        repo.webhook_id = None
+        db.session.commit()
+    else:
+        flask.flash('There is no registered the webhook within app', 'info')
+
+    return flask.redirect(
+        flask.url_for('manage.repository_detail', full_name=repo.full_name)
+    )
 
 
 @manage.route('/repository/delete', methods=['POST'])
 @flask_login.login_required
 def repository_delete():
-    """Delete repo (in app) from GitHub (POST handler)"""
+    """Delete repo (in app) from GitHub (POST handler)
+
+    .. todo:: consider deleting org repository if there are more members
+    """
     db = flask.current_app.container.get('db')
     gh_api = flask.current_app.container.get(
         'gh_api', token=flask.session['github_token']
     )
 
     full_name = flask.request.form.get('full_name')
-    # TODO: check if repo in DB and user has permissions
-    # TODO: remove webhook
-    # TODO: remove repo from DB
+    repo = get_repo_if_admin(db, full_name)
+    if repo is None:
+        flask.abort(404)
 
-    return flask.abort(501)
+    if repo.webhook_id is not None:
+        if gh_api.webhook_delete(repo.full_name, repo.webhook_id):
+            flask.flash('Webhook has been deactivated',
+                        'success')
+        else:
+            flask.flash('GitHub couldn\'t delete the webhook. Please do it '
+                        'manually within GitHub web application.',
+                        'warning')
+        repo.webhook_id = None
+        db.session.commit()
+
+    db.session.delete(repo)
+    db.session.commit()
+    flask.flash('Repository {} has been deleted within app.'.format(full_name),
+                'success')
+
+    return flask.redirect(flask.url_for('manage.repositories'))
 
 
 @manage.route('/repository/update')
@@ -199,11 +293,22 @@ def repository_update():
     )
 
     full_name = flask.request.form.get('full_name')
-    # TODO: check if repo in DB and user has permissions
-    # TODO: update repo from GH
-    # TODO: check if webhook is valid and fix if needed
+    repo = get_repo_if_admin(db, full_name)
+    if repo is None:
+        flask.abort(404)
 
-    return flask.abort(501)
+    gh_repo = gh_api.get('/repos/' + full_name)
+    if gh_repo.is_ok:
+        repo.update_from_dict(gh_repo.data)
+        db.session.commit()
+    else:
+        flask.flash('GitHub doesn\'t know about this repository. '
+                    'Try it later or remove repository from app.',
+                    'error')
+
+    return flask.redirect(
+        flask.url_for('manage.repository_detail', full_name=repo.full_name)
+    )
 
 
 @manage.route('/organizations')
@@ -254,8 +359,43 @@ def organization(login):
 @manage.route('/organization/<login>/update')
 @flask_login.login_required
 def organization_update(login):
-    """List organization repositories for activation
+    """Update organization
 
     .. :todo: update org profile
+    """
+    ORG_REPOS_URL = '/orgs/{}/repos?type=member'
+    gh_api = flask.current_app.container.get(
+        'gh_api', token=flask.session['github_token']
+    )
+    db = flask.current_app.container.get('db')
+    org = db.session.query(Organization).filter_by(login=login).first()
+    if org is None:
+        flask.abort(404)
+
+    gh_repos = gh_api.get(ORG_REPOS_URL.format(login))
+    if gh_repos.is_ok and len(gh_repos.data) > 0:
+        gh_org = gh_api.get('/orgs/'+login)
+        if gh_org.is_ok:
+            org.update_from_dict(gh_org.data)
+            db.session.commit()
+        else:
+            flask.flash('GitHub doesn\'t know about this organization.',
+                        'error')
+    else:
+        flask.flash('You cannot update organizations where you are not '
+                    'a member of single repository.',
+                    'error')
+
+    return flask.redirect(
+        flask.url_for('manage.organizations')
+    )
+
+
+@manage.route('/organization/<login>/delete')
+@flask_login.login_required
+def organization_delete(login):
+    """Delete organization (if no repositories)
+
+    .. :todo: delete org profile
     """
     return flask.abort(501)
