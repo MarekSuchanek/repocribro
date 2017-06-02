@@ -1,11 +1,13 @@
 {% extends "layout.html" %}
+{% from 'macros/basic.html' import octicon without context %}
 {% from 'macros/pagination.html' import pagination without context %}
 {% block body %}
 
-    <h1>Repositories</h1>
+    <h1>Repositories <small>{{ repos_type }}</small></h1>
     <table class="table table-striped" id="repos-table">
         <thead>
         <tr>
+            <th></th>
             <th>Name</th>
             <th>Description</th>
             <th></th>
@@ -14,10 +16,19 @@
         <tbody>
         {% for repo in repos if repo['id'] not in active_ids %}
             <tr>
+                <td>
+                    {% if repo['owner']['login'] == current_user.github_user.login %}
+                        {{ octicon('person') }}
+                    {% else %}
+                        {{ octicon('organization') }}
+                    {% endif %}
+
+                </td>
                 <td>{{ repo['full_name'] }}</td>
                 <td>{% if repo['description'] %}{{ repo['description'] }}{% endif %}</td>
                 <td class="btn-group" style="min-width: 15em;">
-                    <form action="{{ url_for('manage.repo_activate', reponame=repo['name']) }}" method="POST">
+                    <form action="{{ url_for('manage.repository_activate') }}" method="POST">
+                        <input type="hidden" name="full_name" value="{{ repo['full_name'] }}">
                         <div class="btn-group" role="group">
                             <button type="submit" class="btn btn-success" name="enable"
                                     value="{{ Repository.VISIBILITY_PUBLIC }}">Public

@@ -313,6 +313,18 @@ class RepositoryOwner(db.Model):
     }
 
 
+#: Many-to-many relationship between repositories and members
+repos_members = db.Table(
+    'ReposMembers',
+    sqlalchemy.Column('repository_id',
+                      sqlalchemy.Integer(),
+                      sqlalchemy.ForeignKey('Repository.id')),
+    sqlalchemy.Column('user_id',
+                      sqlalchemy.Integer(),
+                      sqlalchemy.ForeignKey('RepositoryOwner.id'))
+)
+
+
 class User(RepositoryOwner, SearchableMixin, SerializableMixin):
     """User from GitHub"""
     __searchable__ = ['login', 'email', 'name', 'company',
@@ -330,6 +342,11 @@ class User(RepositoryOwner, SearchableMixin, SerializableMixin):
     #: User's account within app
     user_account = sqlalchemy.orm.relationship(
         'UserAccount', back_populates='github_user'
+    )
+    #: Members of org repo within app
+    org_repositories = sqlalchemy.orm.relationship(
+        'Repository', back_populates='members',
+        secondary=repos_members,
     )
 
     __mapper_args__ = {
@@ -509,6 +526,11 @@ class Repository(db.Model, SearchableMixin, SerializableMixin):
     releases = sqlalchemy.orm.relationship(
         'Release', back_populates='repository',
         cascade='all, delete-orphan'
+    )
+    #: Members of org repo within app
+    members = sqlalchemy.orm.relationship(
+        'User', back_populates='org_repositories',
+        secondary=repos_members,
     )
 
     #: Constant representing public visibility within app

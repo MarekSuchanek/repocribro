@@ -354,8 +354,11 @@ class CoreExtension(Extension):
 
         :param tabs_dict: Target dictionary for tabs
         :type tabs_dict: dict of str: ``repocribro.extending.helpers.ViewTab``
+
+        .. todo: Rework displaying organizations (allow update/delete)
         """
         repos = flask_login.current_user.github_user.repositories
+        org_repos = flask_login.current_user.github_user.org_repositories
 
         tabs_dict['repositories'] = ViewTab(
             'repositories', 'Repositories', 0,
@@ -365,8 +368,16 @@ class CoreExtension(Extension):
             ),
             octicon='repo', badge=Badge(len(repos))
         )
+        tabs_dict['organizations'] = ViewTab(
+            'organizations', 'Organizations', 1,
+            flask.render_template(
+                'manage/dashboard/orgs_tab.html',
+                repos=org_repos
+            ),
+            octicon='organization', badge=Badge(len(org_repos))
+        )
         tabs_dict['profile'] = ViewTab(
-            'profile', 'Profile', 1,
+            'profile', 'Profile', 2,
             flask.render_template(
                 'manage/dashboard/profile_tab.html',
                 user=flask_login.current_user.github_user
@@ -374,7 +385,7 @@ class CoreExtension(Extension):
             octicon='person'
         )
         tabs_dict['session'] = ViewTab(
-            'session', 'Session', 2,
+            'session', 'Session', 3,
             flask.render_template(
                 'manage/dashboard/session_tab.html',
                 token=flask.session['github_token'],

@@ -247,22 +247,32 @@ class FakeGitHubAPI:
         '/repos/regular/repo1': {
             'id': 100, 'full_name': 'regular/repo1', 'name': 'repo1',
             'language': 'Python', 'html_url': '', 'description': '',
-            'private': False
+            'private': False, 'permissions': {'admin': True},
+            'owner': {'id': 65, 'login': 'regular'}
         },
         '/repos/regular/repo2': {
             'id': 101, 'full_name': 'regular/repo2', 'name': 'repo2',
             'language': 'Javascript', 'html_url': '', 'description': '',
-            'private': False
+            'private': False, 'permissions': {'admin': True},
+            'owner': {'id': 65, 'login': 'regular'}
         },
         '/repos/regular/repo3': {
             'id': 102, 'full_name': 'regular/repo3', 'name': 'repo3',
             'language': 'Haskell', 'html_url': '', 'description': '',
-            'private': False
+            'private': False, 'permissions': {'admin': True},
+            'owner': {'id': 65, 'login': 'regular'}
         },
         '/repos/regular/newOne': {
             'id': 103, 'full_name': 'regular/newOne', 'name': 'newOne',
             'language': 'C++', 'html_url': '', 'description': '',
-            'private': False
+            'private': False, 'permissions': {'admin': True},
+            'owner': {'id': 65, 'login': 'regular'}
+        },
+        '/repos/org/org1': {
+            'id': 105, 'full_name': 'org/org1', 'name': 'org1',
+            'language': 'PHP', 'html_url': '', 'description': '',
+            'private': False, 'permissions': {'admin': True},
+            'owner': {'id': 69, 'login': 'org'}
         },
         '/repos/regular/repo1/events': [
             {
@@ -367,6 +377,7 @@ class FakeGitHubAPI:
     WEBHOOKS = ['push', 'release', 'repository']
     #: Controller for incoming webhook events
     WEBHOOK_CONTROLLER = 'webhooks.gh_webhook'
+    app_connections_link = 'https://github.com'
 
     def __init__(self, client_id='', client_secret='', webhooks_secret='',
                  session=None, token=None):
@@ -415,7 +426,9 @@ class FakeGitHubAPI:
         )
 
     def webhook_get(self, full_name, id):
-        return None
+        return GitHubResponse(
+            FakeResponse(404, {'message': 'Not Found'})
+        )
 
     def webhooks_get(self, full_name):
         return []

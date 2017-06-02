@@ -133,6 +133,8 @@ class GitHubAPI:
     WEBHOOKS = ['push', 'release', 'repository']
     #: Controller for incoming webhook events
     WEBHOOK_CONTROLLER = 'webhooks.gh_webhook'
+    #: URL for checking connections within GitHub
+    CONNECTIONS_URL = 'https://github.com/settings/connections/applications/{}'
 
     def __init__(self, client_id, client_secret, webhooks_secret,
                  session=None, token=None):
@@ -217,7 +219,7 @@ class GitHubAPI:
         :param hook_id: GitHub ID of hook to be get
         :type hook_id: int
         :return: Data of the webhook
-        :rtype: dict or None
+        :rtype: ``repocribro.github.GitHubResponse``
         """
         return self.get('/repos/{}/hooks/{}'.format(full_name, id))
 
@@ -227,7 +229,7 @@ class GitHubAPI:
         :param full_name: Full name of repository
         :type full_name: str
         :return: List of returned webhooks
-        :rtype: list
+        :rtype: ``repocribro.github.GitHubResponse``
         """
         return self.get('/repos/{}/hooks'.format(full_name))
 
@@ -315,3 +317,7 @@ class GitHubAPI:
             hashlib.sha1
         )
         return hmac.compare_digest(h.hexdigest(), signature)
+
+    @property
+    def app_connections_link(self):
+        return self.CONNECTIONS_URL.format(self.client_id)
