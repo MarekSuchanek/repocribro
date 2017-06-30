@@ -9,3 +9,4 @@ Installation
    config
    database
    admin
+   docker
