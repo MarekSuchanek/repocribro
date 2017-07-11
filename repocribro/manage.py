@@ -11,11 +11,12 @@ def run():
 
     .. todo:: allow extension add options & commands,
               separate create and run part of function
+              command for checking config
     """
     manager = flask_script.Manager(create_app)
     manager.add_option('-c', '--config', dest='cfg_files',
                        required=False, action='append',
-                       default='DEFAULT')
+                       default=['DEFAULT'])
     manager.add_option('-v', '--version', action='version',
                        version='{} v{}'.format(PROG_NAME, VERSION))
 

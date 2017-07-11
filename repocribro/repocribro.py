@@ -81,7 +81,7 @@ class Repocribro(flask.Flask):
         self.container = DI_Container()
 
 
-def create_app(cfg_files='DEFAULT'):
+def create_app(cfg_files=['DEFAULT']):
     """Factory for making the web Flask application
 
     :param cfg_files: Single or more config file(s)
@@ -93,7 +93,7 @@ def create_app(cfg_files='DEFAULT'):
     ext_master = ExtensionsMaster(app=app, db=db)
     app.container.set_singleton('ext_master', ext_master)
 
-    if cfg_files == 'DEFAULT':
+    if cfg_files == ['DEFAULT']:
         cfg_files = os.environ.get('REPOCRIBRO_CONFIG_FILE',
                                    DEFAULT_CONFIG_FILES)
 
