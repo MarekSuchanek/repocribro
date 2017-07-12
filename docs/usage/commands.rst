@@ -30,6 +30,25 @@ For more information:
     $ repocribro assign-role --help
 
 
+check-config
+------------
+
+Commands for checking configuration currently used by repocribro.
+There are two styles for printing, same syntax as is in the cfg file
+(default) or just triples section key value.
+
+::
+
+    $ repocribro -c my_cfg1.cfg -c my_cfg2.cfg check-config
+    [flask]
+    secret_key = MySecretKey
+    ...
+
+    $ repocribro check-config --style triple
+    flask secret_key MySecretKey
+    ...
+
+
 db (database)
 -------------
 
