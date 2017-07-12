@@ -2,7 +2,7 @@ import flask_script
 import flask_migrate
 
 from .commands import DbCreateCommand, RepocheckCommand, \
-                      AssignRoleCommand
+                      AssignRoleCommand, CheckConfigCommand
 from .repocribro import create_app, PROG_NAME, VERSION
 
 
@@ -24,6 +24,7 @@ def run():
     manager.add_command('db-create', DbCreateCommand)
     manager.add_command('repocheck', RepocheckCommand)
     manager.add_command('assign-role', AssignRoleCommand)
+    manager.add_command('check-config', CheckConfigCommand)
 
     manager.run()
 
