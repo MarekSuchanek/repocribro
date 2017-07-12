@@ -3,7 +3,7 @@ import pytest
 from sqlalchemy.exc import OperationalError
 
 from repocribro.commands import AssignRoleCommand, DbCreateCommand, \
-    RepocheckCommand
+    RepocheckCommand, CheckConfigCommand
 from repocribro.models import User, Repository
 
 
@@ -104,3 +104,12 @@ def test_repocheck_push_all(filled_db_session, app_client):
     ).first()
     assert len(repo1.pushes) == 2
     assert len(repo1.releases) == 2
+
+
+def test_check_config(capsys):
+    cmd = CheckConfigCommand()
+
+    cmd.run('triple')
+    out, err = capsys.readouterr()
+    assert 'flask server_name repocribro.test' in out.lower()
+    assert 'github client_secret some_client_secret' in out.lower()

@@ -2,7 +2,7 @@ import flask_script
 import flask_migrate
 
 from .commands import DbCreateCommand, RepocheckCommand, \
-                      AssignRoleCommand
+                      AssignRoleCommand, CheckConfigCommand
 from .repocribro import create_app, PROG_NAME, VERSION
 
 
@@ -11,11 +11,12 @@ def run():
 
     .. todo:: allow extension add options & commands,
               separate create and run part of function
+              command for checking config
     """
     manager = flask_script.Manager(create_app)
     manager.add_option('-c', '--config', dest='cfg_files',
                        required=False, action='append',
-                       default='DEFAULT')
+                       default=['DEFAULT'])
     manager.add_option('-v', '--version', action='version',
                        version='{} v{}'.format(PROG_NAME, VERSION))
 
@@ -23,6 +24,7 @@ def run():
     manager.add_command('db-create', DbCreateCommand)
     manager.add_command('repocheck', RepocheckCommand)
     manager.add_command('assign-role', AssignRoleCommand)
+    manager.add_command('check-config', CheckConfigCommand)
 
     manager.run()
 
