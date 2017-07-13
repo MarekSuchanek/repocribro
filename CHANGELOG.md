@@ -4,6 +4,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [Unreleased]
+### Added
+- Support for organizational repositories
+- Command for checking the  actual configuration
+- Customization of name & logo in config
+
+### Changed
+- Fixed optional config option for manager
+- REST GET own implementation instead of flask extension
+
 ## [0.1] - 2017-02-11
 ### Added
 - Web application via Flask and SQLAlchemy
