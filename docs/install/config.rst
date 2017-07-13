@@ -49,6 +49,29 @@ For example:
     # random secret key (use os.urandom())
     SECRET_KEY = VeryPseudoRandomSuchSecret
 
+Webroot in subdirectory
+^^^^^^^^^^^^^^^^^^^^^^^
+
+If you are running the application in subdirectiory and not whole (sub)domain
+(e.g. myportal.xyz/repocribro/), then you probably want to use the setting
+``APPLICATION_ROOT`` which will in case of repocribro not only set appropriately
+session path but also make URLs correct and working.
+
+.. code-block:: ini
+    :caption: Repocribro config (part)
+
+    [flask]
+    APPLICATION_ROOT = /repocribro
+    # ... other config
+
+.. code-block:: nginx
+    :caption: NGINX config (part)
+
+    location ~ /repocribro(/.*)$ {
+        proxy_pass http://127.0.0.1:5000/repocribro$1;
+		proxy_set_header Host $host;
+    }
+
 
 Database
 --------
