@@ -118,4 +118,13 @@ def create_app(cfg_files=['DEFAULT']):
     ext_master.call('init_filters')
     ext_master.call('init_blueprints')
     ext_master.call('init_container')
+
+    if config.has_option('flask', 'application_root'):
+        from werkzeug.serving import run_simple
+        from werkzeug.wsgi import DispatcherMiddleware
+        app.wsgi_app = DispatcherMiddleware(
+            run_simple,
+            {config.get('flask', 'application_root'): app.wsgi_app}
+        )
+
     return app
