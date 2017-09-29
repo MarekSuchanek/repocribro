@@ -120,6 +120,7 @@ def make_githup_api_factory(cfg):
     :return: GitHub API client factory
     :rtype: ``function``
     """
+
     def github_api_factory(token=None, session=None):
         return GitHubAPI(
             cfg.get('github', 'client_id'),
@@ -128,6 +129,7 @@ def make_githup_api_factory(cfg):
             session=session,
             token=token
         )
+
     return github_api_factory
 
 
@@ -211,7 +213,11 @@ class CoreExtension(Extension):
                     fallback=flask.url_for(
                         'static', filename='pics/repocribro-icon.png'
                     )
-                )
+                ),
+                repocribro_core_navbar_style=config.get(
+                    'repocribro-core', 'navbar_style',
+                    fallback='dark'
+                ).lower()
             )
 
     def view_core_search_tabs(self, query, tabs_dict):

@@ -100,6 +100,7 @@ div#landing-info p {
     text-align: justify;
 }
 div#landing-info img.logo{
+    padding: 0.7em;
     max-height: 10em;
 }
 td.avatar{

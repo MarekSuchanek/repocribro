@@ -10,7 +10,12 @@ core = flask.Blueprint('core', __name__, url_prefix='')
 @core.route('/')
 def index():
     """Landing page (GET handler)"""
-    return flask.render_template('core/index.html')
+    config = flask.current_app.container.get('config')
+    text = config.get('repocribro-core', 'landing_text', fallback=None)
+    pic = config.get('repocribro-core', 'landing_picture', fallback=None)
+    return flask.render_template(
+        'core/index.html', landing_text=text, landing_pic=pic
+    )
 
 
 @core.route('/search/')
