@@ -139,4 +139,10 @@ For example:
     NAME = myRepocribro
     # custom logo URL
     LOGO = https://upload.wikimedia.org/wikipedia/commons/thumb/2/2f/Logo_TV_2015.svg/2000px-Logo_TV_2015.svg.png
-
+    # landing page text
+    LANDING_TEXT = <p>Landing text paragraph number 1</p>
+                   <p>Landing text paragraph number 2</p>
+    # landing page picture (defaults to LOGO)
+    LANDING_PICTURE = https://assets-cdn.github.com/images/modules/logos_page/Octocat.png
+    # navbar classes (dark/light, defaults to dark)
+    NAVBAR_STYLE = light
