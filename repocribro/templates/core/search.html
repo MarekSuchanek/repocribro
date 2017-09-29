@@ -28,6 +28,10 @@
     </div>
     {% else %}
         <div class="alert alert-info">Use search field for exploring what are you interested in!</div>
+
+        <div class="search-results">
+            {{ tabzone(tabs, active_tab) }}
+        </div>
     {% endif %}
 {% endblock %}
 
