@@ -29,13 +29,10 @@ def search(query=''):
     ext_master = flask.current_app.container.get('ext_master')
 
     tabs = {}
-    active_tab = ''
-    if query != '':
-        ext_master.call('view_core_search_tabs',
-                        query=query, tabs_dict=tabs)
-        tabs = sorted(tabs.values())
-        active_tab = flask.request.args.get('tab', tabs[0].id)
-
+    ext_master.call('view_core_search_tabs',
+                    query=query, tabs_dict=tabs)
+    tabs = sorted(tabs.values())
+    active_tab = flask.request.args.get('tab', tabs[0].id)
     return flask.render_template(
         'core/search.html', query=query, tabs=tabs, active_tab=active_tab
     )

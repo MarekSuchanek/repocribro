@@ -229,15 +229,20 @@ class CoreExtension(Extension):
         :type tabs_dict: dict of str: ``repocribro.extending.helpers.ViewTab``
         """
         from .models import User, Organization, Repository
-        users = User.fulltext_query(
-            query, self.db.session.query(User)
-        ).all()
-        orgs = Organization.fulltext_query(
-            query, self.db.session.query(Organization)
-        ).all()
-        repos = Repository.fulltext_query(
-            query, self.db.session.query(Repository)
-        ).all()
+        if query == '':
+            users = self.db.session.query(User).all()
+            orgs = self.db.session.query(Organization).all()
+            repos = self.db.session.query(Repository).all()
+        else:
+            users = User.fulltext_query(
+                query, self.db.session.query(User)
+            ).all()
+            orgs = Organization.fulltext_query(
+                query, self.db.session.query(Organization)
+            ).all()
+            repos = Repository.fulltext_query(
+                query, self.db.session.query(Repository)
+            ).all()
 
         tabs_dict['repositories'] = ViewTab(
             'repositories', 'Repositories', 0,
