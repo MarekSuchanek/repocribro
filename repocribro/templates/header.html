@@ -1,5 +1,5 @@
 {% from "macros/basic.html" import octicon without context %}
-<nav class="navbar navbar-default navbar-fixed-top navbar-inverse">
+<nav class="navbar navbar-default navbar-fixed-top{% if repocribro_core_navbar_style != 'light' %} navbar-inverse{% endif %}">
     <div class="container">
         <div class="navbar-header">
             <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar"

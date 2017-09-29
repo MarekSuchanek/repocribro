@@ -51,6 +51,7 @@ setup(
         'flask-migrate',
         'flask-principal',
         'flask-restless',
+        'flask-script',
         'flask-sqlalchemy==2.1',
         'iso8601',
         'jinja2',
