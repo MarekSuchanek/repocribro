@@ -78,13 +78,16 @@
         <form action="{{ url_for('manage.repository_activate') }}" method="POST">
             <input type="hidden" value="{{ repo.full_name }}" name="full_name">
             <div class="btn-group" role="group">
-                <button type="submit" class="btn btn-success" name="enable" value="{{ Repository.VISIBILITY_PUBLIC }}">
+                <button type="submit" class="btn btn-success{% if repo.is_public %} disabled{% endif %}" name="enable"
+                        value="{{ Repository.VISIBILITY_PUBLIC }}"{% if repo.is_public %} disabled{% endif %}>
                     Public
                 </button>
-                <button type="submit" class="btn btn-primary" name="enable" value="{{ Repository.VISIBILITY_HIDDEN }}">
+                <button type="submit" class="btn btn-primary{% if repo.is_hidden %} disabled{% endif %}" name="enable"
+                        value="{{ Repository.VISIBILITY_HIDDEN }}"{% if repo.is_hidden %} disabled{% endif %}>
                     Hidden
                 </button>
-                <button type="submit" class="btn btn-warning" name="enable" value="{{ Repository.VISIBILITY_PRIVATE }}">
+                <button type="submit" class="btn btn-warning{% if repo.is_private %} disabled{% endif %}" name="enable"
+                        value="{{ Repository.VISIBILITY_PRIVATE }}"{% if repo.is_private %} disabled{% endif %}>
                     Private
                 </button>
             </div>
