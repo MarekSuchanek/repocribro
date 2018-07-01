@@ -1,7 +1,7 @@
 repocribro.manage
 =================
 
-.. automodule:: repocribro.manage
+.. automodule:: repocribro.cli
     :members:
     :private-members:
     :special-members:

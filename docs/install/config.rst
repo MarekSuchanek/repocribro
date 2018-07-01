@@ -1,3 +1,5 @@
+.. _config:
+
 Configuration
 =============
 
@@ -27,6 +29,11 @@ Default config file can be also specified with environment variable:
     Type "help", "copyright", "credits" or "license" for more information.
     >>> from repocribro.app import app
     >>> app.run()
+
+You can also take advantage of `python-dotenv`_ and specify configuration
+in `.env` file.
+
+.. _python-dotenv: https://github.com/theskumar/python-dotenv
 
 Application
 -----------

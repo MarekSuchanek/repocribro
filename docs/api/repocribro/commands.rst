@@ -1,32 +1,42 @@
 repocribro.commands
 ===================
 
-AssignRoleCommand
------------------
+assign_role
+-----------
 
-.. autoclass:: repocribro.commands.AssignRoleCommand
+.. automodule:: repocribro.commands.assign_role
     :members:
     :private-members:
-    :special-members: __init__
+    :special-members:
     :undoc-members:
-    :show-inheritance:
 
-DbCreateCommand
----------------
 
-.. autoclass:: repocribro.commands.DbCreateCommand
+check_config
+---------
+
+.. automodule:: repocribro.commands.check_config
     :members:
     :private-members:
-    :special-members: __init__
+    :special-members:
     :undoc-members:
-    :show-inheritance:
 
-RepocheckCommand
-----------------
 
-.. autoclass:: repocribro.commands.RepocheckCommand
+db_create
+---------
+
+.. automodule:: repocribro.commands.db_create
     :members:
     :private-members:
-    :special-members: __init__
+    :special-members:
     :undoc-members:
-    :show-inheritance:
+
+
+repocheck
+---------
+
+.. automodule:: repocribro.commands.repocheck
+    :members:
+    :private-members:
+    :special-members:
+    :undoc-members:
+
