@@ -1,15 +1,16 @@
-import flask
-import flask_script
+import click
+import flask.cli
 
 
-class DbCreateCommand(flask_script.Command):
+def _db_create():
+    db = flask.current_app.container.get('db')
+    print('Performing db.create_all()')
+    db.create_all()
+    print('Database has been created')
+
+
+@click.command()
+@flask.cli.with_appcontext
+def db_create():
     """Perform procedure create all tables"""
-
-    def run(self):
-        """Run the db-create command to create all tables and
-        constraints
-        """
-        db = flask.current_app.container.get('db')
-        print('Performing db.create_all()')
-        db.create_all()
-        print('Database has been created')
+    _db_create()

@@ -5,7 +5,11 @@ There are various command for the app management some are
 provided by Flask extensions, some by repocribro. You can
 use option ``--help`` to get more information.
 
-assign-role
+You can use both ``repocribro`` and ``flask`` commands. The
+configuration must by specified by environenment variable as
+described in :ref:`config`.
+
+assign_role
 -----------
 
 Main purpose for this command is to set the initial admin
@@ -14,7 +18,7 @@ set within administration zone of web interface.
 
 ::
 
-    $ repocribro assign-role --login MarekSuchanek --role admin
+    $ repocribro assign_role --login MarekSuchanek --role admin
     Loaded extensions: core
     Role admin not in DB... adding
     Role admin added to MarekSuchanek
@@ -27,10 +31,10 @@ set within administration zone of web interface.
 For more information:
 ::
 
-    $ repocribro assign-role --help
+    $ repocribro assign_role --help
 
 
-check-config
+check_config
 ------------
 
 Commands for checking configuration currently used by repocribro.
@@ -39,12 +43,12 @@ There are two styles for printing, same syntax as is in the cfg file
 
 ::
 
-    $ repocribro -c my_cfg1.cfg -c my_cfg2.cfg check-config
+    $ repocribro check_config
     [flask]
     secret_key = MySecretKey
     ...
 
-    $ repocribro check-config --style triple
+    $ repocribro check_config --style triple
     flask secret_key MySecretKey
     ...
 
@@ -65,13 +69,14 @@ For more information:
 repocheck
 ---------
 
-*Not implemented yet!*
-
-This command will provide simple checking of one or all
+This command provides simple checking of one or all
 repositories if there are some uncaught events within specified
 time. Main idea is to get the missed events (from webhooks) due
 to app outage.
 
+::
+
+    $ repocribro repocheck --help
 
 runserver
 ---------
@@ -83,7 +88,7 @@ For more information:
 
 ::
 
-    $ repocribro runserver --help
+    $ repocribro run --help
 
 
 

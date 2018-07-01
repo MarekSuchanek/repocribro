@@ -38,11 +38,17 @@ setup(
     },
     entry_points={
         'console_scripts': [
-            'repocribro = repocribro:run',
+            'repocribro = repocribro:cli',
         ],
         'repocribro.ext': [
             'repocribro-core = repocribro.ext_core:make_extension'
-        ]
+        ],
+        'flask.commands': [
+            'assign_role=repocribro.commands:assign_role',
+            'db_create=repocribro.commands:db_create',
+            'check_config=repocribro.commands:check_config',
+            'repocheck=repocribro.commands:repocheck',
+        ],
     },
     install_requires=[
         'configparser',
@@ -51,11 +57,11 @@ setup(
         'flask-migrate',
         'flask-principal',
         'flask-restless',
-        'flask-script',
         'flask-sqlalchemy==2.1',
         'iso8601',
         'jinja2',
         'pytz',
+        'python-dotenv',
         'requests',
         'sqlalchemy',
     ],
