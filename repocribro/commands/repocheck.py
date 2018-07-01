@@ -115,11 +115,14 @@ class RepocheckCommand:
         return True
 
 
+def _repocheck(full_name=None):
+    cmd = RepocheckCommand()
+    cmd.run(full_name)
+
 
 @click.command()
 @click.option('-n', '--name', 'full_name')
 @flask.cli.with_appcontext
 def repocheck(full_name):
     """Check procedure of repository events"""
-    cmd = RepocheckCommand()
-    cmd.run(full_name)
+    _repocheck(full_name)

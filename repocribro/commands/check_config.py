@@ -3,6 +3,19 @@ import flask
 import flask.cli
 
 
+def _check_config(style):
+    config = flask.current_app.container.get('config')
+    if style.lower() == 'triple':
+        for section in config.sections():
+            for (key, value) in config.items(section):
+                print(section, key, value)
+    else:
+        for section in config.sections():
+            print('[{}]'.format(section))
+            for (key, value) in config.items(section):
+                print('{} = {}'.format(key, value))
+
+
 @click.command()
 @click.option('-s', '--style', default='cfg',
               help='Print style "triple" or "cfg"')
@@ -16,13 +29,4 @@ def check_config(style):
     :param style: Printing style name for config
     :type style: str
     """
-    config = flask.current_app.container.get('config')
-    if style.lower() == 'triple':
-        for section in config.sections():
-            for (key, value) in config.items(section):
-                print(section, key, value)
-    else:
-        for section in config.sections():
-            print('[{}]'.format(section))
-            for (key, value) in config.items(section):
-                print('{} = {}'.format(key, value))
+    _check_config(style)

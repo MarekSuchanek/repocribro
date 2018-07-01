@@ -3,22 +3,7 @@ import flask
 import flask.cli
 
 
-@click.command()
-@click.option('-l', '--login')
-@click.option('-r', '--role', 'role_name')
-@flask.cli.with_appcontext
-def assign_role(login, role_name):
-    """Assign desired role to desired user
-
-    Run the assign-role command with given options in
-    order to assign role to user
-
-    :param login: Login name of desired user
-    :type login: str
-    :param role_name: Name of desired role
-    :type role_name: str
-    :raises SystemExit: If user does not exists or already had the role
-    """
+def _assign_role(login, role_name):
     from ..models import Role, User
     db = flask.current_app.container.get('db')
 
@@ -37,3 +22,22 @@ def assign_role(login, role_name):
     user.user_account.roles.append(role)
     db.session.commit()
     print('Role {} added to {}'.format(role_name, login))
+
+
+@click.command()
+@click.option('-l', '--login')
+@click.option('-r', '--role', 'role_name')
+@flask.cli.with_appcontext
+def assign_role(login, role_name):
+    """Assign desired role to desired user
+
+    Run the assign-role command with given options in
+    order to assign role to user
+
+    :param login: Login name of desired user
+    :type login: str
+    :param role_name: Name of desired role
+    :type role_name: str
+    :raises SystemExit: If user does not exists or already had the role
+    """
+    _assign_role(login, role_name)
