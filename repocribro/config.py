@@ -8,6 +8,7 @@ class Config(configparser.ConfigParser):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.mandatory = {}
+        self.add_section('flask')
 
     @property
     def default(self):

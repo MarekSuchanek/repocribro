@@ -1,22 +1,18 @@
-import iso8601
+import click
 import flask
-import flask_script
+import flask.cli
+import iso8601
 import pytz
 from werkzeug.exceptions import HTTPException
 
 
-class RepocheckCommand(flask_script.Command):
-    """Perform check procedure of repository events"""
+class RepocheckCommand:
+
     event2webhook = {
         'PushEvent': 'push',
         'ReleaseEvent': 'release',
         'RepositoryEvent': 'repository',
     }
-
-    #: CLI command options for repocheck
-    option_list = (
-        flask_script.Option('--name', '-n', dest='full_name'),
-    )
 
     def run(self, full_name=None):
         """Run the repocheck command to check repo(s) new events
@@ -74,8 +70,9 @@ class RepocheckCommand(flask_script.Command):
         """
         gh_repo = self.gh_api.get('/repos/{}'.format(repo.full_name))
         if not gh_repo.is_ok:
-            print('GitHub doesn\'t know about that repo: {}'.format(
-                gh_repo.data['message']
+            print('GitHub doesn\'t know about that repo: {} ({})'.format(
+                gh_repo.data['message'],
+                'Maybe it is private...'
             ))
             exit(3)
         gh_events = self.gh_api.get('/repos/{}/events'.format(repo.full_name))
@@ -116,3 +113,13 @@ class RepocheckCommand(flask_script.Command):
             except HTTPException:
                 print('Error while processing #{}'.format(event['id']))
         return True
+
+
+
+@click.command()
+@click.option('-n', '--name', 'full_name')
+@flask.cli.with_appcontext
+def repocheck(full_name):
+    """Check procedure of repository events"""
+    cmd = RepocheckCommand()
+    cmd.run(full_name)
