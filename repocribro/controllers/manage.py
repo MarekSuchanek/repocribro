@@ -163,7 +163,7 @@ def repository_activate():
         flask.flash('You\'ve requested something weird...', 'error')
         return flask.redirect(flask.url_for('manage.repositories'))
 
-    gh_repo = gh_api.get('/repos/'+full_name)
+    gh_repo = gh_api.get('/repos/' + full_name)
     if not gh_repo.is_ok:
         flask.flash('Repository not found at GitHub', 'error')
         return flask.redirect(flask.url_for('manage.repositories'))
@@ -195,7 +195,11 @@ def repository_activate():
     else:
         if not is_personal_repo and user not in repo.members:
             repo.members.append(user)
+
+        gh_repo_langs = gh_api.get('/repos/' + full_name + '/languages')
         repo.update_from_dict(gh_repo.data)
+        if not gh_repo_langs.is_ok:
+            repo.update_languages(gh_repo_langs.data)
 
     if not update_webhook(gh_api, repo):
         flask.flash('We were unable to create webhook for that repository. '
@@ -298,8 +302,10 @@ def repository_update():
         flask.abort(404)
 
     gh_repo = gh_api.get('/repos/' + full_name)
-    if gh_repo.is_ok:
+    gh_repo_langs = gh_api.get('/repos/' + full_name + '/languages')
+    if gh_repo.is_ok and gh_repo_langs.is_ok:
         repo.update_from_dict(gh_repo.data)
+        repo.update_languages(gh_repo_langs.data)
         db.session.commit()
     else:
         flask.flash('GitHub doesn\'t know about this repository. '
