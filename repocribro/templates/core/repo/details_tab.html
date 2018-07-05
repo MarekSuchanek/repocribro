@@ -30,8 +30,7 @@
             </tr>
             <tr>
                 <th>Languages</th>
-                <td>{{ repo.languages }}</td>
-                {# TODO: filter #}
+                <td>{{ repo.languages|repo_languages }}</td>
             </tr>
             {# TODO: fork_of #}
         </table>

@@ -42,6 +42,17 @@ def repo_link(repo, show_secret=False):
     return jinja2.Markup('<a href="{0}">{0}</a>'.format(url))
 
 
+def repo_languages(languages):
+    """Filter for languages to get rid of unrecognized as None
+
+    :param languages: representation of repo languages
+    :type languages: string or None
+    """
+    if languages is not str:
+        return 'unrecognized'
+    return languages
+
+
 def gh_user_link(user):
     """Convert user/org to its GitHub URL
 
@@ -102,6 +113,7 @@ def gh_repo_visibility(repo):
 model_filters = {
     'repo_visibility': repo_visibility,
     'repo_link': repo_link,
+    'repo_languages': repo_languages,
     'gh_user_link': gh_user_link,
     'gh_repo_link': gh_repo_link,
     'gh_push_url': gh_push_url,
