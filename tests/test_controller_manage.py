@@ -84,7 +84,7 @@ def test_authorized_repos(filled_db_session, app_client):
 
     res = app_client.get('/manage/repository/regular/repo1')
     assert res.status == '200 OK'
-    assert 'Python' in res.data.decode('utf-8')
+    assert 'regular/repo1' in res.data.decode('utf-8')
 
     repo2 = filled_db_session.query(Repository).filter_by(
         full_name='regular/repo2'

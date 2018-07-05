@@ -51,7 +51,7 @@ def test_repo_owner(filled_db_session, app_client):
 def test_repo_detail(filled_db_session, app_client):
     res = app_client.get('/repo/regular/repo1')  # PUBLIC
     assert res.status == '200 OK'
-    assert 'Python' in res.data.decode('utf-8')
+    assert 'regular/repo1' in res.data.decode('utf-8')
 
     res = app_client.get('/repo/regular/repo666')
     assert res.status == '404 NOT FOUND'
@@ -80,7 +80,7 @@ def test_repo_hidden(filled_db_session, app_client):
     secret_url = '/hidden-repo/' + repo.secret
     res = app_client.get(secret_url)
     assert res.status == '200 OK'
-    assert 'Python' in res.data.decode('utf-8')
+    assert 'regular/repo2' in res.data.decode('utf-8')
 
 
 # TODO: learn how to teardown (its weird)

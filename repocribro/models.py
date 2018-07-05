@@ -607,6 +607,20 @@ class Repository(db.Model, SearchableMixin, SerializableMixin):
         self.description = repo_dict['description']
         self.private = repo_dict['private']
 
+    def update_languages(self, languages_dict):
+        """Set languages field from GitHub dict
+
+        :param languages_dict: language - bytes dict
+        :type languages_dict: dict
+        """
+        if len(languages_dict) == 0:
+            self.languages = "unrecognized"
+        else:
+            langs = sorted(languages_dict.items(),
+                           key=lambda kv: kv[1],
+                           reverse=True)
+            self.languages = ', '.join([lang[0] for lang in langs])
+
     @staticmethod
     def make_full_name(login, reponame):
         """Create full name from owner login name and repository name
