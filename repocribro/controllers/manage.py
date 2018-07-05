@@ -302,10 +302,11 @@ def repository_update():
         flask.abort(404)
 
     gh_repo = gh_api.get('/repos/' + full_name)
-    gh_repo_langs = gh_api.get('/repos/' + full_name + '/languages')
-    if gh_repo.is_ok and gh_repo_langs.is_ok:
+    if gh_repo.is_ok:
         repo.update_from_dict(gh_repo.data)
-        repo.update_languages(gh_repo_langs.data)
+        gh_repo_langs = gh_api.get('/repos/' + full_name + '/languages')
+        if gh_repo_langs.is_ok:
+            repo.update_languages(gh_repo_langs.data)
         db.session.commit()
     else:
         flask.flash('GitHub doesn\'t know about this repository. '

@@ -256,6 +256,9 @@ class FakeGitHubAPI:
             'private': False, 'permissions': {'admin': True},
             'owner': {'id': 65, 'login': 'regular'}
         },
+        '/repos/regular/repo2/languages': {
+            'Javascript': 100
+        },
         '/repos/regular/repo3': {
             'id': 102, 'full_name': 'regular/repo3', 'name': 'repo3',
             'language': 'Haskell', 'html_url': '', 'description': '',
