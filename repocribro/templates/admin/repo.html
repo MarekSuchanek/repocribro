@@ -14,11 +14,15 @@
                 </tr>
                 <tr>
                     <th>Languages:</th>
-                    <td>{{ repo.languages }}</td>
+                    <td>{{ repo|repo_languages }}</td>
                 </tr>
                 <tr>
                     <th>Description:</th>
                     <td>{{ repo.description }}</td>
+                </tr>
+                <tr>
+                    <th>Topics:</th>
+                    <td>{{ repo|repo_topics }}</td>
                 </tr>
                 <tr>
                     <th>Visibility @GitHub:</th>

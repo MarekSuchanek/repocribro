@@ -11,16 +11,16 @@
             <td>{{ repo|gh_repo_link }}</td>
         </tr>
         <tr>
-            <th>Languages:</th>
-            <td>{{ repo.languages|repo_languages }}</td>
-        </tr>
-        <tr>
             <th>Description:</th>
             <td>{{ repo.description }}</td>
         </tr>
         <tr>
+            <th>Languages:</th>
+            <td>{{ repo|repo_languages }}</td>
+        </tr>
+        <tr>
             <th>Topics:</th>
-            <td>{{ repo.topics|repo_topics }}</td>
+            <td>{{ repo|repo_topics }}</td>
         </tr>
         <tr>
             <th>Visibility @GitHub:</th>

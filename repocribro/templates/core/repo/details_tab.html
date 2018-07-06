@@ -15,10 +15,6 @@
                 <td>{{ repo.description }}</td>
             </tr>
             <tr>
-                <th>Topics</th>
-                <td>{{ repo.topics|repo_topics }}</td>
-            </tr>
-            <tr>
                 <th>Owner</th>
                 <td>
                     {% if repo.owner.type == 'User' %}
@@ -34,7 +30,11 @@
             </tr>
             <tr>
                 <th>Languages</th>
-                <td>{{ repo.languages|repo_languages }}</td>
+                <td>{{ repo|repo_languages }}</td>
+            </tr>
+            <tr>
+                <th>Topics</th>
+                <td>{{ repo|repo_topics }}</td>
             </tr>
             {# TODO: fork_of #}
         </table>

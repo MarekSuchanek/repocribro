@@ -42,21 +42,30 @@ def repo_link(repo, show_secret=False):
     return jinja2.Markup('<a href="{0}">{0}</a>'.format(url))
 
 
-def repo_languages(languages):
+def repo_languages(repo):
     """Filter for languages to get rid of unrecognized as None
 
-    :param languages: representation of repo languages
-    :type languages: string or None
+    :param repo: Repository to show its languages
+    :type repo: ``repocribro.models.Repository``
+    :return: string representation of languages
+    :rtype: str
     """
-    if languages is not str:
+    if not isinstance(repo.languages, str):
         return 'unrecognized'
-    return languages
+    return repo.languages
 
 
-def repo_topics(topics):
-    if topics is None:
+def repo_topics(repo):
+    """Filter for topics as list of badges
+
+    :param repo: Repository to show its topics
+    :type repo: ``repocribro.models.Repository``
+    :return: HTML code with topics as badges
+    :rtype: ``jinja2.Markup``
+    """
+    if repo.topics is None:
         return ''
-    ds_topics = topics.split(' ')
+    ds_topics = repo.topics.split(' ')
     return jinja2.Markup(' '.join([
         '<span class ="badge badge-secondary">{}</span>'.format(topic)
         for topic in ds_topics
