@@ -1,5 +1,4 @@
 import datetime
-import jinja2
 import pytest
 
 from repocribro.filters.common import *
@@ -79,6 +78,29 @@ def test_repo_link():
     result = repo_link(repo, True)
     assert 'a href="' in result
     assert isinstance(result, jinja2.Markup)
+
+
+def test_repo_languages():
+    repo = Repository(777, None, 'some/repo', 'repo', 'C++, Python', '', '',
+                      '', False, None, None, Repository.VISIBILITY_PRIVATE)
+    assert repo_languages(repo) == 'C++, Python'
+    repo.languages = ''
+    assert repo_languages(repo) == ''
+    repo.languages = None
+    assert repo_languages(repo) == 'unrecognized'
+
+
+def test_repo_topics():
+    repo = Repository(777, None, 'some/repo', 'repo', '', '', '',
+                      'github testing-it',
+                      False, None, None, Repository.VISIBILITY_PRIVATE)
+    assert 'github' in repo_topics(repo)
+    assert 'testing-it' in repo_topics(repo)
+    repo.topics = 'cool'
+    assert 'cool' in repo_topics(repo)
+    assert 'testing-it' not in repo_topics(repo)
+    repo.topics = None
+    assert repo_topics(repo) == ''
 
 
 def test_gh_user_link():
