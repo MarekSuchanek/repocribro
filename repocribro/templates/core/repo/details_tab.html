@@ -15,6 +15,10 @@
                 <td>{{ repo.description }}</td>
             </tr>
             <tr>
+                <th>Topics</th>
+                <td>{{ repo.topics }}</td>
+            </tr>
+            <tr>
                 <th>Owner</th>
                 <td>
                     {% if repo.owner.type == 'User' %}
