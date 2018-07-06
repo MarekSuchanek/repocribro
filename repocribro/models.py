@@ -498,6 +498,8 @@ class Repository(db.Model, SearchableMixin, SerializableMixin):
     url = sqlalchemy.Column(sqlalchemy.UnicodeText)
     # Description of the project in repo
     description = sqlalchemy.Column(sqlalchemy.UnicodeText)
+    # Topics (tags) of repo
+    topics = sqlalchemy.Column(sqlalchemy.UnicodeText)
     # GitHub visibility
     private = sqlalchemy.Column(sqlalchemy.Boolean)
     # Internal visibility within app
@@ -541,8 +543,8 @@ class Repository(db.Model, SearchableMixin, SerializableMixin):
     VISIBILITY_HIDDEN = 2
 
     def __init__(self, github_id, fork_of, full_name, name, languages, url,
-                 description, private, webhook_id, owner, visibility_type,
-                 secret=None):
+                 description, topics, private, webhook_id, owner,
+                 visibility_type, secret=None):
         self.github_id = github_id
         self.fork_of = fork_of
         self.full_name = full_name
@@ -550,6 +552,7 @@ class Repository(db.Model, SearchableMixin, SerializableMixin):
         self.languages = languages
         self.url = url
         self.description = description
+        self.topics = topics
         self.private = private
         self.webhook_id = webhook_id
         self.owner = owner
@@ -587,6 +590,7 @@ class Repository(db.Model, SearchableMixin, SerializableMixin):
             repo_dict['language'],
             repo_dict['html_url'],
             repo_dict['description'],
+            Repository.serialize_topics(repo_dict['topics']),
             repo_dict['private'],
             webhook_id,
             owner,
@@ -605,6 +609,7 @@ class Repository(db.Model, SearchableMixin, SerializableMixin):
         self.languages = repo_dict['language']
         self.url = repo_dict['html_url']
         self.description = repo_dict['description']
+        self.topics = self.serialize_topics(repo_dict['topics'])
         self.private = repo_dict['private']
 
     def update_languages(self, languages_dict):
@@ -633,6 +638,17 @@ class Repository(db.Model, SearchableMixin, SerializableMixin):
         :rtype: str
         """
         return '{}/{}'.format(login, reponame)
+
+    @staticmethod
+    def serialize_topics(topics):
+        """Make string from topics list from GitHub
+
+        :param topics: List of topics (strings without whitespaces)
+        :type topics: list of str
+        :return: Serialized list of topics
+        :rtype: str
+        """
+        return ' '.join(topics)
 
     @property
     def owner_login(self):
