@@ -53,6 +53,17 @@ def repo_languages(languages):
     return languages
 
 
+def repo_topics(topics):
+    if topics is None:
+        return ''
+    ds_topics = topics.split(' ')
+    return jinja2.Markup(' '.join([
+        '<span class ="badge badge-secondary">{}</span>'.format(topic)
+        for topic in ds_topics
+    ]))
+
+
+
 def gh_user_link(user):
     """Convert user/org to its GitHub URL
 
@@ -114,6 +125,7 @@ model_filters = {
     'repo_visibility': repo_visibility,
     'repo_link': repo_link,
     'repo_languages': repo_languages,
+    'repo_topics': repo_topics,
     'gh_user_link': gh_user_link,
     'gh_repo_link': gh_repo_link,
     'gh_push_url': gh_push_url,
