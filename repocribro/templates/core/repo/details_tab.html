@@ -30,7 +30,11 @@
             </tr>
             <tr>
                 <th>Languages</th>
-                <td>{{ repo.languages|repo_languages }}</td>
+                <td>{{ repo|repo_languages }}</td>
+            </tr>
+            <tr>
+                <th>Topics</th>
+                <td>{{ repo|repo_topics }}</td>
             </tr>
             {# TODO: fork_of #}
         </table>

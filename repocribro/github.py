@@ -145,7 +145,7 @@ class GitHubAPI:
         self.token = token
         self.scope = []
 
-    def _get_auth_header(self):
+    def _get_headers(self):
         """Prepare auth header fields (empty if no token provided)
 
         :return: Headers for the request
@@ -154,7 +154,8 @@ class GitHubAPI:
         if self.token is None:
             return {}
         return {
-            'Authorization': 'token {}'.format(self.token)
+            'Authorization': 'token {}'.format(self.token),
+            'Accept': 'application/vnd.github.mercy-preview+json'
         }
 
     def get_auth_url(self):
@@ -208,10 +209,10 @@ class GitHubAPI:
             uri += '?page={}'.format(page)
         return GitHubResponse(self.session.get(
             uri,
-            headers=self._get_auth_header()
+            headers=self._get_headers()
         ))
 
-    def webhook_get(self, full_name, id):
+    def webhook_get(self, full_name, hook_id):
         """Perform GET request for repo's webhook
 
         :param full_name: Full name of repository that contains the hook
@@ -221,7 +222,7 @@ class GitHubAPI:
         :return: Data of the webhook
         :rtype: ``repocribro.github.GitHubResponse``
         """
-        return self.get('/repos/{}/hooks/{}'.format(full_name, id))
+        return self.get('/repos/{}/hooks/{}'.format(full_name, hook_id))
 
     def webhooks_get(self, full_name):
         """GET all webhooks of the repository
@@ -260,7 +261,7 @@ class GitHubAPI:
         response = self.session.post(
             self.API_URL + '/repos/{}/hooks'.format(full_name),
             data=json.dumps(data),
-            headers=self._get_auth_header()
+            headers=self._get_headers()
         )
         if response.status_code == 201:
             return response.json()
@@ -280,7 +281,7 @@ class GitHubAPI:
             self.API_URL + '/repos/{}/hooks/{}/tests'.format(
                 full_name, hook_id
             ),
-            headers=self._get_auth_header()
+            headers=self._get_headers()
         )
         return response.status_code == 204
 
@@ -298,7 +299,7 @@ class GitHubAPI:
             self.API_URL + '/repos/{}/hooks/{}'.format(
                 full_name, hook_id
             ),
-            headers=self._get_auth_header()
+            headers=self._get_headers()
         )
         return response.status_code == 204
 

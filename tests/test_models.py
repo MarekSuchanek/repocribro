@@ -81,7 +81,7 @@ def test_user_repo(session, github_data_loader):
 
 
 def test_repo(github_data_loader):
-    repo = Repository(777, None, 'some/repo', 'repo', 'C++', '', '',
+    repo = Repository(777, None, 'some/repo', 'repo', 'C++', '', '', '',
                       False, None, None, Repository.VISIBILITY_PRIVATE)
     repo.id = 10
     assert '10' in repr(repo)
@@ -173,7 +173,7 @@ def test_anonymous():
     assert not anonym.is_authenticated
     assert anonym.rolenames == []
     assert anonym.is_anonymous
-    repo = Repository(777, None, 'some/repo', 'repo', 'C++', '', '',
+    repo = Repository(777, None, 'some/repo', 'repo', 'C++', '', '', '',
                       False, None, None, Repository.VISIBILITY_PRIVATE)
     assert not anonym.sees_repo(repo)
     repo.visibility_type = Repository.VISIBILITY_HIDDEN
@@ -197,7 +197,7 @@ def test_user_mixin():
 
     some_user = User(111, 'some', '', '', None, '', '', None,
                      None, None, None)
-    repo = Repository(777, None, 'some/repo', 'repo', 'C++', '', '',
+    repo = Repository(777, None, 'some/repo', 'repo', 'C++', '', '', '',
                       False, None, some_user, Repository.VISIBILITY_PRIVATE)
     assert not account.sees_repo(repo)
     repo.visibility_type = Repository.VISIBILITY_HIDDEN

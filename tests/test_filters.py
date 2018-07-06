@@ -1,5 +1,4 @@
 import datetime
-import jinja2
 import pytest
 
 from repocribro.filters.common import *
@@ -45,7 +44,7 @@ def test_flash_class(category, css_class):
 
 
 def test_repo_visibility():
-    repo = Repository(777, None, 'some/repo', 'repo', 'C++', '', '',
+    repo = Repository(777, None, 'some/repo', 'repo', 'C++', '', '', '',
                       False, None, None, Repository.VISIBILITY_PRIVATE)
     assert repo_visibility(repo) == 'Private'
     repo.visibility_type = Repository.VISIBILITY_HIDDEN
@@ -55,7 +54,7 @@ def test_repo_visibility():
 
 
 def test_repo_link():
-    repo = Repository(777, None, 'some/project', 'project', 'C++', '', '',
+    repo = Repository(777, None, 'some/project', 'project', 'C++', '', '', '',
                       False, None, None, Repository.VISIBILITY_PUBLIC)
     result = repo_link(repo, False)
     assert 'a href="' in result
@@ -81,6 +80,29 @@ def test_repo_link():
     assert isinstance(result, jinja2.Markup)
 
 
+def test_repo_languages():
+    repo = Repository(777, None, 'some/repo', 'repo', 'C++, Python', '', '',
+                      '', False, None, None, Repository.VISIBILITY_PRIVATE)
+    assert repo_languages(repo) == 'C++, Python'
+    repo.languages = ''
+    assert repo_languages(repo) == ''
+    repo.languages = None
+    assert repo_languages(repo) == 'unrecognized'
+
+
+def test_repo_topics():
+    repo = Repository(777, None, 'some/repo', 'repo', '', '', '',
+                      'github testing-it',
+                      False, None, None, Repository.VISIBILITY_PRIVATE)
+    assert 'github' in repo_topics(repo)
+    assert 'testing-it' in repo_topics(repo)
+    repo.topics = 'cool'
+    assert 'cool' in repo_topics(repo)
+    assert 'testing-it' not in repo_topics(repo)
+    repo.topics = None
+    assert repo_topics(repo) == ''
+
+
 def test_gh_user_link():
     user = User(111, 'some', '', '', None, '', '', None, None, None, None)
     result = gh_user_link(user)
@@ -95,7 +117,7 @@ def test_gh_user_link():
 
 
 def test_gh_repo_link():
-    repo = Repository(777, None, 'some/repo', 'repo', 'C++', '', '',
+    repo = Repository(777, None, 'some/repo', 'repo', 'C++', '', '', '',
                       False, None, None, Repository.VISIBILITY_PRIVATE)
     result = gh_repo_link(repo)
     assert repo.full_name in result
@@ -104,7 +126,7 @@ def test_gh_repo_link():
 
 
 def test_gh_push_url():
-    repo = Repository(777, None, 'some/repo', 'repo', 'C++', '', '',
+    repo = Repository(777, None, 'some/repo', 'repo', 'C++', '', '', '',
                       False, None, None, Repository.VISIBILITY_PRIVATE)
     push = Push(484, 'refs/heads/changes', 'abc', 'def', 1, 1,
                 datetime.datetime.now(), 'sender_login', 'sender_id', repo)
@@ -115,7 +137,7 @@ def test_gh_push_url():
 
 
 def test_gh_repo_visibility():
-    repo = Repository(777, None, 'some/repo', 'repo', 'C++', '', '',
+    repo = Repository(777, None, 'some/repo', 'repo', 'C++', '', '', '',
                       False, None, None, Repository.VISIBILITY_PRIVATE)
     assert gh_repo_visibility(repo) == 'Public'
     repo.private = True

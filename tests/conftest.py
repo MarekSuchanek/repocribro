@@ -194,14 +194,17 @@ def filled_db_session(empty_db_session):
     session.add(org1)
 
     repo1 = Repository(100, None, 'regular/repo1', 'repo1', 'Python', '',
-                       '', False, None, user2, Repository.VISIBILITY_PUBLIC)
+                       '', '', False, None, user2,
+                       Repository.VISIBILITY_PUBLIC)
     session.add(repo1)
     repo2 = Repository(101, None, 'regular/repo2', 'repo2', 'Python', '',
-                       '', False, None, user2, Repository.VISIBILITY_HIDDEN)
+                       '', 'python testing-it awesome', False, None, user2,
+                       Repository.VISIBILITY_HIDDEN)
     repo2.generate_secret()
     session.add(repo2)
     repo3 = Repository(102, None, 'regular/repo3', 'repo3', 'Haskell', '',
-                       '', False, None, user2, Repository.VISIBILITY_PRIVATE)
+                       '', '', False, None, user2,
+                       Repository.VISIBILITY_PRIVATE)
     session.add(repo3)
 
     release = Release(666, 'v1.0', '', '', '', False, False, 'First release',
@@ -236,7 +239,7 @@ class FakeGitHubAPI:
             {
                 'id': 101, 'full_name': 'regular/repo2', 'name': 'repo2',
                 'language': 'Python', 'html_url': '', 'description': '',
-                'private': False
+                'topics': ['python', 'testing-it'], 'private': False
             },
             {
                 'id': 102, 'full_name': 'regular/repo3', 'name': 'repo3',
