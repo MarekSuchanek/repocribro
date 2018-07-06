@@ -63,7 +63,6 @@ def repo_topics(topics):
     ]))
 
 
-
 def gh_user_link(user):
     """Convert user/org to its GitHub URL
 

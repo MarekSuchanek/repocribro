@@ -212,7 +212,7 @@ class GitHubAPI:
             headers=self._get_headers()
         ))
 
-    def webhook_get(self, full_name, id):
+    def webhook_get(self, full_name, hook_id):
         """Perform GET request for repo's webhook
 
         :param full_name: Full name of repository that contains the hook
@@ -222,7 +222,7 @@ class GitHubAPI:
         :return: Data of the webhook
         :rtype: ``repocribro.github.GitHubResponse``
         """
-        return self.get('/repos/{}/hooks/{}'.format(full_name, id))
+        return self.get('/repos/{}/hooks/{}'.format(full_name, hook_id))
 
     def webhooks_get(self, full_name):
         """GET all webhooks of the repository
@@ -261,7 +261,7 @@ class GitHubAPI:
         response = self.session.post(
             self.API_URL + '/repos/{}/hooks'.format(full_name),
             data=json.dumps(data),
-            headers=self._get_auth_header()
+            headers=self._get_headers()
         )
         if response.status_code == 201:
             return response.json()
@@ -281,7 +281,7 @@ class GitHubAPI:
             self.API_URL + '/repos/{}/hooks/{}/tests'.format(
                 full_name, hook_id
             ),
-            headers=self._get_auth_header()
+            headers=self._get_headers()
         )
         return response.status_code == 204
 
@@ -299,7 +299,7 @@ class GitHubAPI:
             self.API_URL + '/repos/{}/hooks/{}'.format(
                 full_name, hook_id
             ),
-            headers=self._get_auth_header()
+            headers=self._get_headers()
         )
         return response.status_code == 204
 

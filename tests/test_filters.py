@@ -45,7 +45,7 @@ def test_flash_class(category, css_class):
 
 
 def test_repo_visibility():
-    repo = Repository(777, None, 'some/repo', 'repo', 'C++', '', '',
+    repo = Repository(777, None, 'some/repo', 'repo', 'C++', '', '', '',
                       False, None, None, Repository.VISIBILITY_PRIVATE)
     assert repo_visibility(repo) == 'Private'
     repo.visibility_type = Repository.VISIBILITY_HIDDEN
@@ -55,7 +55,7 @@ def test_repo_visibility():
 
 
 def test_repo_link():
-    repo = Repository(777, None, 'some/project', 'project', 'C++', '', '',
+    repo = Repository(777, None, 'some/project', 'project', 'C++', '', '', '',
                       False, None, None, Repository.VISIBILITY_PUBLIC)
     result = repo_link(repo, False)
     assert 'a href="' in result
@@ -95,7 +95,7 @@ def test_gh_user_link():
 
 
 def test_gh_repo_link():
-    repo = Repository(777, None, 'some/repo', 'repo', 'C++', '', '',
+    repo = Repository(777, None, 'some/repo', 'repo', 'C++', '', '', '',
                       False, None, None, Repository.VISIBILITY_PRIVATE)
     result = gh_repo_link(repo)
     assert repo.full_name in result
@@ -104,7 +104,7 @@ def test_gh_repo_link():
 
 
 def test_gh_push_url():
-    repo = Repository(777, None, 'some/repo', 'repo', 'C++', '', '',
+    repo = Repository(777, None, 'some/repo', 'repo', 'C++', '', '', '',
                       False, None, None, Repository.VISIBILITY_PRIVATE)
     push = Push(484, 'refs/heads/changes', 'abc', 'def', 1, 1,
                 datetime.datetime.now(), 'sender_login', 'sender_id', repo)
@@ -115,7 +115,7 @@ def test_gh_push_url():
 
 
 def test_gh_repo_visibility():
-    repo = Repository(777, None, 'some/repo', 'repo', 'C++', '', '',
+    repo = Repository(777, None, 'some/repo', 'repo', 'C++', '', '', '',
                       False, None, None, Repository.VISIBILITY_PRIVATE)
     assert gh_repo_visibility(repo) == 'Public'
     repo.private = True

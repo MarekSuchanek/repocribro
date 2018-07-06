@@ -45,7 +45,7 @@ def test_repocheck_invalid(filled_db_session, app_client):
         _repocheck('nonexistent')
     assert exodus.value.code == 1
 
-    repo = Repository(105, None, 'regular/repo4', 'repo4', 'Python', '',
+    repo = Repository(105, None, 'regular/repo4', 'repo4', 'Python', '', '',
                       '', False, None, None, Repository.VISIBILITY_PUBLIC)
     filled_db_session.add(repo)
     filled_db_session.commit()
