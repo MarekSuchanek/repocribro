@@ -590,7 +590,7 @@ class Repository(db.Model, SearchableMixin, SerializableMixin):
             repo_dict['language'],
             repo_dict['html_url'],
             repo_dict['description'],
-            Repository.serialize_topics(repo_dict['topics']),
+            Repository.serialize_topics(repo_dict.get('topics', None)),
             repo_dict['private'],
             webhook_id,
             owner,
@@ -609,7 +609,7 @@ class Repository(db.Model, SearchableMixin, SerializableMixin):
         self.languages = repo_dict['language']
         self.url = repo_dict['html_url']
         self.description = repo_dict['description']
-        self.topics = self.serialize_topics(repo_dict['topics'])
+        self.topics = self.serialize_topics(repo_dict.get('topics', None))
         self.private = repo_dict['private']
 
     def update_languages(self, languages_dict):
@@ -648,6 +648,8 @@ class Repository(db.Model, SearchableMixin, SerializableMixin):
         :return: Serialized list of topics
         :rtype: str
         """
+        if topics is not list or len(topics) == 0:
+            return None
         return ' '.join(topics)
 
     @property
