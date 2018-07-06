@@ -648,7 +648,7 @@ class Repository(db.Model, SearchableMixin, SerializableMixin):
         :return: Serialized list of topics
         :rtype: str
         """
-        if topics is not list or len(topics) == 0:
+        if topics is None or len(topics) == 0:
             return None
         return ' '.join(topics)
 

@@ -145,7 +145,7 @@ class GitHubAPI:
         self.token = token
         self.scope = []
 
-    def _get_auth_header(self):
+    def _get_headers(self):
         """Prepare auth header fields (empty if no token provided)
 
         :return: Headers for the request
@@ -154,7 +154,8 @@ class GitHubAPI:
         if self.token is None:
             return {}
         return {
-            'Authorization': 'token {}'.format(self.token)
+            'Authorization': 'token {}'.format(self.token),
+            'Accept': 'application/vnd.github.mercy-preview+json'
         }
 
     def get_auth_url(self):
@@ -208,7 +209,7 @@ class GitHubAPI:
             uri += '?page={}'.format(page)
         return GitHubResponse(self.session.get(
             uri,
-            headers=self._get_auth_header()
+            headers=self._get_headers()
         ))
 
     def webhook_get(self, full_name, id):
