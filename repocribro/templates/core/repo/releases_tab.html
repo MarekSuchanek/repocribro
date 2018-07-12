@@ -23,8 +23,8 @@
             <td>{{ release.author_login }}</td>
             <td>{{ release.sender_login }}</td>
             <td>{{ release.prerelease|yes_no }}</td>
-            <td>
-                <a href="{{ release.url }}" target="_blank" class="btn btn-default">{{ octicon('mark-github') }}</a>
+            <td class="buttons-cell">
+                <a href="{{ release.url }}" target="_blank" class="btn btn-primary">{{ octicon('mark-github') }}</a>
             </td>
         </tr>
     {% endfor %}

@@ -20,9 +20,15 @@
                 <td class="avatar"><img src="{{ org['avatar_url'] }}" class="avatar-small"></td>
                 <td>{{ org['login'] }}</td>
                 <td>{% if org['description'] %}{{ org['description'] }}{% endif %}</td>
-                <td class="btn-group">
-                    <a href="https://github.com/{{ org['login'] }}" class="btn btn-default">{{ octicon('mark-github') }}</a>
-                    <a href="{{ url_for('manage.organization', login=org['login']) }}" class="btn btn-primary">{{ octicon('repo') }}{{ octicon('tools') }}</a>
+                <td class="buttons-cell">
+                    <div class="btn-group">
+                        <a href="https://github.com/{{ org['login'] }}" class="btn btn-secondary">
+                            {{ octicon('mark-github') }}
+                        </a>
+                        <a href="{{ url_for('manage.organization', login=org['login']) }}" class="btn btn-primary">
+                            {{ octicon('tools') }}
+                        </a>
+                    </div>
                 </td>
             </tr>
             </tbody>

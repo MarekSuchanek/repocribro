@@ -40,7 +40,7 @@
 
     <script type="application/javascript">
         $(document).ready(function () {
-            $('#nav-search-form').hide();
+            $('#nav-search-form').css('visibility', 'hidden');
             var searchUrl = "{{ url_for('core.search') }}";
             $('#query').on('input', function () {
                 $('#search-form').attr('action', searchUrl + "/" + $(this).val());

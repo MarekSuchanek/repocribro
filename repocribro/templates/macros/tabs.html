@@ -5,8 +5,8 @@
     {% endif %}
     <ul class="nav nav-tabs">
         {% for tab in tabs %}
-            <li{% if tab.id == active_tab %} class="active"{% endif %}>
-                <a href="#{{ tab.id }}" data-toggle="tab">
+            <li class="nav-item">
+                <a href="#{{ tab.id }}" data-toggle="tab" class="nav-link{% if tab.id == active_tab %} active{% endif %}">
                     {% if tab.octicon %}{{ octicon(tab.octicon) }}{% endif %}
                     {{ tab.name }}
                     {% if tab.badge %}{{ badge(tab.badge) }}{% endif %}

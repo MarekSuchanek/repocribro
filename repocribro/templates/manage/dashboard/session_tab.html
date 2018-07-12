@@ -3,13 +3,15 @@
 <div class="row">
     <div class="col-lg-6">
         <div class="input-group">
-            <label for="gh_token" class="input-group-addon">Token:</label>
+            <div class="input-group-prepend">
+                <label for="gh_token" class="input-group-text">Token:</label>
+            </div>
             <input id="gh_token" type="password" value="{{ token }}" class="form-control">
-            <span class="input-group-btn">
-                    <button class="btn btn-default" type="button" id="toggle-gh_token">
-                        {{ octicon('eye') }}
-                    </button>
-                </span>
+            <div class="input-group-append">
+                <button class="btn btn-outline-warning" type="button" id="toggle-gh_token">
+                    {{ octicon('eye') }}
+                </button>
+            </div>
         </div>
     </div>
 </div>

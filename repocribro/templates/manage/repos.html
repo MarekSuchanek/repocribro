@@ -26,7 +26,7 @@
                 </td>
                 <td>{{ repo['full_name'] }}</td>
                 <td>{% if repo['description'] %}{{ repo['description'] }}{% endif %}</td>
-                <td class="btn-group" style="min-width: 15em;">
+                <td class="buttons-cell" style="min-width: 15em;">
                     <form action="{{ url_for('manage.repository_activate') }}" method="POST">
                         <input type="hidden" name="full_name" value="{{ repo['full_name'] }}">
                         <div class="btn-group" role="group">

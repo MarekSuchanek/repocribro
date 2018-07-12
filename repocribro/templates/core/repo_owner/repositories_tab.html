@@ -21,9 +21,15 @@
             <td>{{ repo|repo_visibility }}</td>
             <td>{{ repo.pushes|length }}</td>
             <td>{{ repo.releases|length }}</td>
-            <td class="btn-group">
-                <a href="{{ repo.url }}" class="btn btn-default">{{ octicon('mark-github') }}</a>
-                <a href="{{ url_for('core.repo_detail', login=owner.login, reponame=repo.name) }}" class="btn btn-primary">{{ octicon('repo') }}</a>
+            <td class="buttons-cell">
+                <div class="btn-group">
+                    <a href="{{ repo.url }}" class="btn btn-secondary">
+                        {{ octicon('mark-github') }}
+                    </a>
+                    <a href="{{ url_for('core.repo_detail', login=owner.login, reponame=repo.name) }}" class="btn btn-primary">
+                        {{ octicon('repo') }}
+                    </a>
+                </div>
             </td>
         </tr>
     {% endfor %}

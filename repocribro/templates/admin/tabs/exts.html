@@ -16,22 +16,24 @@
             <td>{{ ext.name }}</td>
             <td>{{ ext.category }}</td>
             <td>{{ ext.author }}</td>
-            <td class="btn-group">
+            <td class="buttons-cell">
+                <div class="btn-group ">
                 {% if ext.admin_url %}
                     <a href="{{ ext.admin_url }}" class="btn btn-primary">
                         {{ octicon('tools') }}
                     </a>
                 {% endif %}
                 {% if ext.home_url %}
-                    <a href="{{ ext.home_url }}" target="_blank" class="btn btn-default">
+                    <a href="{{ ext.home_url }}" target="_blank" class="btn btn-secondary">
                         {{ octicon('home') }}
                     </a>
                 {% endif %}
                 {% if ext.gh_url %}
-                    <a href="{{ ext.gh_url }}" target="_blank" class="btn btn-default">
+                    <a href="{{ ext.gh_url }}" target="_blank" class="btn btn-secondary">
                         {{ octicon('mark-github') }}
                     </a>
                 {% endif %}
+                </div>
             </td>
         </tr>
     {% endfor %}

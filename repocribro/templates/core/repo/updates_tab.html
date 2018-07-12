@@ -22,8 +22,8 @@
             <td>{{ push.before[:7] }} - {{ push.after[:7] }}</td>
             <td>{{ push.sender_login }}</td>
             <td>{{ push.size }}</td>
-            <td class="btn-group">
-                <a href="{{ push|gh_push_url }}" target="_blank" class="btn btn-default">{{ octicon('mark-github') }}</a>
+            <td class="buttons-cell">
+                <a href="{{ push|gh_push_url }}" target="_blank" class="btn btn-primary">{{ octicon('mark-github') }}</a>
             </td>
         </tr>
     {% endfor %}

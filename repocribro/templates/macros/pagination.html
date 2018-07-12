@@ -1,31 +1,29 @@
+{% from "macros/basic.html" import octicon without context %}
 {% macro pagination(base_route, page, pages, table_id) -%}
-    <nav>
-        <ul class="pagination">
-            {% set prev_page = page - 1 %}
-            {% set next_page = page + 1 %}
-            {% if prev_page <= 1 %}
-                <li class="disabled"><a href="#{{ table_id }}"><span>&#9194;</span></a></li>
-                <li class="disabled"><a href="#{{ table_id }}"><span>&#9664;</span></a></li>
-            {% else %}
-                <li><a href="{{ url_for(base_route, page=1) }}#{{ table_id }}"><span>&#9194;</span></a></li>
-                <li><a href="{{ url_for(base_route, page=prev_page) }}#{{ table_id }}"><span>&#9664;</span></a></li>
-            {% endif %}
+    <div class="btn-group">
+        {% set prev_page = page - 1 %}
+        {% set next_page = page + 1 %}
+        {% if prev_page < 1 %}
+            <a class="btn btn-secondary disabled" href="#{{ table_id }}">1</a>
+            <a class="btn btn-secondary disabled" href="#{{ table_id }}">{{ octicon('chevron-left') }}</a>
+        {% else %}
+            <a class="btn btn-secondary" href="{{ url_for(base_route, page=1) }}#{{ table_id }}">1</a>
+            <a class="btn btn-secondary" href="{{ url_for(base_route, page=prev_page) }}#{{ table_id }}">{{ octicon('chevron-left') }}</a>
+        {% endif %}
 
-            {% for num_page in range(page-2, page+3) if num_page > 0 and num_page <= pages %}
-                <li{% if num_page == page %} class="active"{% endif %}>
-                    <a href="{{ url_for(base_route, page=page) }}#{{ table_id }}">
-                        {{ num_page }}{% if num_page == page %} <span class="sr-only">(current)</span>{% endif %}
-                    </a>
-                </li>
-            {% endfor %}
+        {% for num_page in range(page-2, page+3) if num_page > 0 and num_page <= pages %}
+            <a href="{{ url_for(base_route, page=num_page) }}#{{ table_id }}"
+               class="btn btn-secondary {% if num_page == page %} disabled{% endif %}">
+                {{ num_page }}{% if num_page == page %} <span class="sr-only">(current)</span>{% endif %}
+            </a>
+        {% endfor %}
 
-            {% if next_page >= pages %}
-                <li class="disabled"><a href="#{{ table_id }}"><span>&#9654;</span></a></li>
-                <li class="disabled"><a href="#{{ table_id }}"><span>&#9193;</span></a></li>
-            {% else %}
-                <li><a href="{{ url_for(base_route, page=next_page) }}#{{ table_id }}"><span>&#9654;</span></a></li>
-                <li><a href="{{ url_for(base_route, page=pages) }}#{{ table_id }}"><span>&#9193;</span></a></li>
-            {% endif %}
-        </ul>
-    </nav>
+        {% if next_page > pages %}
+            <a class="btn btn-secondary disabled" href="#{{ table_id }}">{{ octicon('chevron-right') }}</a>
+            <a class="btn btn-secondary disabled" href="#{{ table_id }}">{{ pages }}</a>
+        {% else %}
+            <a class="btn btn-secondary" href="{{ url_for(base_route, page=next_page) }}#{{ table_id }}">{{ octicon('chevron-right') }}</a>
+            <a class="btn btn-secondary" href="{{ url_for(base_route, page=pages) }}#{{ table_id }}">{{ pages }}</a>
+        {% endif %}
+    </div>
 {%- endmacro %}
