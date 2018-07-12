@@ -35,7 +35,7 @@
             <td>{{ role.name }}</td>
             <td>{{ role.description }}</td>
             <td>{{ role.accounts|length }}</td>
-            <td>
+            <td class="buttons-cell">
                 <a href="{{ url_for('admin.role_detail', name=role.name) }}" class="btn btn-primary btn-small">
                     {{ octicon('tools') }}
                 </a>

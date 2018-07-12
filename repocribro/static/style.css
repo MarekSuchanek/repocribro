@@ -36,6 +36,12 @@ a.navbar-logo{
     padding-top: 0.2em;
     margin-right: 0.3em;
 }
+td.buttons-cell{
+    text-align: right;
+}
+td.buttons-cell > form{
+    margin: 0 !important;
+}
 
 #push,
 #main-footer {

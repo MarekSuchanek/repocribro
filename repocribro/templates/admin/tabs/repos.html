@@ -18,7 +18,7 @@
             <td><a href="{{ url_for('admin.account_detail', login=repo.owner.login) }}">{{ repo.owner.login }}</a></td>
             <td>{{ repo.releases|length }}</td>
             <td>{{ repo.pushes|length }}</td>
-            <td>
+            <td class="buttons-cell">
                 <a href="{{ url_for('admin.repo_detail', login=repo.owner.login, reponame=repo.name) }}" class="btn btn-primary btn-small">
                     {{ octicon('tools') }}
                 </a>
