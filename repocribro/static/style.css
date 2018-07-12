@@ -3,7 +3,22 @@ body {
     height: 100%;
 }
 body{
-    padding-top: 60px;
+    padding-top: 0px;
+}
+nav.navbar{
+    vertical-align: middle;
+    line-height: 42px;
+    padding: 0;
+    margin-bottom: 1em;
+}
+form#nav-search-form{
+    margin-bottom: 0 !important;
+}
+form#nav-search-form > div{
+    margin: 0 auto !important;
+}
+a.navbar-logo{
+    margin-right: 2em;
 }
 
 #content {
