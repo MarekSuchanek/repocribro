@@ -486,8 +486,8 @@ class Repository(db.Model, SearchableMixin, SerializableMixin):
     id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
     #: GitHub unique identifier
     github_id = sqlalchemy.Column(sqlalchemy.Integer, unique=True)
-    #: GitHub id of repository which this is fork of
-    fork_of = sqlalchemy.Column(sqlalchemy.Integer)
+    #: Full name of repository which this is fork of
+    parent_name = sqlalchemy.Column(sqlalchemy.String(150), nullable=True)
     #: Full name (owner login + repository name)
     full_name = sqlalchemy.Column(sqlalchemy.String(150), unique=True)
     # Repository name
@@ -542,11 +542,11 @@ class Repository(db.Model, SearchableMixin, SerializableMixin):
     #: Constant representing hidden visibility within app
     VISIBILITY_HIDDEN = 2
 
-    def __init__(self, github_id, fork_of, full_name, name, languages, url,
+    def __init__(self, github_id, parent_name, full_name, name, languages, url,
                  description, topics, private, webhook_id, owner,
                  visibility_type, secret=None):
         self.github_id = github_id
-        self.fork_of = fork_of
+        self.parent_name = parent_name
         self.full_name = full_name
         self.name = name
         self.languages = languages
@@ -576,15 +576,13 @@ class Repository(db.Model, SearchableMixin, SerializableMixin):
         :type secret: str
         :return: Created new repository
         :rtype: ``repocribro.models.Repository``
-
-        .. todo:: work with fork_of somehow
         """
-        fork_of = None
+        parent_name = None
         if 'parent' in repo_dict:
-            fork_of = repo_dict['parent']['id']
+            parent_name = repo_dict['parent']['full_name']
         return Repository(
             repo_dict['id'],
-            fork_of,
+            parent_name,
             repo_dict['full_name'],
             repo_dict['name'],
             repo_dict['language'],
