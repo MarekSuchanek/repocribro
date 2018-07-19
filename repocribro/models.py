@@ -478,8 +478,8 @@ class Repository(db.Model, SearchableMixin, SerializableMixin):
     """Repository from GitHub"""
     __tablename__ = 'Repository'
     __searchable__ = ['full_name', 'languages', 'description']
-    __serializable__ = ['id', 'github_id', 'fork_of', 'full_name', 'name',
-                        'languages', 'url', 'description', 'private',
+    __serializable__ = ['id', 'github_id', 'parent_name', 'full_name',
+                        'name', 'languages', 'url', 'description', 'private',
                         'visibility_type', 'last_event', 'owner_id']
 
     #: Unique identifier of the repository
