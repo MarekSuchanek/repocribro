@@ -44,6 +44,16 @@
                     <th>Webhook ID:</th>
                     <td>{{ repo.webhook_id }}</td>
                 </tr>
+                {% if repo.parent_name != None %}
+                <tr>
+                    <th>Fork of</th>
+                    <td>
+                        <a href="https://github.com/{{ repo.parent_name }}" target="_blank">
+                            {{ octicon('mark-github') }} {{ repo.parent_name }}
+                        </a>
+                    </td>
+                </tr>
+                {% endif %}
             </table>
         </div>
         <div class="col-xs-12 col-md-3">

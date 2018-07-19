@@ -36,7 +36,16 @@
                 <th>Topics</th>
                 <td>{{ repo|repo_topics }}</td>
             </tr>
-            {# TODO: fork_of #}
+            {% if repo.parent_name != None %}
+            <tr>
+                <th>Fork of</th>
+                <td>
+                    <a href="https://github.com/{{ repo.parent_name }}" target="_blank">
+                        {{ octicon('mark-github') }} {{ repo.parent_name }}
+                    </a>
+                </td>
+            </tr>
+            {% endif %}
         </table>
     </div>
 </div>
