@@ -21,8 +21,12 @@
                     </div>
                 </div>
                 <div class="form-group">
-                    <label for="name">Description:</label>
-                    <textarea class="form-control" id="name" name="description">{{ role.description }}</textarea>
+                    <label for="privileges">Privileges:</label>
+                    <input class="form-control" id="privileges" name="privileges" value="{{ role.privileges }}">
+                </div>
+                <div class="form-group">
+                    <label for="description">Description:</label>
+                    <textarea class="form-control" id="description" name="description">{{ role.description }}</textarea>
                 </div>
             </form>
         </div>

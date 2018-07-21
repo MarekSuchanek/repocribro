@@ -257,13 +257,16 @@ class Role(db.Model, RoleMixin):
     name = sqlalchemy.Column(sqlalchemy.String(80), unique=True)
     #: Description (purpose, notes, ...) of the role
     description = sqlalchemy.Column(sqlalchemy.UnicodeText)
+    #: Serialized list of privileges
+    privileges = sqlalchemy.Column(sqlalchemy.Text)
     #: User accounts assigned to the role
     user_accounts = sqlalchemy.orm.relationship(
         'UserAccount', back_populates='roles', secondary=roles_users
     )
 
-    def __init__(self, name, description):
+    def __init__(self, name, privileges, description):
         self.name = name
+        self.privileges = privileges
         self.description = description
 
     def __repr__(self):

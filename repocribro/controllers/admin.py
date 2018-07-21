@@ -173,12 +173,15 @@ def role_edit(name):
     if role is None:
         flask.abort(404)
     name = flask.request.form.get('name', '')
+    priv = flask.request.form.get('privileges', '')
     desc = flask.request.form.get('description', None)
     if name == '':
         flask.flash('Couldn\'t make that role...', 'warning')
         return flask.redirect(flask.url_for('admin.index', tab='roles'))
+    # TODO: validate priv (chars, separators, etc.)
     try:
         role.name = name
+        role.privileges = priv
         role.description = desc
         db.session.commit()
     except sqlalchemy.exc.IntegrityError as e:
@@ -213,12 +216,13 @@ def role_create():
     db = flask.current_app.container.get('db')
 
     name = flask.request.form.get('name', '')
+    priv = flask.request.form.get('privileges', '')
     desc = flask.request.form.get('description', None)
     if name == '':
         flask.flash('Couldn\'t make that role...', 'warning')
         return flask.redirect(flask.url_for('admin.index', tab='roles'))
     try:
-        role = Role(name, desc)
+        role = Role(name, priv, desc)
         db.session.add(role)
         db.session.commit()
     except sqlalchemy.exc.IntegrityError as e:
