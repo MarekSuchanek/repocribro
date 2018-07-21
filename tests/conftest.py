@@ -164,7 +164,7 @@ def filled_db_session(empty_db_session):
         Organization, Repository, Commit, Release, Push
 
     # Setup admin role
-    admin_role = Role('admin', 'Administrators')
+    admin_role = Role('admin', '*', 'Administrators')
     session.add(admin_role)
 
     account_banned = UserAccount()
