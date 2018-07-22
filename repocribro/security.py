@@ -28,16 +28,39 @@ def init_login_manager(db):
     return login_manager, principals
 
 
+class PermissionsContainer:
+
+    def __init__(self, name):
+        self.x_name = name
+        self.x_dict = dict()
+
+    def __getattr__(self, key):
+        return flask_principal.Permission(*self.x_dict[key])
+
+
 class Permissions:
-    """ Class for prividing various permissions
+    """ Class for prividing various permissions"""
 
-    .. todo:: allow extensions provide permissions to others
-    """
+    def __init__(self):
+        self.roles = PermissionsContainer('roles')
+        self.actions = PermissionsContainer('actions')
 
-    #: Administrator role permission
-    admin_role = flask_principal.Permission(
-        flask_principal.RoleNeed('admin')
-    )
+    def register_role(self, role_name):
+        self.roles.x_dict[role_name] = \
+            (flask_principal.RoleNeed(role_name),)
+
+    def register_action(self, priv_name):
+        self.actions.x_dict[priv_name] = \
+            (flask_principal.ActionNeed(priv_name),)
+
+    @property
+    def all_roles(self):
+        return set(self.roles.x_dict.keys())
+
+    @property
+    def all_actions(self):
+        return set(self.actions.x_dict.keys())
+
 
 #: All permissions in the app
 permissions = Permissions()
@@ -83,15 +106,20 @@ def on_identity_loaded(sender, identity):
     :param identity: Identity container
     :type identity: ``flask_principal.Identity``
     """
-    identity.user = flask_login.current_user
+    user = flask_login.current_user
+    identity.user = user
 
-    if hasattr(flask_login.current_user, 'id'):
+    if hasattr(user, 'id'):
         identity.provides.add(
             flask_principal.UserNeed(flask_login.current_user.id)
         )
 
-    if hasattr(flask_login.current_user, 'roles'):
-        for role in flask_login.current_user.roles:
+    if hasattr(user, 'roles'):
+        for role in user.roles:
             identity.provides.add(
                 flask_principal.RoleNeed(role.name)
+            )
+        for priviledge in user.privileges(permissions.all_actions):
+            identity.provides.add(
+                flask_principal.ActionNeed(priviledge)
             )

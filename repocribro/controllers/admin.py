@@ -9,7 +9,7 @@ admin = flask.Blueprint('admin', __name__, url_prefix='/admin')
 
 
 @admin.route('')
-@permissions.admin_role.require(404)
+@permissions.roles.admin.require(404)
 def index():
     """Administration zone dashboard (GET handler)"""
     ext_master = flask.current_app.container.get('ext_master')
@@ -26,7 +26,7 @@ def index():
 
 
 @admin.route('/account/<login>')
-@permissions.admin_role.require(404)
+@permissions.roles.admin.require(404)
 def account_detail(login):
     """Account administration (GET handler)"""
     db = flask.current_app.container.get('db')
@@ -38,7 +38,7 @@ def account_detail(login):
 
 
 @admin.route('/account/<login>/ban', methods=['POST'])
-@permissions.admin_role.require(404)
+@permissions.roles.admin.require(404)
 def account_ban(login):
     """Ban (make inactive) account (POST handler)"""
     db = flask.current_app.container.get('db')
@@ -66,7 +66,7 @@ def account_ban(login):
 
 
 @admin.route('/account/<login>/delete', methods=['POST'])
-@permissions.admin_role.require(404)
+@permissions.roles.admin.require(404)
 def account_delete(login):
     """Delete account (POST handler)"""
     db = flask.current_app.container.get('db')
@@ -84,7 +84,7 @@ def account_delete(login):
 
 
 @admin.route('/repository/<login>/<reponame>')
-@permissions.admin_role.require(404)
+@permissions.roles.admin.require(404)
 def repo_detail(login, reponame):
     """Repository administration (GET handler)"""
     db = flask.current_app.container.get('db')
@@ -101,7 +101,7 @@ def repo_detail(login, reponame):
 
 
 @admin.route('/repository/<login>/<reponame>/visibility', methods=['POST'])
-@permissions.admin_role.require(404)
+@permissions.roles.admin.require(404)
 def repo_visibility(login, reponame):
     """Change repository visibility (POST handler)"""
     db = flask.current_app.container.get('db')
@@ -134,7 +134,7 @@ def repo_visibility(login, reponame):
 
 
 @admin.route('/repository/<login>/<reponame>/delete', methods=['POST'])
-@permissions.admin_role.require(404)
+@permissions.roles.admin.require(404)
 def repo_delete(login, reponame):
     """Delete repository  (POST handler)"""
     db = flask.current_app.container.get('db')
@@ -152,7 +152,7 @@ def repo_delete(login, reponame):
 
 
 @admin.route('/role/<name>')
-@permissions.admin_role.require(404)
+@permissions.roles.admin.require(404)
 def role_detail(name):
     """Role administration (GET handler)"""
     db = flask.current_app.container.get('db')
@@ -164,7 +164,7 @@ def role_detail(name):
 
 
 @admin.route('/role/<name>/edit', methods=['POST'])
-@permissions.admin_role.require(404)
+@permissions.roles.admin.require(404)
 def role_edit(name):
     """Edit role (POST handler)"""
     db = flask.current_app.container.get('db')
@@ -194,7 +194,7 @@ def role_edit(name):
 
 
 @admin.route('/role/<name>/delete', methods=['POST'])
-@permissions.admin_role.require(404)
+@permissions.roles.admin.require(404)
 def role_delete(name):
     """Delete role (POST handler)"""
     db = flask.current_app.container.get('db')
@@ -210,7 +210,7 @@ def role_delete(name):
 
 
 @admin.route('/roles/create', methods=['POST'])
-@permissions.admin_role.require(404)
+@permissions.roles.admin.require(404)
 def role_create():
     """Create new role (POST handler)"""
     db = flask.current_app.container.get('db')
@@ -234,7 +234,7 @@ def role_create():
 
 
 @admin.route('/role/<name>/add', methods=['POST'])
-@permissions.admin_role.require(404)
+@permissions.roles.admin.require(404)
 def role_assignment_add(name):
     """Assign role to user (POST handler)"""
     db = flask.current_app.container.get('db')
@@ -257,7 +257,7 @@ def role_assignment_add(name):
 
 
 @admin.route('/role/<name>/remove', methods=['POST'])
-@permissions.admin_role.require(404)
+@permissions.roles.admin.require(404)
 def role_assignment_remove(name):
     """Remove assignment of role to user (POST handler)"""
     db = flask.current_app.container.get('db')

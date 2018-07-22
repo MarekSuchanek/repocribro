@@ -2,6 +2,7 @@ import flask
 import flask_login
 
 from ..models import User, Organization, Repository
+from ..security import permissions
 
 #: Core controller blueprint
 core = flask.Blueprint('core', __name__, url_prefix='')
@@ -21,6 +22,7 @@ def index():
 @core.route('/search/')
 @core.route('/search')
 @core.route('/search/<query>')
+# @permissions.actions.search.require(403)
 def search(query=''):
     """Search page (GET handler)
 

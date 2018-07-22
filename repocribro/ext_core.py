@@ -4,7 +4,7 @@ import flask_migrate
 
 from .extending import Extension
 from .extending.helpers import ViewTab, Badge
-from .models import Push, Release, Repository
+from .models import Push, Release, Repository, Role
 from .github import GitHubAPI
 
 
@@ -163,6 +163,16 @@ class CoreExtension(Extension):
     def provide_filters():
         from .filters import all_filters
         return all_filters
+
+    @staticmethod
+    def provide_roles():
+        return {
+            'admin': Role('admin', '*', 'Service administrators'),
+        }
+
+    @staticmethod
+    def provide_actions():
+        return ['login', 'search']
 
     @staticmethod
     def get_gh_webhook_processors():

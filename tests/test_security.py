@@ -21,7 +21,7 @@ def test_login_logout(app, empty_db_session):
 
 def test_permission_admin(app, empty_db_session):
     with app.test_request_context('/'):
-        @permissions.admin_role.require(403)
+        @permissions.roles.admin.require(403)
         def test():
             return 200
 

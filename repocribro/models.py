@@ -79,6 +79,14 @@ class RoleMixin:
         """
         return hash(self.name)
 
+    def permits(self, privilege):
+        privileges = self.privileges.split(':')
+        if privilege in privileges:
+            return True
+        if '*' in privileges:  # TODO: better wildcards
+            return True
+        return False
+
 
 class Anonymous(flask_login.AnonymousUserMixin):
     """Anonymous (not logged) user representation"""
@@ -245,6 +253,15 @@ class UserAccount(db.Model, UserMixin, SearchableMixin):
         :rtype: str
         """
         return '<UserAccount (#{})>'.format(self.id)
+
+    def privileges(self, all_privileges=frozenset()):
+        privileges = set()
+        for priv in all_privileges:
+            for role in self.roles:
+                if role.permits(priv):
+                    privileges.add(priv)
+                    break
+        return privileges
 
 
 class Role(db.Model, RoleMixin):

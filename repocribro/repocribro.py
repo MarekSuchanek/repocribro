@@ -112,9 +112,13 @@ def create_app(cfg_files=['DEFAULT']):
     ext_names = ext_master.call('introduce', 'unknown')
     print('Loaded extensions: {}'.format(', '.join(ext_names)))
 
+    from .security import permissions
+    app.container.set_singleton('permissions', permissions)
+
     ext_master.call('init_first')
     ext_master.call('init_models')
     ext_master.call('init_business')
+    ext_master.call('init_security')
     ext_master.call('init_filters')
     ext_master.call('init_blueprints')
     ext_master.call('init_container')

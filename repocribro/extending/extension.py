@@ -108,6 +108,24 @@ class Extension:
         """
         return {}
 
+    @staticmethod
+    def provide_roles():
+        """Extension can define roles for user accounts
+
+        :return: Dictionary with name + Role entity
+        :rtype: dict of str: ``repocribro.models.Role``
+        """
+        return {}
+
+    @staticmethod
+    def provide_actions():
+        """Extension can define actions for privileges
+
+        :return: List of action names
+        :rtype: list of str
+        """
+        return []
+
     def init_models(self):
         """Hook operation for initiating the models and registering them
         within db
@@ -125,6 +143,14 @@ class Extension:
         within Jinja env of repocribro Flask app
         """
         self.register_filters_from_dict(self.provide_filters())
+
+    def init_security(self):
+        """Hook operation to setup privileges (roles and actions)"""
+        permissions = config = self.app.container.get('permissions')
+        for role_name in self.provide_roles().keys():
+            permissions.register_role(role_name)
+        for action_name in self.provide_actions():
+            permissions.register_action(action_name)
 
     def introduce(self):
         """Hook operation for getting short introduction of extension (mostly
