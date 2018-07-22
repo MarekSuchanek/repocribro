@@ -107,6 +107,14 @@ def reload_anonymous_role(app, db):
             Anonymous.roles.append(anonymous_role)
 
 
+def get_default_user_role(app, db):
+    with app.app_context():
+        user_role = db.session.query(Role).filter_by(
+            name=UserAccount.default_rolename
+        ).first()
+    return user_role
+
+
 @flask_principal.identity_loaded.connect
 def on_identity_loaded(sender, identity):
     """Principal helper for loading the identity of logged user

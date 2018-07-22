@@ -2,7 +2,9 @@ import flask
 import flask_sqlalchemy
 
 from ..models import User, UserAccount
-from ..security import login as security_login, logout as security_logout
+from ..security import login as security_login, \
+                       logout as security_logout, \
+                       get_default_user_role
 
 #: Auth controller blueprint
 auth = flask.Blueprint('auth', __name__, url_prefix='/auth')
@@ -33,6 +35,9 @@ def github_callback_get_account(db, gh_api):
     is_new = False
     if gh_user is None:
         user_account = UserAccount()
+        default_role = get_default_user_role(flask.current_app, db)
+        if default_role is not None:
+            user_account.roles.append(default_role)
         db.session.add(user_account)
         gh_user = User.create_from_dict(user_data, user_account)
         db.session.add(gh_user)

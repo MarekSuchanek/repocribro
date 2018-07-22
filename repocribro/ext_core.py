@@ -4,7 +4,7 @@ import flask_migrate
 
 from .extending import Extension
 from .extending.helpers import ViewTab, Badge
-from .models import Push, Release, Repository, Role, Anonymous
+from .models import Push, Release, Repository, Role, Anonymous, UserAccount
 from .github import GitHubAPI
 
 
@@ -168,7 +168,8 @@ class CoreExtension(Extension):
     def provide_roles():
         return {
             'admin': Role('admin', '*', 'Service administrators'),
-            'anonymous': Role(Anonymous.rolename, 'search*:login', 'Not-logged user')
+            'user': Role(UserAccount.default_rolename, 'search*', 'Regular users'),
+            'anonymous': Role(Anonymous.rolename, 'search*:login', 'Not-logged users')
         }
 
     @staticmethod

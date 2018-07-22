@@ -230,6 +230,8 @@ class UserAccount(db.Model, UserMixin, SearchableMixin):
     """UserAccount in the repocribro app"""
     __tablename__ = 'UserAccount'
 
+    default_rolename = 'user'
+
     #: Unique identifier of the user account
     id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
     #: Timestamp where account was created
