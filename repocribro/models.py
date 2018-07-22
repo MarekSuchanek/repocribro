@@ -2,6 +2,7 @@ import flask_sqlalchemy
 import sqlalchemy
 import flask_login
 import datetime
+import fnmatch
 
 from .database import db
 
@@ -83,8 +84,9 @@ class RoleMixin:
         privileges = self.privileges.split(':')
         if privilege in privileges:
             return True
-        if '*' in privileges:  # TODO: better wildcards
-            return True
+        for p in privileges:
+            if fnmatch.fnmatch(privilege, p):
+                return True
         return False
 
 
