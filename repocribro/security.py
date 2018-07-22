@@ -2,7 +2,7 @@ import flask
 import flask_login
 import flask_principal
 
-from .models import UserAccount, Anonymous
+from .models import UserAccount, Anonymous, Role
 
 
 def init_login_manager(db):
@@ -96,6 +96,15 @@ def clear_session(*args):
     """
     for key in args:
         flask.session.pop(key, None)
+
+
+def reload_anonymous_role(app, db):
+    with app.app_context():
+        anonymous_role = db.session.query(Role).filter_by(
+            name=Anonymous.rolename
+        ).first()
+        if anonymous_role is not None:
+            Anonymous.roles.append(anonymous_role)
 
 
 @flask_principal.identity_loaded.connect

@@ -90,63 +90,6 @@ class RoleMixin:
         return False
 
 
-class Anonymous(flask_login.AnonymousUserMixin):
-    """Anonymous (not logged) user representation"""
-
-    @property
-    def is_active(self):
-        """Check whether is user active
-
-        :return: False, anonymous is not active
-        :rtype: bool
-        """
-        return False
-
-    def has_role(self, role):
-        """Check whether has the role
-
-        :param role: Role to be checked
-        :type role: ``repocribro.models.RoleMixin``
-        :return: False, anonymous has no roles
-        :rtype: bool
-        """
-        return False
-
-    @property
-    def rolenames(self):
-        """Get names of all roles of that user
-
-        :return: Empty list, anonymous has no roles
-        :rtype: list of str
-        """
-        return []
-
-    def owns_repo(self, repo):
-        """Check if user owns the repository
-
-        :param repo: Repository which shoudl be tested
-        :type repo: ``repocribro.models.Repository``
-        :return: False, anonymous can not own repository
-        :rtype: bool
-        """
-        return False
-
-    def sees_repo(self, repo, has_secret=False):
-        """Check if user is allowed to see the repo
-
-        Anonymous can see only public repos
-
-        :param repo: Repository which user want to see
-        :type repo: ``repocribro.models.Repository``
-        :param has_secret: If current user knows the secret URL
-        :type has_secret: bool
-        :return: If user can see repo
-        :rtype: bool
-        """
-        visible = repo.is_public or (has_secret and repo.is_hidden)
-        return visible
-
-
 class UserMixin(flask_login.UserMixin):
     @property
     def is_active(self):
@@ -200,6 +143,75 @@ class UserMixin(flask_login.UserMixin):
         """
         visible = repo.is_public or (has_secret and repo.is_hidden)
         return visible or self.has_role('admin') or self.owns_repo(repo)
+
+    def privileges(self, all_privileges=frozenset()):
+        privileges = set()
+        for priv in all_privileges:
+            for role in self.roles:
+                if role.permits(priv):
+                    privileges.add(priv)
+                    break
+        return privileges
+
+
+class Anonymous(flask_login.AnonymousUserMixin, UserMixin):
+    """Anonymous (not logged) user representation"""
+
+    rolename = 'anonymous'
+    roles = []
+
+    @property
+    def is_active(self):
+        """Check whether is user active
+
+        :return: False, anonymous is not active
+        :rtype: bool
+        """
+        return False
+
+    def has_role(self, role):
+        """Check whether has the role
+
+        :param role: Role to be checked
+        :type role: ``repocribro.models.RoleMixin``
+        :return: False, anonymous has no roles
+        :rtype: bool
+        """
+        return role == self.rolename
+
+    @property
+    def rolenames(self):
+        """Get names of all roles of that user
+
+        :return: Empty list, anonymous has no roles
+        :rtype: list of str
+        """
+        return [self.rolename]
+
+    def owns_repo(self, repo):
+        """Check if user owns the repository
+
+        :param repo: Repository which shoudl be tested
+        :type repo: ``repocribro.models.Repository``
+        :return: False, anonymous can not own repository
+        :rtype: bool
+        """
+        return False
+
+    def sees_repo(self, repo, has_secret=False):
+        """Check if user is allowed to see the repo
+
+        Anonymous can see only public repos
+
+        :param repo: Repository which user want to see
+        :type repo: ``repocribro.models.Repository``
+        :param has_secret: If current user knows the secret URL
+        :type has_secret: bool
+        :return: If user can see repo
+        :rtype: bool
+        """
+        visible = repo.is_public or (has_secret and repo.is_hidden)
+        return visible
 
 
 #: Many-to-many relationship between user accounts and roles
@@ -255,15 +267,6 @@ class UserAccount(db.Model, UserMixin, SearchableMixin):
         :rtype: str
         """
         return '<UserAccount (#{})>'.format(self.id)
-
-    def privileges(self, all_privileges=frozenset()):
-        privileges = set()
-        for priv in all_privileges:
-            for role in self.roles:
-                if role.permits(priv):
-                    privileges.add(priv)
-                    break
-        return privileges
 
 
 class Role(db.Model, RoleMixin):

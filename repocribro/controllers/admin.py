@@ -1,8 +1,8 @@
 import flask
 import sqlalchemy
 
-from ..models import User, Role, Repository
-from ..security import permissions
+from ..models import User, Role, Repository, Anonymous
+from ..security import permissions, reload_anonymous_role
 
 #: Admin controller blueprint
 admin = flask.Blueprint('admin', __name__, url_prefix='/admin')
@@ -184,6 +184,8 @@ def role_edit(name):
         role.privileges = priv
         role.description = desc
         db.session.commit()
+        if name == Anonymous.rolename:
+            reload_anonymous_role(flask.current_app, db)
     except sqlalchemy.exc.IntegrityError as e:
         flask.flash('Couldn\'t make that role... {}'.format(str(e)),
                     'warning')
@@ -225,6 +227,8 @@ def role_create():
         role = Role(name, priv, desc)
         db.session.add(role)
         db.session.commit()
+        if name == Anonymous.rolename:
+            reload_anonymous_role(flask.current_app, db)
     except sqlalchemy.exc.IntegrityError as e:
         flask.flash('Couldn\'t make that role... {}'.format(str(e)),
                     'warning')

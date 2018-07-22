@@ -4,7 +4,7 @@ import flask_migrate
 
 from .extending import Extension
 from .extending.helpers import ViewTab, Badge
-from .models import Push, Release, Repository, Role
+from .models import Push, Release, Repository, Role, Anonymous
 from .github import GitHubAPI
 
 
@@ -168,6 +168,7 @@ class CoreExtension(Extension):
     def provide_roles():
         return {
             'admin': Role('admin', '*', 'Service administrators'),
+            'anonymous': Role(Anonymous.rolename, 'search*:login', 'Not-logged user')
         }
 
     @staticmethod
@@ -201,7 +202,9 @@ class CoreExtension(Extension):
 
     def init_business(self):
         """Init business layer (other extensions, what is needed)"""
-        from .security import init_login_manager
+        from .security import init_login_manager, reload_anonymous_role
+
+        reload_anonymous_role(self.app, self.db)
         login_manager, principals = init_login_manager(self.db)
         login_manager.init_app(self.app)
         principals.init_app(self.app)
