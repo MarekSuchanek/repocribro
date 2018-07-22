@@ -115,6 +115,16 @@ def get_default_user_role(app, db):
     return user_role
 
 
+def create_default_role(app, db, role):
+    with app.app_context():
+        existing_role = db.session.query(Role).filter_by(
+            name=role.name
+        ).first()
+        if existing_role is None:
+            db.session.add(role)
+            db.session.commit()
+
+
 @flask_principal.identity_loaded.connect
 def on_identity_loaded(sender, identity):
     """Principal helper for loading the identity of logged user

@@ -146,9 +146,11 @@ class Extension:
 
     def init_security(self):
         """Hook operation to setup privileges (roles and actions)"""
-        permissions = config = self.app.container.get('permissions')
-        for role_name in self.provide_roles().keys():
+        from ..security import create_default_role
+        permissions = self.app.container.get('permissions')
+        for role_name, role in self.provide_roles().items():
             permissions.register_role(role_name)
+            create_default_role(self.app, self.db, role)
         for action_name in self.provide_actions():
             permissions.register_action(action_name)
 
