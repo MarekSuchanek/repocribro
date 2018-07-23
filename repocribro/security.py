@@ -35,7 +35,7 @@ class PermissionsContainer:
         self.x_dict = dict()
 
     def __getattr__(self, key):
-        return flask_principal.Permission(*self.x_dict[key])
+        return flask_principal.Permission(*self.x_dict.get(key, []))
 
 
 class Permissions:
