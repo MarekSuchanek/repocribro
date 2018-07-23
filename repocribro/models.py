@@ -3,6 +3,7 @@ import sqlalchemy
 import flask_login
 import datetime
 import fnmatch
+import re
 
 from .database import db
 
@@ -51,6 +52,8 @@ class SearchableMixin:
 class RoleMixin:
     """Mixin for models representing roles"""
 
+    priv_regex = re.compile('[a-z_\?\*]+')
+
     def __eq__(self, other):
         """Equality of roles is based on names
 
@@ -84,10 +87,17 @@ class RoleMixin:
         privileges = self.privileges.split(':')
         if privilege in privileges:
             return True
-        for p in privileges:
-            if fnmatch.fnmatch(privilege, p):
+        for priv in privileges:
+            if fnmatch.fnmatch(privilege, priv):
                 return True
         return False
+
+    def valid_privileges(self):
+        privileges = self.privileges.split(':')
+        for priv in privileges:
+            if not self.priv_regex.search(priv):
+                return False
+        return True
 
 
 class UserMixin(flask_login.UserMixin):

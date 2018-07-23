@@ -178,11 +178,15 @@ def role_edit(name):
     if name == '':
         flask.flash('Couldn\'t make that role...', 'warning')
         return flask.redirect(flask.url_for('admin.index', tab='roles'))
-    # TODO: validate priv (chars, separators, etc.)
+
+    role.name = name
+    role.privileges = priv.lower()
+    role.description = desc
+    if not role.valid_privileges():
+        flask.flash('Unsaved - incorrect characters in privileges '
+                    'for role {}'.format(name), 'warning')
+        return flask.redirect(flask.url_for('admin.role_detail', name=role.name))
     try:
-        role.name = name
-        role.privileges = priv
-        role.description = desc
         db.session.commit()
         if name == Anonymous.rolename:
             reload_anonymous_role(flask.current_app, db)
@@ -223,8 +227,12 @@ def role_create():
     if name == '':
         flask.flash('Couldn\'t make that role...', 'warning')
         return flask.redirect(flask.url_for('admin.index', tab='roles'))
+    role = Role(name, priv, desc)
+    if not role.valid_privileges():
+        flask.flash('Unsaved - incorrect characters in privileges '
+                    'for role {}'.format(name), 'warning')
+        return flask.redirect(flask.url_for('admin.role_detail', name=role.name))
     try:
-        role = Role(name, priv, desc)
         db.session.add(role)
         db.session.commit()
         if name == Anonymous.rolename:
