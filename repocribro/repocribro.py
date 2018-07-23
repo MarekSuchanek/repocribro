@@ -80,6 +80,10 @@ class Repocribro(flask.Flask):
         super().__init__(PROG_NAME)
         self.container = DI_Container()
 
+    def ext_call(self, what_to_call):
+        ext_master = self.container.get('ext_master')
+        ext_master.call(what_to_call)
+
 
 def create_app(cfg_files=['DEFAULT']):
     """Factory for making the web Flask application

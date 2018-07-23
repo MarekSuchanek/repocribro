@@ -114,6 +114,8 @@ def db(app, request):
     _db.app = app
     _db.create_all()
 
+    app.ext_call('init_security')  # create default roles
+
     request.addfinalizer(teardown)
     return _db
 
@@ -161,11 +163,12 @@ def filled_db_session(empty_db_session):
     session = empty_db_session
     import datetime
     from repocribro.models import Role, UserAccount, User, \
-        Organization, Repository, Commit, Release, Push
+        Organization, Repository, Commit, Release, Push, Anonymous
 
     # Setup admin role
     admin_role = Role('admin', '*', 'Administrators')
     session.add(admin_role)
+    Anonymous.permits = lambda x: True
 
     account_banned = UserAccount()
     account_banned.active = False

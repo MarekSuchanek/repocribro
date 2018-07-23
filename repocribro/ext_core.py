@@ -168,8 +168,10 @@ class CoreExtension(Extension):
     def provide_roles():
         return {
             'admin': Role('admin', '*', 'Service administrators'),
-            'user': Role(UserAccount.default_rolename, 'search*', 'Regular users'),
-            'anonymous': Role(Anonymous.rolename, 'search*:login', 'Not-logged users')
+            'user': Role(UserAccount.default_rolename, 'search*',
+                         'Regular users'),
+            'anonymous': Role(Anonymous.rolename, 'search*:login',
+                              'Not-logged users')
         }
 
     @staticmethod

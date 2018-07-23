@@ -171,7 +171,7 @@ def test_anonymous():
     assert not anonym.has_role('user')
     assert not anonym.is_active
     assert not anonym.is_authenticated
-    assert anonym.rolenames == []
+    assert anonym.rolenames == ['anonymous']
     assert anonym.is_anonymous
     repo = Repository(777, None, 'some/repo', 'repo', 'C++', '', '', '',
                       False, None, None, Repository.VISIBILITY_PRIVATE)

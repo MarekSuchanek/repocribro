@@ -185,7 +185,8 @@ def role_edit(name):
     if not role.valid_privileges():
         flask.flash('Unsaved - incorrect characters in privileges '
                     'for role {}'.format(name), 'warning')
-        return flask.redirect(flask.url_for('admin.role_detail', name=role.name))
+        return flask.redirect(flask.url_for('admin.role_detail',
+                                            name=role.name))
     try:
         db.session.commit()
         if name == Anonymous.rolename:
@@ -231,7 +232,8 @@ def role_create():
     if not role.valid_privileges():
         flask.flash('Unsaved - incorrect characters in privileges '
                     'for role {}'.format(name), 'warning')
-        return flask.redirect(flask.url_for('admin.role_detail', name=role.name))
+        return flask.redirect(flask.url_for('admin.role_detail',
+                                            name=role.name))
     try:
         db.session.add(role)
         db.session.commit()
@@ -242,7 +244,8 @@ def role_create():
                     'warning')
         db.session.rollback()
         return flask.redirect(flask.url_for('admin.index', tab='roles'))
-    return flask.redirect(flask.url_for('admin.role_detail', name=role.name))
+    return flask.redirect(flask.url_for('admin.role_detail',
+                                        name=role.name))
 
 
 @admin.route('/role/<name>/add', methods=['POST'])

@@ -22,7 +22,6 @@ def index():
 @core.route('/search/')
 @core.route('/search')
 @core.route('/search/<query>')
-@permissions.actions.search.require(403)
 def search(query=''):
     """Search page (GET handler)
 

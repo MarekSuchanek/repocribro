@@ -100,29 +100,40 @@ def clear_session(*args):
 
 def reload_anonymous_role(app, db):
     with app.app_context():
-        anonymous_role = db.session.query(Role).filter_by(
-            name=Anonymous.rolename
-        ).first()
+        anonymous_role = None
+        try:
+            anonymous_role = db.session.query(Role).filter_by(
+                name=Anonymous.rolename
+            ).first()
+        except:
+            pass
         if anonymous_role is not None:
             Anonymous.roles.append(anonymous_role)
 
 
 def get_default_user_role(app, db):
+    user_role = None
     with app.app_context():
-        user_role = db.session.query(Role).filter_by(
-            name=UserAccount.default_rolename
-        ).first()
+        try:
+            user_role = db.session.query(Role).filter_by(
+                name=UserAccount.default_rolename
+            ).first()
+        except:
+            pass
     return user_role
 
 
 def create_default_role(app, db, role):
     with app.app_context():
-        existing_role = db.session.query(Role).filter_by(
-            name=role.name
-        ).first()
-        if existing_role is None:
-            db.session.add(role)
-            db.session.commit()
+        try:
+            existing_role = db.session.query(Role).filter_by(
+                name=role.name
+            ).first()
+            if existing_role is None:
+                db.session.add(role)
+                db.session.commit()
+        except:
+            pass
 
 
 @flask_principal.identity_loaded.connect
