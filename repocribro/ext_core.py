@@ -167,16 +167,26 @@ class CoreExtension(Extension):
     @staticmethod
     def provide_roles():
         return {
-            'admin': Role('admin', '*', 'Service administrators'),
-            'user': Role(UserAccount.default_rolename, 'search*',
+            'admin': Role('admin',
+                          '*',
+                          'Service administrators'),
+            'user': Role(UserAccount.default_rolename,
+                         'search:logout:manage*:browse*',
                          'Regular users'),
-            'anonymous': Role(Anonymous.rolename, 'search*:login',
+            'anonymous': Role(Anonymous.rolename,
+                              'search*:browse*:login',
                               'Not-logged users')
         }
 
     @staticmethod
     def provide_actions():
-        return ['login', 'search']
+        return ['login', 'logout', 'search', 'browse_repo_hidden',
+                'browse', 'browse_user', 'browse_repo', 'browse_org',
+                'manage_dashboard', 'manage_profile_update', 'manage_repos',
+                'manage_repo', 'manage_repo_delete', 'manage_repo_update',
+                'manage_repo_activate', 'manage_repo_deactivate',
+                'manage_orgs', 'manage_org', 'manage_org_update',
+                'manage_org_delete']
 
     @staticmethod
     def get_gh_webhook_processors():

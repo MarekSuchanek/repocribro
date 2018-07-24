@@ -1,2 +1,20 @@
 search, use search engine
-login, login via GitHub to app
+login, login to Repocribro via GitHub to app
+logout, logout from Repocribro
+browse, visit basic pages like landing
+browse_user, visit detail of user
+browse_org, visit detail of organization
+browse_repo, visit detail of repository that is public or owned-private
+browse_repo_hidden, visit detail of repository that is hidden
+manage_dashboard, access to account management dashboard
+manage_profile_update, update profile information from GitHub
+manage_repos, list GitHub repositories
+manage_repo, manage single repository within Repocribro
+manage_repo_update, update repository information from GitHub
+manage_repo_delete, delete repository from Repocribro
+manage_repo_activate, activate repository within Repocribro
+manage_repo_deactivate,  deactivate webhook for Repocribro
+manage_orgs, list GitHub organizations
+manage_org, manage single organization
+manage_org_update, update organization information from GitHub
+manage_org_delete, delete organization from Repocribro

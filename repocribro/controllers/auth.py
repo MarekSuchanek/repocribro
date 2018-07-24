@@ -4,13 +4,14 @@ import flask_sqlalchemy
 from ..models import User, UserAccount
 from ..security import login as security_login, \
                        logout as security_logout, \
-                       get_default_user_role
+                       get_default_user_role, permissions
 
 #: Auth controller blueprint
 auth = flask.Blueprint('auth', __name__, url_prefix='/auth')
 
 
 @auth.route('/github')
+@permissions.actions.login.require(400)
 def github():
     """Redirect to GitHub OAuth gate (GET handler)"""
     gh_api = flask.current_app.container.get('gh_api')
@@ -47,6 +48,7 @@ def github_callback_get_account(db, gh_api):
 
 
 @auth.route('/github/callback')
+@permissions.actions.login.require(400)
 def github_callback():
     """Callback gate for GitHub OAUTH (GET handler)"""
     db = flask.current_app.container.get('db')
@@ -78,6 +80,7 @@ def github_callback():
 
 
 @auth.route('/logout')
+@permissions.actions.logout.require(400)
 def logout():
     """Logout currently logged user (GET handler)"""
     security_logout()

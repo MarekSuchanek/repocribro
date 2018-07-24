@@ -2,6 +2,7 @@ import flask
 import flask_login
 
 from ..models import Repository, Organization
+from ..security import permissions
 
 #: Manage controller blueprint
 manage = flask.Blueprint('manage', __name__, url_prefix='/manage')
@@ -9,6 +10,7 @@ manage = flask.Blueprint('manage', __name__, url_prefix='/manage')
 
 @manage.route('')
 @flask_login.login_required
+@permissions.actions.manage_dashboard.require(403)
 def dashboard():
     """Management zone dashboard (GET handler)"""
     ext_master = flask.current_app.container.get('ext_master')
@@ -25,6 +27,7 @@ def dashboard():
 
 @manage.route('/profile/update')
 @flask_login.login_required
+@permissions.actions.manage_profile_update.require(403)
 def profile_update():
     """Update user info from GitHub (GET handler)
 
@@ -44,6 +47,7 @@ def profile_update():
 
 @manage.route('/repositories')
 @flask_login.login_required
+@permissions.actions.manage_repos.require(403)
 def repositories():
     """List user repositories from GitHub (GET handler)"""
     page = int(flask.request.args.get('page', 0))
@@ -85,6 +89,7 @@ def get_repo_if_admin(db, full_name):
 
 @manage.route('/repository/<path:full_name>')
 @flask_login.login_required
+@permissions.actions.manage_repo.require(403)
 def repository_detail(full_name):
     """Repository detail (GET handler)"""
     db = flask.current_app.container.get('db')
@@ -143,6 +148,7 @@ def update_webhook(gh_api, repo):
 
 @manage.route('/repository/activate', methods=['POST'])
 @flask_login.login_required
+@permissions.actions.manage_repo_activate.require(403)
 def repository_activate():
     """Activate repo in app from GitHub (POST handler)
 
@@ -218,6 +224,7 @@ def repository_activate():
 
 @manage.route('/repository/deactivate', methods=['POST'])
 @flask_login.login_required
+@permissions.actions.manage_repo_deactivate.require(403)
 def repository_deactivate():
     """Deactivate repo in app from GitHub (POST handler)"""
     db = flask.current_app.container.get('db')
@@ -250,6 +257,7 @@ def repository_deactivate():
 
 @manage.route('/repository/delete', methods=['POST'])
 @flask_login.login_required
+@permissions.actions.manage_repo_delete.require(403)
 def repository_delete():
     """Delete repo (in app) from GitHub (POST handler)
 
@@ -286,6 +294,7 @@ def repository_delete():
 
 @manage.route('/repository/update', methods=['POST'])
 @flask_login.login_required
+@permissions.actions.manage_repo_update.require(403)
 def repository_update():
     """Update repo info from GitHub (POST handler)
 
@@ -320,6 +329,7 @@ def repository_update():
 
 @manage.route('/organizations')
 @flask_login.login_required
+@permissions.actions.manage_orgs.require(403)
 def organizations():
     """List user organizations from GitHub (GET handler)"""
     page = int(flask.request.args.get('page', 0))
@@ -340,6 +350,7 @@ def organizations():
 
 @manage.route('/organization/<login>')
 @flask_login.login_required
+@permissions.actions.manage_org.require(403)
 def organization(login):
     """List organization repositories for activation
 
@@ -365,6 +376,7 @@ def organization(login):
 
 @manage.route('/organization/<login>/update')
 @flask_login.login_required
+@permissions.actions.manage_org_update.require(403)
 def organization_update(login):
     """Update organization
 
@@ -400,6 +412,7 @@ def organization_update(login):
 
 @manage.route('/organization/<login>/delete')
 @flask_login.login_required
+@permissions.actions.manage_org_delete.require(403)
 def organization_delete(login):
     """Delete organization (if no repositories)
 
