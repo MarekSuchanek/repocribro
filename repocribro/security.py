@@ -29,6 +29,7 @@ def init_login_manager(db):
 
 
 class PermissionsContainer:
+    """Container for permission to be used for decorators"""
 
     def __init__(self, name):
         self.x_name = name
@@ -39,26 +40,44 @@ class PermissionsContainer:
 
 
 class Permissions:
-    """ Class for prividing various permissions"""
+    """Class for prividing various permissions"""
 
     def __init__(self):
         self.roles = PermissionsContainer('roles')
         self.actions = PermissionsContainer('actions')
 
     def register_role(self, role_name):
+        """Register new role by name
+
+        :param role_name: name of role to register
+        :type role_name: str
+        """
         self.roles.x_dict[role_name] = \
             (flask_principal.RoleNeed(role_name),)
 
     def register_action(self, priv_name):
+        """Register new action privilege by name
+
+        :param priv_name: name of action privilege to register
+        :type priv_name: str
+        """
         self.actions.x_dict[priv_name] = \
             (flask_principal.ActionNeed(priv_name),)
 
     @property
     def all_roles(self):
+        """All registered roles
+
+        :return: set of str
+        """
         return set(self.roles.x_dict.keys())
 
     @property
     def all_actions(self):
+        """All registered action privileges
+
+        :return: set of str
+        """
         return set(self.actions.x_dict.keys())
 
 
@@ -99,6 +118,13 @@ def clear_session(*args):
 
 
 def reload_anonymous_role(app, db):
+    """Reload special role for anonymous users
+
+    :param app: Current flask application
+    :type app: ``repocribro.repocribro.Repocribro``
+    :param db: Database connection
+    :type db: ``flask_sqlalchemy.SQLAlchemy``
+    """
     with app.app_context():
         anonymous_role = None
         try:
@@ -112,6 +138,13 @@ def reload_anonymous_role(app, db):
 
 
 def get_default_user_role(app, db):
+    """Get special default role for registered users
+
+    :param app: Current flask application
+    :type app: ``repocribro.repocribro.Repocribro``
+    :param db: Database connection
+    :type db: ``flask_sqlalchemy.SQLAlchemy``
+    """
     user_role = None
     with app.app_context():
         try:
@@ -124,6 +157,15 @@ def get_default_user_role(app, db):
 
 
 def create_default_role(app, db, role):
+    """Create default role for the app
+
+    :param app: Current flask application
+    :type app: ``repocribro.repocribro.Repocribro``
+    :param db: Database connection
+    :type db: ``flask_sqlalchemy.SQLAlchemy``
+    :param role: Role to be created
+    :type role: ``repocribro.models.Role``
+    """
     with app.app_context():
         try:
             existing_role = db.session.query(Role).filter_by(

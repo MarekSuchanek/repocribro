@@ -81,8 +81,14 @@ class Repocribro(flask.Flask):
         self.container = DI_Container()
 
     def ext_call(self, what_to_call):
+        """Call hook on all extensions
+
+        :param what_to_call: name of hook to call
+        :type what_to_call: str
+        :return: result of the call
+        """
         ext_master = self.container.get('ext_master')
-        ext_master.call(what_to_call)
+        return ext_master.call(what_to_call)
 
 
 def create_app(cfg_files=['DEFAULT']):

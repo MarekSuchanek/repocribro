@@ -84,6 +84,13 @@ class RoleMixin:
         return hash(self.name)
 
     def permits(self, privilege):
+        """Check if action priviledge is permitted in this role
+
+        :param privilege: privilege to be tested
+        :type: str
+        :return: if it is permitted
+        :rtype: bool
+        """
         privileges = self.privileges.split(':')
         if privilege in privileges:
             return True
@@ -93,6 +100,11 @@ class RoleMixin:
         return False
 
     def valid_privileges(self):
+        """Checks if privileges string is valid
+
+        :return: if privileges string is valid
+        :rtype: bool
+        """
         privileges = self.privileges.split(':')
         for priv in privileges:
             if not self.priv_regex.search(priv):
@@ -155,6 +167,13 @@ class UserMixin(flask_login.UserMixin):
         return visible or self.has_role('admin') or self.owns_repo(repo)
 
     def privileges(self, all_privileges=frozenset()):
+        """Filter given privileges if are applicable for the user
+
+        :param all_privileges: set of all privileges to be filtered
+        :type all_privileges: set of str
+        :return: set of applicable privileges
+        :rtype: set of str
+        """
         privileges = set()
         for priv in all_privileges:
             for role in self.roles:
