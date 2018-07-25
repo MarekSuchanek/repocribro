@@ -28,7 +28,7 @@ def test_permission_admin(app, empty_db_session):
         with pytest.raises(Forbidden):
             assert test() == 200
 
-        role_admin = Role('admin', '*', '')
+        role_admin = Role('testadmin', '*', '')
         account = UserAccount()
         account.id = 666
         account.roles.append(role_admin)

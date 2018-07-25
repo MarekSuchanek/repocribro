@@ -25,6 +25,10 @@ def init_login_manager(db):
     def load_user(user_id):
         return db.session.query(UserAccount).get(int(user_id))
 
+    @principals.identity_loader
+    def identity_loader():
+        return flask_principal.AnonymousIdentity()
+
     return login_manager, principals
 
 
@@ -134,7 +138,7 @@ def reload_anonymous_role(app, db):
         except:
             pass
         if anonymous_role is not None:
-            Anonymous.roles.append(anonymous_role)
+            Anonymous.set_role(anonymous_role)
 
 
 def get_default_user_role(app, db):
@@ -188,6 +192,7 @@ def on_identity_loaded(sender, identity):
     """
     user = flask_login.current_user
     identity.user = user
+    print(user)
 
     if hasattr(user, 'id'):
         identity.provides.add(

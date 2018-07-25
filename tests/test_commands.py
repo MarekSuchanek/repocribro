@@ -13,14 +13,14 @@ def test_assign_role(filled_db_session):
     user = filled_db_session.query(User).filter_by(login='regular').first()
     assert not user.user_account.has_role('admin')
     assert not user.user_account.has_role('new_role')
-    assert len(user.user_account.roles) == 0
+    assert len(user.user_account.roles) == 1  # default user role
 
     _assign_role('regular', 'admin')
     assert user.user_account.has_role('admin')
-    assert len(user.user_account.roles) == 1
+    assert len(user.user_account.roles) == 2
     _assign_role('regular', 'new_role')
     assert user.user_account.has_role('new_role')
-    assert len(user.user_account.roles) == 2
+    assert len(user.user_account.roles) == 3
     with pytest.raises(SystemExit) as exodus:
         _assign_role('regular', 'admin')
     assert exodus.value.code == 2

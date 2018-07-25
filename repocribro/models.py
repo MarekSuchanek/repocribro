@@ -187,7 +187,15 @@ class Anonymous(flask_login.AnonymousUserMixin, UserMixin):
     """Anonymous (not logged) user representation"""
 
     rolename = 'anonymous'
-    roles = []
+    _roles = []
+
+    @property
+    def roles(self):
+        return type(self)._roles
+
+    @classmethod
+    def set_role(cls, role):
+        cls._roles = [role]
 
     @property
     def is_active(self):
