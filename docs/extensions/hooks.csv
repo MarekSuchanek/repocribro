@@ -1,6 +1,7 @@
 ``get_gh_event_processors``, "Get GitHub events processors", ``dict`` of ``str``: ``list`` of ``function``
 ``get_gh_webhook_processors``, "Get GitHub webhook processors", ``dict`` of ``str``: ``list`` of ``function``
 ``init_business``, "Init business layer of the extension", ``None``
+``init_security``, "Init security of the extensions (define roles and privileges)", ``None``
 ``init_blueprints``, "Init Flask blueprints (register them)", ``None``
 ``init_container``, "Put whatever you need into DI container of the app", ``None``
 ``init_filters``, "Init Jinja2 filters for views (register them)", ``None``

@@ -17,7 +17,8 @@ def _assign_role(login, role_name):
     role = db.session.query(Role).filter_by(name=role_name).first()
     if role is None:
         print('Role {} not in DB... adding'.format(role_name))
-        role = Role(role_name, '')
+        print('WARNING - created role has all privileges by default!')
+        role = Role(role_name, '*', '')
         db.session.add(role)
     user.user_account.roles.append(role)
     db.session.commit()

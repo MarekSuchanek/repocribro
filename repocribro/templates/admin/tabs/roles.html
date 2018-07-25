@@ -15,8 +15,13 @@
         </div>
     </div>
     <div class="form-group">
-        <label for="name">Description:</label>
-        <textarea class="form-control" id="name" name="description"></textarea>
+        <label for="privileges">Privileges:</label>
+        <input type="text" class="form-control" id="privileges" name="privileges">
+        <small class="form-text text-muted">Privileges separated by semicolon <code>:</code> (see documentation)</small>
+    </div>
+    <div class="form-group">
+        <label for="description">Description:</label>
+        <textarea class="form-control" id="description" name="description"></textarea>
     </div>
 </form>
 
@@ -25,6 +30,7 @@
     <tr>
         <th>Name</th>
         <th>Description</th>
+        <th>Privileges</th>
         <th>Users</th>
         <th></th>
     </tr>
@@ -34,6 +40,7 @@
         <tr>
             <td>{{ role.name }}</td>
             <td>{{ role.description }}</td>
+            <td>{{ role.privileges }}</td>
             <td>{{ role.accounts|length }}</td>
             <td class="buttons-cell">
                 <a href="{{ url_for('admin.role_detail', name=role.name) }}" class="btn btn-primary btn-small">

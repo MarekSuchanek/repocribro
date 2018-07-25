@@ -21,14 +21,14 @@ def test_login_logout(app, empty_db_session):
 
 def test_permission_admin(app, empty_db_session):
     with app.test_request_context('/'):
-        @permissions.admin_role.require(403)
+        @permissions.roles.admin.require(403)
         def test():
             return 200
 
         with pytest.raises(Forbidden):
             assert test() == 200
 
-        role_admin = Role('admin', '')
+        role_admin = Role('testadmin', '*', '')
         account = UserAccount()
         account.id = 666
         account.roles.append(role_admin)

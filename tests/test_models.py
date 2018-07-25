@@ -150,9 +150,9 @@ def test_repo_push(session, github_data_loader):
 
 
 def test_role_mixin():
-    roleA = Role('admin', 'Admin of this great app')
-    roleB = Role('admin', 'Administrator of the app')
-    roleC = Role('admininistrator', 'Admin of this great app')
+    roleA = Role('admin', '*', 'Admin of this great app')
+    roleB = Role('admin', '*', 'Administrator of the app')
+    roleC = Role('admininistrator', '*', 'Admin of this great app')
     assert roleA == roleB
     assert roleB == roleA
     assert hash(roleA) == hash(roleB)
@@ -171,7 +171,7 @@ def test_anonymous():
     assert not anonym.has_role('user')
     assert not anonym.is_active
     assert not anonym.is_authenticated
-    assert anonym.rolenames == []
+    assert anonym.rolenames == ['anonymous']
     assert anonym.is_anonymous
     repo = Repository(777, None, 'some/repo', 'repo', 'C++', '', '', '',
                       False, None, None, Repository.VISIBILITY_PRIVATE)
@@ -205,7 +205,7 @@ def test_user_mixin():
     repo.visibility_type = Repository.VISIBILITY_PUBLIC
     assert account.sees_repo(repo)
 
-    role = Role('admin', '')
+    role = Role('admin', '*', '')
     account.roles.append(role)
     assert account.has_role('admin')
     assert account.rolenames == ['admin']

@@ -1,5 +1,6 @@
 """REST API controller
 
+.. todo:: refactor significantly with permissions
 .. todo:: pagination of resources
 """
 import flask

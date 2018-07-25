@@ -80,6 +80,16 @@ class Repocribro(flask.Flask):
         super().__init__(PROG_NAME)
         self.container = DI_Container()
 
+    def ext_call(self, what_to_call):
+        """Call hook on all extensions
+
+        :param what_to_call: name of hook to call
+        :type what_to_call: str
+        :return: result of the call
+        """
+        ext_master = self.container.get('ext_master')
+        return ext_master.call(what_to_call)
+
 
 def create_app(cfg_files=['DEFAULT']):
     """Factory for making the web Flask application
@@ -112,8 +122,12 @@ def create_app(cfg_files=['DEFAULT']):
     ext_names = ext_master.call('introduce', 'unknown')
     print('Loaded extensions: {}'.format(', '.join(ext_names)))
 
+    from .security import permissions
+    app.container.set_singleton('permissions', permissions)
+
     ext_master.call('init_first')
     ext_master.call('init_models')
+    ext_master.call('init_security')
     ext_master.call('init_business')
     ext_master.call('init_filters')
     ext_master.call('init_blueprints')

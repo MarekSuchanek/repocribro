@@ -12,7 +12,7 @@ assign_role
 
 
 check_config
----------
+------------
 
 .. automodule:: repocribro.commands.check_config
     :members:

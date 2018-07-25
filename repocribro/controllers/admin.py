@@ -1,15 +1,15 @@
 import flask
 import sqlalchemy
 
-from ..models import User, Role, Repository
-from ..security import permissions
+from ..models import User, Role, Repository, Anonymous
+from ..security import permissions, reload_anonymous_role
 
 #: Admin controller blueprint
 admin = flask.Blueprint('admin', __name__, url_prefix='/admin')
 
 
 @admin.route('')
-@permissions.admin_role.require(404)
+@permissions.roles.admin.require(404)
 def index():
     """Administration zone dashboard (GET handler)"""
     ext_master = flask.current_app.container.get('ext_master')
@@ -26,7 +26,7 @@ def index():
 
 
 @admin.route('/account/<login>')
-@permissions.admin_role.require(404)
+@permissions.roles.admin.require(404)
 def account_detail(login):
     """Account administration (GET handler)"""
     db = flask.current_app.container.get('db')
@@ -38,7 +38,7 @@ def account_detail(login):
 
 
 @admin.route('/account/<login>/ban', methods=['POST'])
-@permissions.admin_role.require(404)
+@permissions.roles.admin.require(404)
 def account_ban(login):
     """Ban (make inactive) account (POST handler)"""
     db = flask.current_app.container.get('db')
@@ -66,7 +66,7 @@ def account_ban(login):
 
 
 @admin.route('/account/<login>/delete', methods=['POST'])
-@permissions.admin_role.require(404)
+@permissions.roles.admin.require(404)
 def account_delete(login):
     """Delete account (POST handler)"""
     db = flask.current_app.container.get('db')
@@ -84,7 +84,7 @@ def account_delete(login):
 
 
 @admin.route('/repository/<login>/<reponame>')
-@permissions.admin_role.require(404)
+@permissions.roles.admin.require(404)
 def repo_detail(login, reponame):
     """Repository administration (GET handler)"""
     db = flask.current_app.container.get('db')
@@ -101,7 +101,7 @@ def repo_detail(login, reponame):
 
 
 @admin.route('/repository/<login>/<reponame>/visibility', methods=['POST'])
-@permissions.admin_role.require(404)
+@permissions.roles.admin.require(404)
 def repo_visibility(login, reponame):
     """Change repository visibility (POST handler)"""
     db = flask.current_app.container.get('db')
@@ -134,7 +134,7 @@ def repo_visibility(login, reponame):
 
 
 @admin.route('/repository/<login>/<reponame>/delete', methods=['POST'])
-@permissions.admin_role.require(404)
+@permissions.roles.admin.require(404)
 def repo_delete(login, reponame):
     """Delete repository  (POST handler)"""
     db = flask.current_app.container.get('db')
@@ -152,7 +152,7 @@ def repo_delete(login, reponame):
 
 
 @admin.route('/role/<name>')
-@permissions.admin_role.require(404)
+@permissions.roles.admin.require(404)
 def role_detail(name):
     """Role administration (GET handler)"""
     db = flask.current_app.container.get('db')
@@ -164,7 +164,7 @@ def role_detail(name):
 
 
 @admin.route('/role/<name>/edit', methods=['POST'])
-@permissions.admin_role.require(404)
+@permissions.roles.admin.require(404)
 def role_edit(name):
     """Edit role (POST handler)"""
     db = flask.current_app.container.get('db')
@@ -173,14 +173,24 @@ def role_edit(name):
     if role is None:
         flask.abort(404)
     name = flask.request.form.get('name', '')
+    priv = flask.request.form.get('privileges', '')
     desc = flask.request.form.get('description', None)
     if name == '':
         flask.flash('Couldn\'t make that role...', 'warning')
         return flask.redirect(flask.url_for('admin.index', tab='roles'))
+
+    role.name = name
+    role.privileges = priv.lower()
+    role.description = desc
+    if not role.valid_privileges():
+        flask.flash('Unsaved - incorrect characters in privileges '
+                    'for role {}'.format(name), 'warning')
+        return flask.redirect(flask.url_for('admin.role_detail',
+                                            name=role.name))
     try:
-        role.name = name
-        role.description = desc
         db.session.commit()
+        if name == Anonymous.rolename:
+            reload_anonymous_role(flask.current_app, db)
     except sqlalchemy.exc.IntegrityError as e:
         flask.flash('Couldn\'t make that role... {}'.format(str(e)),
                     'warning')
@@ -191,7 +201,7 @@ def role_edit(name):
 
 
 @admin.route('/role/<name>/delete', methods=['POST'])
-@permissions.admin_role.require(404)
+@permissions.roles.admin.require(404)
 def role_delete(name):
     """Delete role (POST handler)"""
     db = flask.current_app.container.get('db')
@@ -207,30 +217,39 @@ def role_delete(name):
 
 
 @admin.route('/roles/create', methods=['POST'])
-@permissions.admin_role.require(404)
+@permissions.roles.admin.require(404)
 def role_create():
     """Create new role (POST handler)"""
     db = flask.current_app.container.get('db')
 
     name = flask.request.form.get('name', '')
+    priv = flask.request.form.get('privileges', '')
     desc = flask.request.form.get('description', None)
     if name == '':
         flask.flash('Couldn\'t make that role...', 'warning')
         return flask.redirect(flask.url_for('admin.index', tab='roles'))
+    role = Role(name, priv, desc)
+    if not role.valid_privileges():
+        flask.flash('Unsaved - incorrect characters in privileges '
+                    'for role {}'.format(name), 'warning')
+        return flask.redirect(flask.url_for('admin.role_detail',
+                                            name=role.name))
     try:
-        role = Role(name, desc)
         db.session.add(role)
         db.session.commit()
+        if name == Anonymous.rolename:
+            reload_anonymous_role(flask.current_app, db)
     except sqlalchemy.exc.IntegrityError as e:
         flask.flash('Couldn\'t make that role... {}'.format(str(e)),
                     'warning')
         db.session.rollback()
         return flask.redirect(flask.url_for('admin.index', tab='roles'))
-    return flask.redirect(flask.url_for('admin.role_detail', name=role.name))
+    return flask.redirect(flask.url_for('admin.role_detail',
+                                        name=role.name))
 
 
 @admin.route('/role/<name>/add', methods=['POST'])
-@permissions.admin_role.require(404)
+@permissions.roles.admin.require(404)
 def role_assignment_add(name):
     """Assign role to user (POST handler)"""
     db = flask.current_app.container.get('db')
@@ -253,7 +272,7 @@ def role_assignment_add(name):
 
 
 @admin.route('/role/<name>/remove', methods=['POST'])
-@permissions.admin_role.require(404)
+@permissions.roles.admin.require(404)
 def role_assignment_remove(name):
     """Remove assignment of role to user (POST handler)"""
     db = flask.current_app.container.get('db')

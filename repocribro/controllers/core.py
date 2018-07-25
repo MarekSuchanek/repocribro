@@ -2,12 +2,14 @@ import flask
 import flask_login
 
 from ..models import User, Organization, Repository
+from ..security import permissions
 
 #: Core controller blueprint
 core = flask.Blueprint('core', __name__, url_prefix='')
 
 
 @core.route('/')
+@permissions.actions.browse.require(403)
 def index():
     """Landing page (GET handler)"""
     config = flask.current_app.container.get('config')
@@ -21,6 +23,7 @@ def index():
 @core.route('/search/')
 @core.route('/search')
 @core.route('/search/<query>')
+@permissions.actions.search.require(403)
 def search(query=''):
     """Search page (GET handler)
 
@@ -39,6 +42,7 @@ def search(query=''):
 
 
 @core.route('/user/<login>')
+@permissions.actions.browse_user.require(403)
 def user_detail(login):
     """User detail (GET handler)
 
@@ -70,6 +74,7 @@ def user_detail(login):
 
 
 @core.route('/org/<login>')
+@permissions.actions.browse_org.require(403)
 def org_detail(login):
     """Organization detail (GET handler)
 
@@ -98,6 +103,7 @@ def org_detail(login):
 
 
 @core.route('/repo/<login>')
+@permissions.actions.browse_repo.require(403)
 def repo_redir(login):
     flask.flash('Seriously?! You forget to specify repository name, didn\'t '
                 'you? We redirected you but be careful next time!', 'notice')
@@ -126,6 +132,7 @@ def repo_detail_common(db, ext_master, repo, has_secret=False):
 
 
 @core.route('/repo/<login>/<reponame>')
+@permissions.actions.browse_repo.require(403)
 def repo_detail(login, reponame):
     """Repo detail (GET handler)"""
     db = flask.current_app.container.get('db')
@@ -138,6 +145,7 @@ def repo_detail(login, reponame):
 
 
 @core.route('/hidden-repo/<secret>')
+@permissions.actions.browse_repo_hidden.require(403)
 def repo_detail_hidden(secret):
     """Hidden repo detail (GET handler)"""
     db = flask.current_app.container.get('db')

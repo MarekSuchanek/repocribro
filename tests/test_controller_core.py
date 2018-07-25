@@ -1,12 +1,13 @@
 
 
-def test_landing(app_client):
+def test_landing(filled_db_session, app_client):
+    app_client.get('/test/logout')
     assert app_client.get('/').status == '200 OK'
     assert '<h1>repocribro</h1>' in \
            app_client.get('/').data.decode('utf-8')
 
 
-def test_search(app_client):
+def test_search(filled_db_session, app_client):
     res = app_client.get('/search')
     assert res.status == '200 OK'
     assert '<h1>Search</h1>' in res.data.decode('utf-8')

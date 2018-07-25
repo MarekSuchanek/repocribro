@@ -7,3 +7,4 @@ Usage
    start
    commands
    web
+   privileges

@@ -148,11 +148,12 @@ def github_data_loader():
 
 
 @pytest.fixture(scope='function')
-def empty_db_session(db):
+def empty_db_session(app, db):
     meta = db.metadata
     for table in reversed(meta.sorted_tables):
         db.session.execute(table.delete())
     db.session.commit()
+    app.ext_call('init_security')  # create default roles
     return db.session
 
 
@@ -161,16 +162,17 @@ def filled_db_session(empty_db_session):
     session = empty_db_session
     import datetime
     from repocribro.models import Role, UserAccount, User, \
-        Organization, Repository, Commit, Release, Push
+        Organization, Repository, Commit, Release, Push, Anonymous
 
     # Setup admin role
-    admin_role = Role('admin', 'Administrators')
-    session.add(admin_role)
+    admin_role = empty_db_session.query(Role).filter_by(name='admin').first()
+    user_role = empty_db_session.query(Role).filter_by(name='user').first()
 
     account_banned = UserAccount()
     account_banned.active = False
     session.add(account_banned)
     account_user = UserAccount()
+    account_user.roles.append(user_role)
     session.add(account_user)
     account_admin = UserAccount()
     account_admin.roles.append(admin_role)
@@ -218,6 +220,11 @@ def filled_db_session(empty_db_session):
                     True, push)
     session.add(commit)
     session.commit()
+
+    anonymous_role = session.query(Role).filter_by(
+        name=Anonymous.rolename
+    ).first()
+
     return session
 
 

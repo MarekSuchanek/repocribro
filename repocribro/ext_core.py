@@ -4,7 +4,7 @@ import flask_migrate
 
 from .extending import Extension
 from .extending.helpers import ViewTab, Badge
-from .models import Push, Release, Repository
+from .models import Push, Release, Repository, Role, Anonymous, UserAccount
 from .github import GitHubAPI
 
 
@@ -165,6 +165,30 @@ class CoreExtension(Extension):
         return all_filters
 
     @staticmethod
+    def provide_roles():
+        return {
+            'admin': Role('admin',
+                          '*',
+                          'Service administrators'),
+            'user': Role(UserAccount.default_rolename,
+                         'search:logout:manage*:browse*',
+                         'Regular users'),
+            'anonymous': Role(Anonymous.rolename,
+                              'search*:browse*:login',
+                              'Not-logged users')
+        }
+
+    @staticmethod
+    def provide_actions():
+        return ['login', 'logout', 'search', 'browse_repo_hidden',
+                'browse', 'browse_user', 'browse_repo', 'browse_org',
+                'manage_dashboard', 'manage_profile_update', 'manage_repos',
+                'manage_repo', 'manage_repo_delete', 'manage_repo_update',
+                'manage_repo_activate', 'manage_repo_deactivate',
+                'manage_orgs', 'manage_org', 'manage_org_update',
+                'manage_org_delete']
+
+    @staticmethod
     def get_gh_webhook_processors():
         """Get all GitHub webhooks processory"""
         return {
@@ -191,7 +215,9 @@ class CoreExtension(Extension):
 
     def init_business(self):
         """Init business layer (other extensions, what is needed)"""
-        from .security import init_login_manager
+        from .security import init_login_manager, reload_anonymous_role
+
+        reload_anonymous_role(self.app, self.db)
         login_manager, principals = init_login_manager(self.db)
         login_manager.init_app(self.app)
         principals.init_app(self.app)

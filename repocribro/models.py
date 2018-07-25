@@ -2,6 +2,8 @@ import flask_sqlalchemy
 import sqlalchemy
 import flask_login
 import datetime
+import fnmatch
+import re
 
 from .database import db
 
@@ -50,6 +52,8 @@ class SearchableMixin:
 class RoleMixin:
     """Mixin for models representing roles"""
 
+    priv_regex = re.compile('[a-z_\?\*]+')
+
     def __eq__(self, other):
         """Equality of roles is based on names
 
@@ -79,62 +83,33 @@ class RoleMixin:
         """
         return hash(self.name)
 
+    def permits(self, privilege):
+        """Check if action priviledge is permitted in this role
 
-class Anonymous(flask_login.AnonymousUserMixin):
-    """Anonymous (not logged) user representation"""
-
-    @property
-    def is_active(self):
-        """Check whether is user active
-
-        :return: False, anonymous is not active
+        :param privilege: privilege to be tested
+        :type: str
+        :return: if it is permitted
         :rtype: bool
         """
+        privileges = self.privileges.split(':')
+        if privilege in privileges:
+            return True
+        for priv in privileges:
+            if fnmatch.fnmatch(privilege, priv):
+                return True
         return False
 
-    def has_role(self, role):
-        """Check whether has the role
+    def valid_privileges(self):
+        """Checks if privileges string is valid
 
-        :param role: Role to be checked
-        :type role: ``repocribro.models.RoleMixin``
-        :return: False, anonymous has no roles
+        :return: if privileges string is valid
         :rtype: bool
         """
-        return False
-
-    @property
-    def rolenames(self):
-        """Get names of all roles of that user
-
-        :return: Empty list, anonymous has no roles
-        :rtype: list of str
-        """
-        return []
-
-    def owns_repo(self, repo):
-        """Check if user owns the repository
-
-        :param repo: Repository which shoudl be tested
-        :type repo: ``repocribro.models.Repository``
-        :return: False, anonymous can not own repository
-        :rtype: bool
-        """
-        return False
-
-    def sees_repo(self, repo, has_secret=False):
-        """Check if user is allowed to see the repo
-
-        Anonymous can see only public repos
-
-        :param repo: Repository which user want to see
-        :type repo: ``repocribro.models.Repository``
-        :param has_secret: If current user knows the secret URL
-        :type has_secret: bool
-        :return: If user can see repo
-        :rtype: bool
-        """
-        visible = repo.is_public or (has_secret and repo.is_hidden)
-        return visible
+        privileges = self.privileges.split(':')
+        for priv in privileges:
+            if not self.priv_regex.search(priv):
+                return False
+        return True
 
 
 class UserMixin(flask_login.UserMixin):
@@ -191,6 +166,90 @@ class UserMixin(flask_login.UserMixin):
         visible = repo.is_public or (has_secret and repo.is_hidden)
         return visible or self.has_role('admin') or self.owns_repo(repo)
 
+    def privileges(self, all_privileges=frozenset()):
+        """Filter given privileges if are applicable for the user
+
+        :param all_privileges: set of all privileges to be filtered
+        :type all_privileges: set of str
+        :return: set of applicable privileges
+        :rtype: set of str
+        """
+        privileges = set()
+        for priv in all_privileges:
+            for role in self.roles:
+                if role.permits(priv):
+                    privileges.add(priv)
+                    break
+        return privileges
+
+
+class Anonymous(flask_login.AnonymousUserMixin, UserMixin):
+    """Anonymous (not logged) user representation"""
+
+    rolename = 'anonymous'
+    _roles = []
+
+    @property
+    def roles(self):
+        return type(self)._roles
+
+    @classmethod
+    def set_role(cls, role):
+        cls._roles = [role]
+
+    @property
+    def is_active(self):
+        """Check whether is user active
+
+        :return: False, anonymous is not active
+        :rtype: bool
+        """
+        return False
+
+    def has_role(self, role):
+        """Check whether has the role
+
+        :param role: Role to be checked
+        :type role: ``repocribro.models.RoleMixin``
+        :return: False, anonymous has no roles
+        :rtype: bool
+        """
+        return role == self.rolename
+
+    @property
+    def rolenames(self):
+        """Get names of all roles of that user
+
+        :return: Empty list, anonymous has no roles
+        :rtype: list of str
+        """
+        return [self.rolename]
+
+    def owns_repo(self, repo):
+        """Check if user owns the repository
+
+        :param repo: Repository which shoudl be tested
+        :type repo: ``repocribro.models.Repository``
+        :return: False, anonymous can not own repository
+        :rtype: bool
+        """
+        return False
+
+    def sees_repo(self, repo, has_secret=False):
+        """Check if user is allowed to see the repo
+
+        Anonymous can see only public repos
+
+        :param repo: Repository which user want to see
+        :type repo: ``repocribro.models.Repository``
+        :param has_secret: If current user knows the secret URL
+        :type has_secret: bool
+        :return: If user can see repo
+        :rtype: bool
+        """
+        visible = repo.is_public or (has_secret and repo.is_hidden)
+        return visible
+
 
 #: Many-to-many relationship between user accounts and roles
 roles_users = db.Table(
@@ -207,6 +266,8 @@ roles_users = db.Table(
 class UserAccount(db.Model, UserMixin, SearchableMixin):
     """UserAccount in the repocribro app"""
     __tablename__ = 'UserAccount'
+
+    default_rolename = 'user'
 
     #: Unique identifier of the user account
     id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
@@ -257,13 +318,16 @@ class Role(db.Model, RoleMixin):
     name = sqlalchemy.Column(sqlalchemy.String(80), unique=True)
     #: Description (purpose, notes, ...) of the role
     description = sqlalchemy.Column(sqlalchemy.UnicodeText)
+    #: Serialized list of privileges
+    privileges = sqlalchemy.Column(sqlalchemy.Text)
     #: User accounts assigned to the role
     user_accounts = sqlalchemy.orm.relationship(
         'UserAccount', back_populates='roles', secondary=roles_users
     )
 
-    def __init__(self, name, description):
+    def __init__(self, name, privileges, description):
         self.name = name
+        self.privileges = privileges
         self.description = description
 
     def __repr__(self):

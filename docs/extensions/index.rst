@@ -5,6 +5,7 @@ Writing extensions
    :maxdepth: 2
 
    hooks
+   privileges
 
 You can write your own **repocribro** extension. It's very simple,
 all you need is extend the ``Extension`` class from ``repocribro.extending``,

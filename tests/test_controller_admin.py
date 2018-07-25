@@ -118,17 +118,18 @@ def test_account_delete(filled_db_session, app_client):
 def test_role_create_edit_delete(filled_db_session, app_client):
     from repocribro.models import Role
     app_client.get('/test/login/admin')
-    existing_role = {'name': 'admin', 'description': ''}
+    existing_role = {'name': 'admin', 'privileges': '*', 'description': ''}
     ret = app_client.post('/admin/roles/create', data=existing_role)
     assert ret.status == '302 FOUND'
 
-    bad_role = {'name': '', 'description': ''}
+    bad_role = {'name': '', 'privileges': '', 'description': ''}
     ret = app_client.post('/admin/roles/create', data=bad_role)
     assert ret.status == '302 FOUND'
 
     role = filled_db_session.query(Role).filter_by(name='testadmin').first()
     assert role is None
-    new_role = {'name': 'testadmin', 'description': ''}
+    new_role = {'name': 'testadmin', 'privileges': 'login:s*',
+                'description': ''}
     ret = app_client.post('/admin/roles/create', data=new_role)
     assert ret.status == '302 FOUND'
     role = filled_db_session.query(Role).filter_by(name='testadmin').first()
@@ -147,7 +148,7 @@ def test_role_create_edit_delete(filled_db_session, app_client):
 
     role = filled_db_session.query(Role).filter_by(name='test_admin').first()
     assert role is None
-    edit_role = {'name': 'test_admin', 'description': ''}
+    edit_role = {'name': 'test_admin', 'privileges': '*', 'description': ''}
     ret = app_client.post('/admin/role/testadmin/edit', data=edit_role)
     assert ret.status == '302 FOUND'
     role = filled_db_session.query(Role).filter_by(name='test_admin').first()

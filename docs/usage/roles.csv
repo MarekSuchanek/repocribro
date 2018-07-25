@@ -1,0 +1,3 @@
+admin, ``*``, Service administrators
+user, TBD, Regular users
+anonymous, ``search*:login``, Not-logged users
