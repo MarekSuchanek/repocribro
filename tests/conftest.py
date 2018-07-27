@@ -22,19 +22,22 @@ with betamax.Betamax.configure() as config:
         config.default_cassette_options['record_mode'] = 'all'
     else:
         config.default_cassette_options['record_mode'] = 'none'
+    config.default_cassette_options['record_mode'] = 'once'
     config.define_cassette_placeholder('<TOKEN>', token)
 
 
 @pytest.fixture
-def github_api(betamax_session):
+def github_api(betamax_parametrized_session):
     """GitHub API client with betamax session"""
-    betamax_session.headers.update({'accept-encoding': 'identity'})
+    betamax_parametrized_session.headers.update(
+        {'accept-encoding': 'identity'}
+    )
     api_key = 'fake_key'
     api_secret = 'fake_secret'
     webhooks_secret = 'webhooks_secret'
     token = os.environ.get('GITHUB_TOKEN', 'GitHub TOKEN')
     return GitHubAPI(api_key, api_secret, webhooks_secret,
-                     session=betamax_session, token=token)
+                     session=betamax_parametrized_session, token=token)
 
 
 test = flask.Blueprint('test', __name__, url_prefix='/test')
