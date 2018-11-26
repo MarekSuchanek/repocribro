@@ -91,6 +91,15 @@ class Extension:
         return []
 
     @staticmethod
+    def provide_template_folders():
+        """Extension can provide Jinja2 folders
+
+        :return: List of str
+        :rtype: list of str
+        """
+        return []
+
+    @staticmethod
     def provide_blueprints():
         """Extension can provide Flask blueprints to the app by this method
 

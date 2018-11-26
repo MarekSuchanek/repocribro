@@ -155,6 +155,11 @@ class CoreExtension(Extension):
         return all_models
 
     @staticmethod
+    def provide_template_loader():
+        from jinja2 import PackageLoader
+        return PackageLoader('repocribro', 'templates')
+
+    @staticmethod
     def provide_blueprints():
         from .controllers import all_blueprints
         return all_blueprints
