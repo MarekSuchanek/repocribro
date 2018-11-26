@@ -160,6 +160,14 @@ class CoreExtension(Extension):
         return PackageLoader('repocribro', 'templates')
 
     @staticmethod
+    def provide_dropdown_menu_items():
+        return {
+            'manage.dashboard': 'Dashboard',
+            'manage.repositories': 'Repositories',
+            'manage.organizations': 'Organizations'
+        }
+
+    @staticmethod
     def provide_blueprints():
         from .controllers import all_blueprints
         return all_blueprints
