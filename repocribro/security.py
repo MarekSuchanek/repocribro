@@ -192,7 +192,6 @@ def on_identity_loaded(sender, identity):
     """
     user = flask_login.current_user
     identity.user = user
-    print(user)
 
     if hasattr(user, 'id'):
         identity.provides.add(

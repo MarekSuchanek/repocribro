@@ -1,4 +1,5 @@
 import flask
+import jinja2
 import os
 
 from .extending import ExtensionsMaster
@@ -125,11 +126,16 @@ def create_app(cfg_files=['DEFAULT']):
     from .security import permissions
     app.container.set_singleton('permissions', permissions)
 
+    app.jinja_loader = jinja2.ChoiceLoader(
+        ext_master.call('provide_template_loader')
+    )
+
     ext_master.call('init_first')
     ext_master.call('init_models')
     ext_master.call('init_security')
     ext_master.call('init_business')
     ext_master.call('init_filters')
+    ext_master.call('init_template_vars')
     ext_master.call('init_blueprints')
     ext_master.call('init_container')
 

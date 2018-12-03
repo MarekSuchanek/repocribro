@@ -91,6 +91,14 @@ class Extension:
         return []
 
     @staticmethod
+    def provide_template_loader():
+        return None
+
+    @staticmethod
+    def provide_dropdown_menu_items():
+        return {}
+
+    @staticmethod
     def provide_blueprints():
         """Extension can provide Flask blueprints to the app by this method
 
@@ -154,6 +162,12 @@ class Extension:
         reload_anonymous_role(self.app, self.db)
         for action_name in self.provide_actions():
             permissions.register_action(action_name)
+
+    def init_template_vars(self):
+        if not hasattr(self.app.config, 'dropdown_menu_items'):
+            self.app.config.dropdown_menu_items = {}
+        for route, title in self.provide_dropdown_menu_items().items():
+            self.app.config.dropdown_menu_items[route] = title
 
     def introduce(self):
         """Hook operation for getting short introduction of extension (mostly
