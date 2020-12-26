@@ -1,7 +1,7 @@
 repocribro
 ==========
 
-|license| |travis| |coveralls| |docs| |pypi| |requires|
+|license| |docs| |pypi| |requires|
 
 
 Repocribro is web application allowing users to register their GitHub repository so they can 
@@ -68,18 +68,12 @@ This project is licensed under the MIT License - see the `LICENSE`_ file for mor
 .. |license| image:: https://img.shields.io/badge/license-MIT-blue.svg
     :alt: License
     :target: LICENSE
-.. |travis| image:: https://travis-ci.org/MarekSuchanek/repocribro.svg?branch=master
-    :alt: Build Status
-    :target: https://travis-ci.org/MarekSuchanek/repocribro
-.. |coveralls| image:: https://coveralls.io/repos/github/MarekSuchanek/repocribro/badge.svg?branch=master
-    :alt: Test Coverage
-    :target: https://coveralls.io/github/MarekSuchanek/repocribro?branch=maste
 .. |docs| image:: https://readthedocs.org/projects/pyt-twitterwall/badge/?version=latest
     :alt: Documentation Status
     :target: http://repocribro.readthedocs.io/en/latest/?badge=latest
 .. |pypi| image:: https://badge.fury.io/py/repocribro.svg
     :alt: PyPi Version
     :target: https://badge.fury.io/py/repocribro
-.. |requires| image:: https://requires.io/github/MarekSuchanek/repocribro/requirements.svg?branch=master
+.. |requires| image:: https://requires.io/github/MarekSuchanek/repocribro/requirements.svg?branch=develop
      :alt: Requirements Status
-     :target: https://requires.io/github/MarekSuchanek/repocribro/requirements/?branch=master
+     :target: https://requires.io/github/MarekSuchanek/repocribro/requirements/?branch=develop
