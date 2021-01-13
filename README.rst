@@ -54,6 +54,24 @@ label.
 
 For details please visit `repocribro.readthedocs.io`_ and `wiki@GitHub`_.
 
+Docker Compose
+--------------
+
+To make use of ``docker-compose.yml``, you need to adjust configuration based on ``docker-config.example.cfg`` and also create the database:
+
+
+::
+
+    $ docker exec -it repocribro_db_1 mysql -u root -p
+    Enter password: <password>
+    mysql> CREATE DATABASE repocribro;
+    mysql> exit
+    Bye
+
+    $ docker exec -it repocribro_repocribro_1 repocribro db_create
+
+
+
 License
 -------
 

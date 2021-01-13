@@ -10,7 +10,9 @@ RUN pip install -r requirements.txt
 COPY . /repocribro
 RUN pip install .
 
+ENV REPOCRIBRO_CONFIG_FILE=/repocribro/config.cfg
+
 # Install plugins
-RUN pip install repocribro-file repocribro-badges repocribro-pages
+RUN pip install mysqlclient repocribro-file repocribro-badges repocribro-pages
 
 ENTRYPOINT ["repocribro"]
